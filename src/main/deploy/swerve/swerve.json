@@ -1,0 +1,44 @@
+{
+    "modules": [
+      {
+        "name": "Front Left",
+        "driveMotorID": 1,
+        "steerMotorID": 2,
+        "steerEncoder": {
+          "type": "sparkMax",
+          "offset": 0.1
+        }
+      },
+      {
+        "name": "Front Right",
+        "driveMotorID": 3,
+        "steerMotorID": 4,
+        "steerEncoder": {
+          "type": "sparkMax",
+          "offset": -0.2
+        }
+      },
+      {
+        "name": "Back Left",
+        "driveMotorID": 5,
+        "steerMotorID": 6,
+        "steerEncoder": {
+          "type": "sparkMax",
+          "offset": 0.15
+        }
+      },
+      {
+        "name": "Back Right",
+        "driveMotorID": 7,
+        "steerMotorID": 8,
+        "steerEncoder": {
+          "type": "sparkMax",
+          "offset": -0.1
+        }
+      }
+    ],
+    "robot": {
+      "trackWidth": 0.6,
+      "wheelBase": 0.7
+    }
+  }

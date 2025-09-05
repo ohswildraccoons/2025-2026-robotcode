@@ -20,20 +20,20 @@ import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
-private final SwerveDrive swerveDrive;
+  private final SwerveDrive swerveDrive;
 
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
-    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve"); 
+    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     SwerveDrive tempDrive = null;
-  
+
     try {
       tempDrive = new SwerveParser(swerveJsonDirectory)
           .createSwerveDrive(SwerveDriveConstants.maximumSpeed);
     } catch (IOException e) {
       e.printStackTrace();
     }
-  
+
     if (tempDrive != null) {
       swerveDrive = tempDrive;
     } else {
@@ -41,10 +41,7 @@ private final SwerveDrive swerveDrive;
       throw new RuntimeException("SwerveDrive initialization failed.");
     }
 
-    
-
-  }
-  ;
+  };
 
   /**
    * Example command factory method.
@@ -54,43 +51,41 @@ private final SwerveDrive swerveDrive;
   public Command exampleMethodCommand() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    
-
 
     return runOnce(
         () -> {
           /* one-time action goes here */
         });
 
-        
   }
 
-
-  // public void drive(Translation2d translation, double rotation, boolean fieldRelative)
+  // public void drive(Translation2d translation, double rotation, boolean
+  // fieldRelative)
   // {
-  //   swerveDrive.drive(translation,
-  //                     rotation,
-  //                     fieldRelative,
-  //                     false); // Open loop is disabled since it shouldn't be used most of the time.
+  // swerveDrive.drive(translation,
+  // rotation,
+  // fieldRelative,
+  // false); // Open loop is disabled since it shouldn't be used most of the time.
   // }
 
-
-
-   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
-  {
+  public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
+      DoubleSupplier angularRotationX) {
     return run(() -> {
       // Make the robot move
-      swerveDrive.drive(SwerveMath.scaleTranslation(new Translation2d(
-                            translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()), 0.8),
-                        Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
-                        true,
-                        false);
+      swerveDrive.drive(SwerveMath.scaleTranslation(
+          new Translation2d(
+              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+              translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
+          0.8),
+          Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(), // rotation
+          false, // Field relative
+          false);
     });
   }
 
   /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   * An example method querying a boolean state of the subsystem (for example, a
+   * digital sensor).
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
