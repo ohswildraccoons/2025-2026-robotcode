@@ -19,6 +19,6 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class SwerveDriveConstants{
-    public static final double maximumSpeed = Units.feetToMeters(4.5);
+    public static final double maximumSpeed = Units.feetToMeters(14.5);
   }
 }
