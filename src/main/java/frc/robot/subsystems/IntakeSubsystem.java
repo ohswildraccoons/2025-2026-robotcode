@@ -17,14 +17,14 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {}
 
-  public Command StartIntakeCommand() {
+  public Command startIntakeCommand() {
     return runOnce(
         () -> {
           m_intakeMotor.set(Constants.IntakeConstants.intakeMotorSpeedPercent / 100.0); // Set intake motor to full speed
         });
   }
 
-  public Command StopIntakeCommand() {
+  public Command stopIntakeCommand() {
     return runOnce(
         () -> {
           m_intakeMotor.set(0.0); // Set intake motor to full speed
