@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command stopIntakeCommand() {
     return runOnce(
         () -> {
-          m_intakeMotor.set(0.0); // Set intake motor to full speed
+          m_intakeMotor.set(0.0); // Stop the intake motor
         });
   }
 }
