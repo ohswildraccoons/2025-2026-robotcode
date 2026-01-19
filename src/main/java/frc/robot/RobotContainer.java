@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -43,6 +45,9 @@ public class RobotContainer {
             () -> m_driverController.getLeftX(),
             () -> m_driverController.getLeftY(),
             () -> m_driverController.getRightX()));
+    m_intakeSubsystem.setDefaultCommand(
+        m_intakeSubsystem.StartIntakeCommand()
+    );
     // Configure the trigger bindings
     configureBindings();
   }
