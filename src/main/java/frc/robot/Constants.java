@@ -18,7 +18,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-  public static class IntakeConstants{
+  public static class IntakeConstants {
     public static final int intakeMotorPort = 1; // TODO: Set the correct port number
     public static final int intakeMotorSpeedPercent = 60; // Percent speed for intake motor
   }
