@@ -10,10 +10,19 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.Angle;
+
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.ShooterSubsytem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -27,8 +36,10 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem();
+ 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -43,8 +54,16 @@ public class RobotContainer {
             () -> m_driverController.getLeftX(),
             () -> m_driverController.getLeftY(),
             () -> m_driverController.getRightX()));
+
     // Configure the trigger bindings
     configureBindings();
+
+    
+    // Set the default command to force the shooter rest.
+    m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
+    // Set the default command to force the arm to go to 0.
+    m_TurretSubsystem.setDefaultCommand(m_TurretSubsystem.setAngle(Degrees.of(0)));
+
   }
 
   /**
@@ -62,11 +81,33 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+            // // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+            // new Trigger(m_exampleSubsystem::exampleCondition)
+            //     .onTrue(new ExampleCommand(m_exampleSubsystem));
 
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+            // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    // // Schedule `setVelocity` when the Xbox controller's B button is pressed,
+    // // cancelling on release.
+    // m_driverController.a().whileTrue(m_shooterSubsystem.setVelocity(RPM.of(60)));
+    // m_driverController.b().whileTrue(m_shooterSubsystem.setVelocity(RPM.of(300)));
+    // // Schedule `set` when the Xbox controller's B button is pressed,
+    // // cancelling on release.
+    // m_driverController.x().whileTrue(m_shooterSubsystem.set(0.3));
+    // m_driverController.y().whileTrue(m_shooterSubsystem.set(-0.3));
+
+    
+    // Schedule `setAngle` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(5))));
+    // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(5))));
+    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(Degrees.of(45)));
+    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(Degrees.of(-45)));
+    // Schedule `set` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    m_driverController.x().whileTrue(m_TurretSubsystem.set(0.3));
+    m_driverController.y().whileTrue(m_TurretSubsystem.set(-0.3));
+
   }
 
   /**
@@ -76,6 +117,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    // return Autos.exampleAuto(m_exampleSubsystem);
+    return Autos.exampleAuto(null);
   }
 }
