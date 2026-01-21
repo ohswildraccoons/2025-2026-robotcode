@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -40,7 +41,9 @@ public class TurretSubsystem extends SubsystemBase{
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+  .withClosedLoopController(4.0, 0.0, 0.0)
+  //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
+ // .withSimClosedLoopController(9999999.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(10, 1)))
   .withIdleMode(MotorMode.BRAKE)
@@ -54,7 +57,7 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkMax spark = new SparkMax(31, MotorType.kBrushless);
+  private SparkFlex spark = new SparkFlex(31, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -62,9 +65,10 @@ public class TurretSubsystem extends SubsystemBase{
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(0), Degrees.of(720)) // Hard limit bc wiring prevents infinite spinning
+      .withHardLimit(Degrees.of(-720.0), Degrees.of(720)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("PivotExample", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
+     
 
   // Arm Mechanism
   private Pivot turrePivot = new Pivot(m_config);

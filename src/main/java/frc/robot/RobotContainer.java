@@ -101,8 +101,8 @@ public class RobotContainer {
     // cancelling on release.
     // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(5))));
     // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(5))));
-    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(Degrees.of(45)));
-    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(Degrees.of(-45)));
+    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(90))));
+    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(90))));
     // Schedule `set` when the Xbox controller's B button is pressed,
     // cancelling on release.
     m_driverController.x().whileTrue(m_TurretSubsystem.set(0.3));
