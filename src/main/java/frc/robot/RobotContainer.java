@@ -51,9 +51,9 @@ public class RobotContainer {
   public RobotContainer() {
     m_swerveDrive.setDefaultCommand(
         m_swerveDrive.driveCommand(
-            () -> m_driverController.getLeftX(),
-            () -> m_driverController.getLeftY(),
-            () -> m_driverController.getRightX()));
+            () -> m_driverController.getLeftX() * -1,
+            () -> m_driverController.getLeftY() * -1,
+            () -> m_driverController.getRightX() * -1));
 
     // Configure the trigger bindings
     configureBindings();

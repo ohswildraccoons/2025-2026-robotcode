@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     mFlex = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlex.set(100);
+    mFlex.set(50);
 
 
     
