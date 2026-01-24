@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.revrobotics.spark.SparkFlex;
-import com.thethriftybot.ThriftyNova.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
