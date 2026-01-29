@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.thethriftybot.ThriftyNova.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -39,6 +40,8 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     mFlex = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     mFlex.set(50);
+    SmartDashboard.putData(CommandScheduler.getInstance());
+
 
 
     
@@ -117,5 +120,6 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }
