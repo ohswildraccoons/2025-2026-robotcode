@@ -14,13 +14,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
-import edu.wpi.first.units.measure.*;
 
 public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
@@ -32,7 +29,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     try {
       tempDrive = new SwerveParser(swerveJsonDirectory)
-          .createSwerveDrive(SwerveDriveConstants.maximumSpeed, new Pose2d(new Translation2d (1.0, 1.0), Rotation2d.fromDegrees(0.0))); //testing - hs
+          .createSwerveDrive(SwerveDriveConstants.maximumSpeed);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -43,6 +40,7 @@ public class SwerveSubsystem extends SubsystemBase {
       System.out.println("Failed to create SwerveDrive");
       throw new RuntimeException("SwerveDrive initialization failed.");
     }
+
   };
 
   /**

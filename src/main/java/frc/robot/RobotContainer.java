@@ -110,12 +110,11 @@ public class RobotContainer {
     // cancelling on release.
     // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(5))));
     // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(5))));
-    m_driverController.a().whileTrue(m_TurretSubsystem.setSysAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(90))));
+    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(() ->m_TurretSubsystem.getAngle().plus(Degrees.of(2)) ));
     // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(90))));
-    m_driverController.b().whileTrue(m_TurretSubsystem.setSysAngle(Degrees.of(180)));
-    m_driverController.povUp().whileTrue(m_TurretSubsystem.arbitraryIncreaseAngle());
+    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(() -> m_TurretSubsystem.getAngle().minus(Degrees.of(2))));
 
-    m_mechController.a().whileTrue(m_TurretSubsystem.setSysAngle(Degrees.of(Math.atan2(m_mechController.getRightY(), m_mechController.getRightX()))));
+    m_mechController.rightTrigger().whileTrue(m_TurretSubsystem.setAngle( () ->Degrees.of(Math.toDegrees(Math.atan2(m_mechController.getRightY(), m_mechController.getRightX())))));
 
     // Schedule `set` when the Xbox controller's B button is pressed,
     // cancelling on release.m_driverController.rightStick().whileTrue();

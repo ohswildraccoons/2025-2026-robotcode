@@ -81,9 +81,9 @@ public class TurretSubsystem extends SubsystemBase{
    * Set the angle of the arm.
    * @param angle Angle to go to.
    */
-  public Command setSysAngle(Angle  angle) { 
-    return runOnce(() -> {
-      turrePivot.setAngle(angle);
+  public Command setAngle(Supplier<Angle> angle) { 
+    return turrePivot.setAngle(() -> {
+      return angle.get();
     });
   }
 
@@ -105,25 +105,16 @@ public Angle getAngle(){return turrePivot.getAngle();}
   public Command sysId() { return turrePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));}
 
   public Command joystickTurret(DoubleSupplier x, DoubleSupplier y) {
-    return run(() -> {
+    return turrePivot.setAngle(() -> {
         double angle = Math.atan2(y.getAsDouble(), x.getAsDouble());
         double angleDeg = Math.toDegrees(angle);
         SmartDashboard.putNumber("TEST", angleDeg);
-        turrePivot.setAngle(Degrees.of(angleDeg));
+        // turrePivot.setAngle(Degrees.of(angleDeg));
+        return Degrees.of(angleDeg);
     });
 }
 
-public Command arbitraryIncreaseAngle()
-{
-  return runOnce(() -> {
-    System.out.println("arb in called");
-    Angle currentAngle = turrePivot.getAngle();
-    System.out.println("Current Angle: " + currentAngle);
-    setSysAngle(currentAngle.plus(Degrees.of(5555))); 
-    System.out.println("New Angle: " + currentAngle.plus(Degrees.of(5555)));
 
-  });
-}
 
 // public Command inputTurret(double x, double y) {
 //   double angle = Math.atan2(y, x);
