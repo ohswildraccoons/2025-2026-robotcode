@@ -14,6 +14,9 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -21,6 +24,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
@@ -37,13 +41,13 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
-public class TurretSubsystem extends SubsystemBase{
+public class TurretSubsystem extends SubsystemBase{ 
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
   .withClosedLoopController(4.0, 0.0, 0.0)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
- // .withSimClosedLoopController(9999999.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+//  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(10, 1)))
   .withIdleMode(MotorMode.BRAKE)
@@ -77,7 +81,11 @@ public class TurretSubsystem extends SubsystemBase{
    * Set the angle of the arm.
    * @param angle Angle to go to.
    */
-  public Command setAngle(Angle angle) { return turrePivot.setAngle(angle);}
+  public Command setSysAngle(Angle  angle) { 
+    return runOnce(() -> {
+      turrePivot.setAngle(angle);
+    });
+  }
 
 /*
  * Get the angle of the Turret.
@@ -96,6 +104,33 @@ public Angle getAngle(){return turrePivot.getAngle();}
    */
   public Command sysId() { return turrePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));}
 
+  public Command joystickTurret(DoubleSupplier x, DoubleSupplier y) {
+    return run(() -> {
+        double angle = Math.atan2(y.getAsDouble(), x.getAsDouble());
+        double angleDeg = Math.toDegrees(angle);
+        SmartDashboard.putNumber("TEST", angleDeg);
+        turrePivot.setAngle(Degrees.of(angleDeg));
+    });
+}
+
+public Command arbitraryIncreaseAngle()
+{
+  return runOnce(() -> {
+    System.out.println("arb in called");
+    Angle currentAngle = turrePivot.getAngle();
+    System.out.println("Current Angle: " + currentAngle);
+    setSysAngle(currentAngle.plus(Degrees.of(5555))); 
+    System.out.println("New Angle: " + currentAngle.plus(Degrees.of(5555)));
+
+  });
+}
+
+// public Command inputTurret(double x, double y) {
+//   double angle = Math.atan2(y, x);
+//   double angleDeg = Math.toDegrees(angle);
+//   SmartDashboard.putNumber("TEST-2", angleDeg);
+//   setAngle(Degrees.of(angleDeg));
+// }
 
   /** Creates a new ExampleSubsystem. */
   public TurretSubsystem() {}

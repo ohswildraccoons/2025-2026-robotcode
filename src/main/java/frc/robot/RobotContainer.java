@@ -12,6 +12,7 @@ import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Degrees;
@@ -44,6 +45,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
+ private final CommandXboxController m_mechController = new CommandXboxController(
+      OperatorConstants.kDriverControllerPort + 1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -62,8 +65,14 @@ public class RobotContainer {
     // Set the default command to force the shooter rest.
     m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
     // Set the default command to force the arm to go to 0.
-    m_TurretSubsystem.setDefaultCommand(m_TurretSubsystem.setAngle(Degrees.of(0)));
+    // m_TurretSubsystem.setDefaultCommand(m_TurretSubsystem.setAngle(Degrees.of(0)));
 
+    m_TurretSubsystem.setDefaultCommand(
+        m_TurretSubsystem.joystickTurret(
+            () -> m_mechController.getRightX(),
+            () -> m_mechController.getRightY()
+        )
+    );
   }
 
   /**
@@ -101,10 +110,15 @@ public class RobotContainer {
     // cancelling on release.
     // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(5))));
     // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(5))));
-    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(90))));
-    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(90))));
+    m_driverController.a().whileTrue(m_TurretSubsystem.setSysAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(90))));
+    // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(90))));
+    m_driverController.b().whileTrue(m_TurretSubsystem.setSysAngle(Degrees.of(180)));
+    m_driverController.povUp().whileTrue(m_TurretSubsystem.arbitraryIncreaseAngle());
+
+    m_mechController.a().whileTrue(m_TurretSubsystem.setSysAngle(Degrees.of(Math.atan2(m_mechController.getRightY(), m_mechController.getRightX()))));
+
     // Schedule `set` when the Xbox controller's B button is pressed,
-    // cancelling on release.
+    // cancelling on release.m_driverController.rightStick().whileTrue();
     m_driverController.x().whileTrue(m_TurretSubsystem.set(0.3));
     m_driverController.y().whileTrue(m_TurretSubsystem.set(-0.3));
 
