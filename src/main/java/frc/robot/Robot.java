@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.revrobotics.spark.SparkFlex;
-import com.thethriftybot.ThriftyNova.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -114,7 +113,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
-//test
+
 
   }
 
