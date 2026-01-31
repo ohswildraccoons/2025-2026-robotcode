@@ -38,14 +38,14 @@ This is the source code for the 2026 robot from Oceanside High School's First Ro
 | Right Stick Button | Button 10       | r          |            |
 | LT                 | Button 11       | e          |            |
 | RT                 | Button 12       | y          |            |
-| POV R              | POV 0 deg       | 8          |            |
-| POV U R            | POV 45 deg      | 9          |            |
-| POV U              | POV 90 deg      | 6          |            |
-| POV U L            | POV 135 deg     | 3          |            |
-| POV L              | POV 180 deg     | 2          |            |
-| POV D L            | POV 225 deg     | 1          |            |
-| POV D              | POV 270 deg     | 4          |            |
-| POV D R            | POV 315 deg     | 7          |            |
+| POV R              | POV 0 deg       | numpad 8   |            |
+| POV U R            | POV 45 deg      | numpad 9   |            |
+| POV U              | POV 90 deg      | numpad 6   |            |
+| POV U L            | POV 135 deg     | numpad 3   |            |
+| POV L              | POV 180 deg     | numpad 2   |            |
+| POV D L            | POV 225 deg     | numpad 1   |            |
+| POV D              | POV 270 deg     | numpad 4   |            |
+| POV D R            | POV 315 deg     | numpad 7   |            |
 
 ## Deploy Code
 - Attach the computer to the RoboRio via ethernet cable. You may need a USB-C to ethernet adapter.
