@@ -70,7 +70,7 @@ public class TurretSubsystem extends SubsystemBase{
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
       .withHardLimit(Degrees.of(-7200000.0), Degrees.of(720000000)) // Hard limit bc wiring prevents infinite spinning
-      .withTelemetry("PivotExample", TelemetryVerbosity.HIGH) // Telemetry
+      .withTelemetry("TurretPivot", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
      
 
