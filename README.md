@@ -24,7 +24,7 @@ This is the source code for the 2026 robot from Oceanside High School's First Ro
 | Left Stick Down    | Axis 1 Decrease | w          |            |
 | Right Stick Right  | Axis 2 Increase | t          |            |
 | Right Stick Left   | Axis 2 Decrease | g          |            |
-| Right Stick Up     | Axis 3 Decrease | h          |            |
+| Right Stick Up     | Axis 3 Increase | h          |            |
 | Right Stick Down   | Axis 3 Decrease | f          |            |
 | A                  | Button 1        | z          |            |
 | B                  | Button 2        | x          |            |
