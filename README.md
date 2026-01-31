@@ -30,14 +30,14 @@ This is the source code for the 2026 robot from Oceanside High School's First Ro
 | B                  | Button 2        | x          |            |
 | X                  | Button 3        | c          |            |
 | Y                  | Button 4        | v          |            |
-| LT                 | Button 5        | b          |            |
-| RT                 | Button 6        | n          |            |
-| LB                 | Button 7        | m          |            |
-| RB                 | Button 8        | ,          |            |
+| LB                 | Button 5        | b          |            |
+| RB                 | Button 6        | n          |            |
+| back               | Button 7        | m          |            |
+| start              | Button 8        | ,          |            |
 | Left Stick Button  | Button 9        | q          |            |
 | Right Stick Button | Button 10       | r          |            |
-| BACK               | Button 11       | e          |            |
-| START              | Button 12       | y          |            |
+| LT                 | Button 11       | e          |            |
+| RT                 | Button 12       | y          |            |
 | POV R              | POV 0 deg       | 8          |            |
 | POV U R            | POV 45 deg      | 9          |            |
 | POV U              | POV 90 deg      | 6          |            |
