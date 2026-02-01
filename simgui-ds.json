@@ -3,22 +3,22 @@
     {
       "axisConfig": [
         {
-          "decKey": 65,
-          "incKey": 68
-        },
-        {
           "decKey": 87,
           "incKey": 83
         },
-        {},
-        {},
         {
-          "decKey": 71,
-          "incKey": 84
+          "decKey": 65,
+          "incKey": 68
         },
+        {},
+        {},
         {
           "decKey": 70,
           "incKey": 72
+        },
+        {
+          "decKey": 71,
+          "incKey": 84
         }
       ],
       "axisCount": 6,
