@@ -1,0 +1,72 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Encoders": "Alerts",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/IMU": "Alerts",
+      "/SmartDashboard/JSON": "Alerts",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterSubsytem/Live Tuning": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretSubsystem/Live Tuning": "Command",
+      "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/Pigeon IMU [13]": "Gyro",
+      "/SmartDashboard/PivotExample/mechanism": "Mechanism2d",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/ShooterMech/mechanism": "Mechanism2d",
+      "/SmartDashboard/Swerve Drive": "Alerts",
+      "/SmartDashboard/TurretPivot/mechanism": "Mechanism2d",
+      "/SmartDashboard/TurretSubsystem": "Subsystem",
+      "/SmartDashboard/wake me up bruih": "Command"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "OdometryPose": {
+          "arrowSize": 47,
+          "selectable": false
+        },
+        "Robot": {
+          "arrowColor": [
+            0.1985294222831726,
+            0.0,
+            0.3970588445663452,
+            255.0
+          ],
+          "length": 0.6858000159263611,
+          "weight": 1.0
+        },
+        "XModules": {
+          "arrows": false,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.12700000405311584,
+          "weight": 2.0,
+          "width": 0.12700000405311584
+        },
+        "bottom": 1914,
+        "height": 8.069275856018066,
+        "left": 245,
+        "right": 3942,
+        "top": 118,
+        "units": "inches",
+        "width": 16.54119300842285,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}

@@ -11,9 +11,14 @@ import java.io.IOException;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.Constants;
@@ -25,22 +30,27 @@ public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    SwerveDrive tempDrive = null;
 
     try {
-      tempDrive = new SwerveParser(swerveJsonDirectory)
+      if (RobotBase.isSimulation()) {
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        swerveDrive = new SwerveParser(swerveJsonDirectory)
+          .createSwerveDrive(SwerveDriveConstants.maximumSpeed, new Pose2d(0.5,0.5, Rotation2d.kZero)); 
+        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+        swerveDrive.setCosineCompensator(false); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life
+      } else {
+        swerveDrive = new SwerveParser(swerveJsonDirectory)
           .createSwerveDrive(SwerveDriveConstants.maximumSpeed);
+      }
     } catch (IOException e) {
       e.printStackTrace();
-    }
-
-    if (tempDrive != null) {
-      swerveDrive = tempDrive;
-    } else {
-      System.out.println("Failed to create SwerveDrive");
+      System.out.println("Failed to read SwerveDrive JSON files");
+      throw new RuntimeException("SwerveDrive initialization failed.");
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Unknown error during SwerveDrive initialization");
       throw new RuntimeException("SwerveDrive initialization failed.");
     }
-
   };
 
   /**
