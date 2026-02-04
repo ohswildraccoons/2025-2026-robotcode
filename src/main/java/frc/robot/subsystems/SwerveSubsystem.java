@@ -69,14 +69,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   }
 
-  // public void drive(Translation2d translation, double rotation, boolean
-  // fieldRelative)
-  // {
-  // swerveDrive.drive(translation,
-  // rotation,
-  // fieldRelative,
-  // false); // Open loop is disabled since it shouldn't be used most of the time.
-  // }
+  public Pose2d getRobotPose() {
+    return swerveDrive.getPose();
+  }
 
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
       DoubleSupplier angularRotationX) {

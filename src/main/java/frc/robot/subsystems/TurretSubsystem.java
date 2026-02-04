@@ -22,6 +22,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +42,8 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
+import frc.robot.Constants;
+import frc.robot.Constants.MotorConstants;;
 
 public class TurretSubsystem extends SubsystemBase{ 
     
@@ -61,7 +65,7 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkFlex spark = new SparkFlex(31, MotorType.kBrushless);
+  private SparkFlex spark = new SparkFlex(Constants.MotorConstants.kTurretMotorPort, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -107,21 +111,23 @@ public Angle getAngle(){return turrePivot.getAngle();}
   public Command joystickTurret(DoubleSupplier x, DoubleSupplier y) {
     return turrePivot.setAngle(() -> {
         double angle = Math.atan2(y.getAsDouble(), x.getAsDouble());
-        double angleDeg = Math.toDegrees(angle);
+        double angleDeg = Math.toDegrees(angle) * -1;
         SmartDashboard.putNumber("TEST", angleDeg);
         // turrePivot.setAngle(Degrees.of(angleDeg));
         return Degrees.of(angleDeg);
     });
 }
 
-
-
-// public Command inputTurret(double x, double y) {
-//   double angle = Math.atan2(y, x);
-//   double angleDeg = Math.toDegrees(angle);
-//   SmartDashboard.putNumber("TEST-2", angleDeg);
-//   setAngle(Degrees.of(angleDeg));
-// }
+  public Command targetPose(Supplier<Pose2d> targetPose, Pose3d robotPose) {
+    return turrePivot.setAngle(() -> {
+        double deltaX = targetPose.get().getX() - robotPose.getX();
+        double deltaY = targetPose.get().getY() - robotPose.getY();
+        double angle = Math.atan2(deltaY * -1, deltaX * -1);
+        double angleDeg = Math.toDegrees(angle);
+        SmartDashboard.putNumber("Turret Target Angle", angleDeg);
+        return Degrees.of(angleDeg);
+    });
+  }
 
   /** Creates a new ExampleSubsystem. */
   public TurretSubsystem() {

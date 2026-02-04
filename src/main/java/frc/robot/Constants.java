@@ -21,4 +21,20 @@ public final class Constants {
   public static class SwerveDriveConstants{
     public static final double maximumSpeed = Units.feetToMeters(14.5);
   }
+  public static class MotorConstants{
+    public static final int kLeftFrontDriveMotorPort = 1;
+    public static final int kLeftFrontSteerMotorPort = 2;
+    public static final int kRightFrontDriveMotorPort = 3;
+    public static final int kRightFrontSteerMotorPort = 4;
+    public static final int kLeftRearDriveMotorPort = 5;
+    public static final int kLeftRearSteerMotorPort = 6;
+    public static final int kRightRearDriveMotorPort = 7;
+    public static final int kRightRearSteerMotorPort = 8;
+   
+    public static final int kIntakeMotorPort = 11;
+    public static final int kTravelMotorPort = 12;
+    public static final int kShooterMotorPort = 13;
+    public static final int kTurretMotorPort = 9;
+    
+  } 
 }

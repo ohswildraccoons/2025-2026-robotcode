@@ -63,6 +63,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/TurretPivot/mechanism": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },

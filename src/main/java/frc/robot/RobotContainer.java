@@ -9,6 +9,9 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import swervelib.SwerveDrive;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
@@ -37,10 +40,11 @@ import frc.robot.subsystems.ShooterSubsytem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
-  private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem();
- 
+  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
+  // private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+  // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem();
+  Pose3d robotPose = new Pose3d();
+  Pose3d testFiringAreaPose3d = new Pose3d( 8.3, 3.8, 4, new Rotation3d(0 ,0 ,0));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -52,27 +56,27 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    m_swerveDrive.setDefaultCommand(
-        m_swerveDrive.driveCommand(
-            () -> m_driverController.getLeftX() * -1,
-            () -> m_driverController.getLeftY() * -1,
-            () -> m_driverController.getRightX() * -1));
+    // m_swerveDrive.setDefaultCommand(
+    //     m_swerveDrive.driveCommand(
+    //         () -> m_driverController.getLeftX() * -1,
+    //         () -> m_driverController.getLeftY() * -1,
+    //         () -> m_driverController.getRightX() * -1));
 
     // Configure the trigger bindings
     configureBindings();
 
     
     // Set the default command to force the shooter rest.
-    m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
+    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
     // Set the default command to force the arm to go to 0.
     // m_TurretSubsystem.setDefaultCommand(m_TurretSubsystem.setAngle(Degrees.of(0)));
 
-    m_TurretSubsystem.setDefaultCommand(
-        m_TurretSubsystem.joystickTurret(
-            () -> m_mechController.getRightX(),
-            () -> m_mechController.getRightY()
-        )
-    );
+    // m_TurretSubsystem.setDefaultCommand(
+    //     m_TurretSubsystem.targetPose(
+    //       () -> m_swerveDrive.getRobotPose(),
+    //       testFiringAreaPose3d
+    //   )
+    // );
   }
 
   /**
@@ -90,36 +94,19 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-            // // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-            // new Trigger(m_exampleSubsystem::exampleCondition)
-            //     .onTrue(new ExampleCommand(m_exampleSubsystem));
+            
+    // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(() ->m_TurretSubsystem.getAngle().plus(Degrees.of(1)) ));
+    // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(() -> m_TurretSubsystem.getAngle().minus(Degrees.of(1))));
 
-            // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // m_mechController.rightTrigger().whileTrue(m_TurretSubsystem.setAngle( () ->Degrees.of(Math.toDegrees(-1 * Math.atan2(m_mechController.getRightY(), m_mechController.getRightX())))));
 
-    // // Schedule `setVelocity` when the Xbox controller's B button is pressed,
-    // // cancelling on release.
-    // m_driverController.a().whileTrue(m_shooterSubsystem.setVelocity(RPM.of(60)));
-    // m_driverController.b().whileTrue(m_shooterSubsystem.setVelocity(RPM.of(300)));
-    // // Schedule `set` when the Xbox controller's B button is pressed,
-    // // cancelling on release.
-    // m_driverController.x().whileTrue(m_shooterSubsystem.set(0.3));
-    // m_driverController.y().whileTrue(m_shooterSubsystem.set(-0.3));
+    // m_driverController.leftBumper().whileTrue(m_TurretSubsystem.targetPose(
+    //   () -> m_swerveDrive.getRobotPose(),
+    //   testFiringAreaPose3d
+    // ));
 
-    
-    // Schedule `setAngle` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    // m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(5))));
-    // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().plus(Degrees.of(5))));
-    m_driverController.a().whileTrue(m_TurretSubsystem.setAngle(() ->m_TurretSubsystem.getAngle().plus(Degrees.of(2)) ));
-    // m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(m_TurretSubsystem.getAngle().minus(Degrees.of(90))));
-    m_driverController.b().whileTrue(m_TurretSubsystem.setAngle(() -> m_TurretSubsystem.getAngle().minus(Degrees.of(2))));
-
-    m_mechController.rightTrigger().whileTrue(m_TurretSubsystem.setAngle( () ->Degrees.of(Math.toDegrees(Math.atan2(m_mechController.getRightY(), m_mechController.getRightX())))));
-
-    // Schedule `set` when the Xbox controller's B button is pressed,
-    // cancelling on release.m_driverController.rightStick().whileTrue();
-    m_driverController.x().whileTrue(m_TurretSubsystem.set(0.3));
-    m_driverController.y().whileTrue(m_TurretSubsystem.set(-0.3));
+    // m_driverController.x().whileTrue(m_TurretSubsystem.set(0.3));
+    // m_driverController.y().whileTrue(m_TurretSubsystem.set(-0.3));
 
   }
 
