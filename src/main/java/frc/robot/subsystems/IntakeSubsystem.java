@@ -8,19 +8,24 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import frc.robot.Constants.MotorConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
+  SparkFlex IntakeExtendMotor;
+  SparkFlex IntakeRollerMotor;
+   SparkFlexConfig IntakeConfig;
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
 
-    SparkFlex IntakeExtendMotor = new SparkFlex(10, MotorType.kBrushless);
+    IntakeExtendMotor = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
 
-    SparkFlex IntakeRollerMotor = new SparkFlex(11, MotorType.kBrushless);
+    IntakeRollerMotor = new SparkFlex(MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
 
-    SparkFlexConfig IntakeConfig = new SparkFlexConfig();
+    IntakeConfig = new SparkFlexConfig();
 
     IntakeConfig.smartCurrentLimit(40);
     IntakeConfig.openLoopRampRate(0.125);
@@ -44,7 +49,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     return run(
         () -> {
-                                         /* one-time action goes here */
+                      /* one-time action goes here */
+
+          IntakeRollerMotor.set(1.0);
+
         });
 
         
@@ -62,7 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.ge);
   }
 
   @Override
