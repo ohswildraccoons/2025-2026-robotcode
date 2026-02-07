@@ -18,7 +18,6 @@ import frc.robot.Constants.MotorConstants;
 
 
 
-
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating

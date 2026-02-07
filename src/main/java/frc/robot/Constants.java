@@ -22,6 +22,8 @@ public final class Constants {
     public static final double maximumSpeed = Units.feetToMeters(14.5);
   }
   public static class MotorConstants{
+
+    // swerve 1 - 10
     public static final int kLeftFrontDriveMotorPort = 1;
     public static final int kLeftFrontSteerMotorPort = 2;
     public static final int kRightFrontDriveMotorPort = 3;
@@ -31,10 +33,21 @@ public final class Constants {
     public static final int kRightRearDriveMotorPort = 7;
     public static final int kRightRearSteerMotorPort = 8;
    
+    // intake 11 - 20
     public static final int kIntakeMotorPort = 11;
-    public static final int kTravelMotorPort = 12;
-    public static final int kShooterMotorPort = 13;
-    public static final int kTurretMotorPort = 9;
+    public static final int kIntakeExtendMotorPort = 12;
+
+    // hopper 21 - 30
+    public static final int kTravelMotorPort = 21;
+
+    // indexer 31 - 40
+
+    // turret 41-50
+
+    // shooter 51-60
+    public static final int kShooterMotorPort = 51;
+    public static final int kTurretMotorPort = 52;
+    
     
   } 
 }
