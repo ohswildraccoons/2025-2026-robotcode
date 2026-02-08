@@ -17,6 +17,7 @@ public class IntakeSubsystem extends SubsystemBase {
   SparkFlex IntakeExtendMotor;
   SparkFlex IntakeRollerMotor;
    SparkFlexConfig IntakeConfig;
+   boolean deployed;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -33,44 +34,69 @@ public class IntakeSubsystem extends SubsystemBase {
     IntakeConfig.idleMode(IdleMode.kBrake);
 
     IntakeConfig.inverted(false);
-    IntakeRollerMotor.set(.8);
+    IntakeRollerMotor.set(0);
+    IntakeExtendMotor.set(0);//sets speed for Extension motor to 100%
+
+
   }
 
-  /**
+  /*
    * Example command factory method.
    *
-   * @return a command
+   * return a command
    */
-  public Command runRollers() {
+
+public Command RunRollers(){
+
+  return new Command(){
+
+    if(deployed==false){
+      deployRunRollers()
+    };
+  };
+
+};
+   
+  public Command deployRunRollers() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    
 
+   return new Command() {
+     @Override
+     public void initialize() {
+       IntakeExtendMotor.set(1.0);
+       IntakeRollerMotor.set(0);   // one-time action
+        }
 
-    return run(
-        () -> {
-                      /* one-time action goes here */
+     @Override
+     public void end(boolean interrupted) {
+         IntakeExtendMotor.set(0);
+         IntakeRollerMotor.set(1.0);     // runs when command stops being called
+            deployed = true;
+     }
+   };
+  }
 
-          IntakeRollerMotor.set(1.0);
+   public Command unDeployRunRollers() {
 
-        });
+     return new Command() {
+     @Override
+     public void initialize() {
+       IntakeExtendMotor.set(-1.0);
+       IntakeRollerMotor.set(0);   // one-time action
+        }
 
+     @Override
+    public void end(boolean interrupted) {
+         IntakeExtendMotor.set(0);
+            deployed = false;
+        }
+    };
+  }
         
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-
-  @Override
+ @Override
   public void periodic() {
-    SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.ge);
+    // SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.get);
   }
 
   @Override
