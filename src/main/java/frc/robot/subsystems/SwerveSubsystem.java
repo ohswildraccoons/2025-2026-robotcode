@@ -20,6 +20,7 @@ import swervelib.math.SwerveMath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
@@ -53,20 +54,8 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   };
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-
+ public ChassisSpeeds getVelocity() {
+    return swerveDrive.getFieldVelocity();
   }
 
   public Pose2d getRobotPose() {

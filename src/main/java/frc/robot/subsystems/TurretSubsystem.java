@@ -118,16 +118,72 @@ public Angle getAngle(){return turrePivot.getAngle();}
     });
 }
 
-  public Command targetPose(Supplier<Pose2d> targetPose, Pose3d robotPose) {
+  public Command targetPose(Supplier<Pose2d> targetPose, Pose3d robotPose, SwerveSubsystem swerveSubsystem) {
     return turrePivot.setAngle(() -> {
-        double deltaX = targetPose.get().getX() - robotPose.getX();
-        double deltaY = targetPose.get().getY() - robotPose.getY();
+        
+        Pose2d virtualTargetPose = ghostTargetPose(targetPose.get(), robotPose, 10.0, swerveSubsystem);
+        double deltaX = virtualTargetPose.getX() - robotPose.getX();
+        double deltaY = virtualTargetPose.getY() - robotPose.getY();
         double angle = Math.atan2(deltaY * -1, deltaX * -1);
         double angleDeg = Math.toDegrees(angle);
         SmartDashboard.putNumber("Turret Target Angle", angleDeg);
         return Degrees.of(angleDeg);
     });
   }
+
+  private Pose2d ghostTargetPose(Pose2d targetPose, Pose3d botPose3d, double bulletVelocity, SwerveSubsystem swerveSubsystem){
+      // inputs
+      float Bx = (float) botPose3d.getX(), By = (float) botPose3d.getY();      // bot position
+      float Vx = (float) swerveSubsystem.getVelocity().vxMetersPerSecond;      // bot velocity
+      float Vy = (float) swerveSubsystem.getVelocity().vyMetersPerSecond;      // bot velocity
+      float Tx = (float) targetPose.getX(), Ty = (float) targetPose.getY();    // target position (stationary)
+      float s = (float) bulletVelocity;                                        // bullet speed (relative to bot)
+
+      // relative position
+      float Rx = Tx - Bx;
+      float Ry = Ty - By;
+
+      // precompute scalars
+      float v2 = Vx*Vx + Vy*Vy;
+      float RV = Rx*Vx + Ry*Vy;
+      float R2 = Rx*Rx + Ry*Ry;
+
+      // quadratic coefficients
+      float a = s*s - v2;
+      float b = 2.0f * RV;
+      float c = -R2;
+
+      // solve discriminant
+      float disc = b*b - 4.0f*a*c;
+      if (disc < 0.0f) {
+          // no solution: can't hit with current speed
+          // fall back to aiming at actual target or something else
+      }
+
+      float sqrtDisc = (float) Math.sqrt(disc);
+      float t1 = (-b + sqrtDisc) / (2.0f * a);
+      float t2 = (-b - sqrtDisc) / (2.0f * a);
+
+      // pick smallest positive time
+      float t = -1.0f;
+      if (t1 > 0.0f && t2 > 0.0f) t = (t1 < t2) ? t1 : t2;
+      else if (t1 > 0.0f) t = t1;
+      else if (t2 > 0.0f) t = t2;
+
+      if (t <= 0.0f) {
+          // no valid positive intercept time
+          // again, fall back as needed
+      }
+
+      // virtual target position
+      float virtualTx = Tx - Vx * t;
+      float virtualTy = Ty - Vy * t;
+
+      // now aim your turret at (virtualTx, virtualTy)
+
+      return new Pose2d(virtualTx, virtualTy, targetPose.getRotation());
+  }
+
 
   /** Creates a new ExampleSubsystem. */
   public TurretSubsystem() {
