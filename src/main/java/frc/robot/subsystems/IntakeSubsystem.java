@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -13,11 +17,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
 public class IntakeSubsystem extends SubsystemBase {
   SparkFlex IntakeExtendMotor;
   SparkFlex IntakeRollerMotor;
    SparkFlexConfig IntakeConfig;
    boolean deployed;
+  SparkClosedLoopController ExtendController = IntakeExtendMotor.getClosedLoopController();
+  
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -26,12 +33,21 @@ public class IntakeSubsystem extends SubsystemBase {
 
     IntakeRollerMotor = new SparkFlex(MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
 
-    IntakeConfig = new SparkFlexConfig();
+    SparkFlexConfig IntakeConfig = new SparkFlexConfig();
+    SparkFlexConfig ExtendConfig = new SparkFlexConfig();
+
+    ExtendConfig.closedLoop
+        .p(0) //we need to figure out the gear ratio then # of units per rotation
+        .i(0.0)
+        .d(0.0)
+        .outputRange(kMinOutput, kMaxOutput); //limits(?)
+    
 
     IntakeConfig.smartCurrentLimit(40);
     IntakeConfig.openLoopRampRate(0.125);
 
     IntakeConfig.idleMode(IdleMode.kBrake);
+
 
     IntakeConfig.inverted(false);
     IntakeRollerMotor.set(0);
@@ -46,53 +62,35 @@ public class IntakeSubsystem extends SubsystemBase {
    * return a command
    */
 
-public Command RunRollers(){
+   
+  public Command deployRollers() {
 
-  return new Command(){
+        return runOnce(()->{
 
-    if(deployed==false){
-      deployRunRollers()
-    };
-  };
+  ExtendController.setSetpoint(0, ControlType.kPosition);
+
+    });
+  }
+
+public Command speed(double x){
+
+      return run(()->{
+         
+      IntakeRollerMotor.set(x);
+
+      });
 
 };
-   
-  public Command deployRunRollers() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
+      
+/* public Command runRollers() {
 
-   return new Command() {
-     @Override
-     public void initialize() {
-       IntakeExtendMotor.set(1.0);
-       IntakeRollerMotor.set(0);   // one-time action
-        }
+        return run(()->{
+         IntakeRollerMotor.set(1);     // runs when command stops being called
+            
+         } );
+}*/
+  
 
-     @Override
-     public void end(boolean interrupted) {
-         IntakeExtendMotor.set(0);
-         IntakeRollerMotor.set(1.0);     // runs when command stops being called
-            deployed = true;
-     }
-   };
-  }
-
-   public Command unDeployRunRollers() {
-
-     return new Command() {
-     @Override
-     public void initialize() {
-       IntakeExtendMotor.set(-1.0);
-       IntakeRollerMotor.set(0);   // one-time action
-        }
-
-     @Override
-    public void end(boolean interrupted) {
-         IntakeExtendMotor.set(0);
-            deployed = false;
-        }
-    };
-  }
         
  @Override
   public void periodic() {
