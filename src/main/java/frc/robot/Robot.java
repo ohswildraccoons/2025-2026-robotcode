@@ -27,9 +27,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-  private final SparkFlex mFlexInake;
+/*  private final SparkFlex mFlexInake;
   private final SparkFlex mFlexShooterPath;
-  private final SparkFlex mFlexShooterOutake;
+  private final SparkFlex mFlexShooterOutake; */
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -39,12 +39,13 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+
+    /*mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     mFlexInake.set(0);
     mFlexShooterPath = new SparkFlex(MotorConstants.kTravelMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     mFlexShooterPath.set(0.8);
     mFlexShooterOutake = new SparkFlex(MotorConstants.kShooterMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlexShooterOutake.set(1);
+    mFlexShooterOutake.set(1);*/
     
     SmartDashboard.putData(CommandScheduler.getInstance());
 
