@@ -78,17 +78,11 @@ public class RobotContainer {
       )
     );
 
-    m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.speed(0.4));
 
-    // m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.set());
-    // m_IntakeSubsystem.setDefaultCommand(()->
-    // )
+     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.speed(m_mechController.getLeftTriggerAxis()));
+     
     
     
-    
-    // )
-
-
 
   }
 

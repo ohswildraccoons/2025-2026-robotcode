@@ -50,4 +50,19 @@ public final class Constants {
     
     
   } 
+// ROLLER_DEPLOYED_POSITION * DEGREES_TO_ROT * INTAKE_DEPLOY_GEAR_RATIO * INTAKE_DEPLOY * PULLEY_RATIO
+  public static class GearRatios
+  {
+    public static double INTAKE_DEPLOY_GEAR_RATIO = (1/100);
+  }
+
+  public static class TargetPositions
+  {
+
+  }
+   public static class Conversions
+  {
+    
+  }
 }
+

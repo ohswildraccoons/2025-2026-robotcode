@@ -33,18 +33,18 @@
     },
     "###/SmartDashboard/TurretPivot/mechanism": {
       "Collapsed": "0",
-      "Pos": "474,38",
-      "Size": "770,616"
+      "Pos": "1465,695",
+      "Size": "367,250"
     },
     "###FMS": {
       "Collapsed": "0",
-      "Pos": "93,761",
-      "Size": "202,214"
+      "Pos": "-45,749",
+      "Size": "336,158"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "644,741",
-      "Size": "976,278"
+      "Pos": "342,773",
+      "Size": "976,82"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -64,7 +64,7 @@
     "###Other Devices": {
       "Collapsed": "0",
       "Pos": "1466,-22",
-      "Size": "250,729"
+      "Size": "250,695"
     },
     "###System Joysticks": {
       "Collapsed": "0",

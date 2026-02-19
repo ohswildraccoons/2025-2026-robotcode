@@ -13,6 +13,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.robot.Constants;
+import frc.robot.Constants.GearRatios;
 import frc.robot.Constants.MotorConstants;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -79,7 +82,7 @@ private SparkClosedLoopController ExtendController;
 
         return runOnce(()->{
 
-  ExtendController.setSetpoint(0, ControlType.kPosition);
+  ExtendController.setSetpoint((ROLLER_DEPLOYED_POSITION * DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * INTAKE_DEPLOY * PULLEY_RATIO), ControlType.kPosition);
 
     });
   }
