@@ -8,8 +8,8 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OperatorConstants;
 
 import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -53,6 +53,7 @@ public class RobotContainer {
   private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
   private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
+  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   Pose3d robotPose = new Pose3d();
   Pose3d testFiringAreaPose3d = new Pose3d( 8.3, 3.8, 4, new Rotation3d(0 ,0 ,0));
 
@@ -89,6 +90,13 @@ public class RobotContainer {
           m_swerveDrive
       )
     );
+
+
+     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.speed(m_mechController.getLeftTriggerAxis()));
+     
+    
+    
+
   }
 
   /**>

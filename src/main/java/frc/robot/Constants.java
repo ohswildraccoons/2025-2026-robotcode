@@ -107,4 +107,25 @@ public final class Constants {
   
 
   
+// ROLLER_DEPLOYED_POSITION * DEGREES_TO_ROT * INTAKE_DEPLOY_GEAR_RATIO * INTAKE_DEPLOY * PULLEY_RATIO
+  public static class GearRatios
+  {
+    public static double INTAKE_DEPLOY_GEAR_RATIO = (1/100);
+    public static double PULLEY_RATIO = (30/51);
+  }
+
+  public static class TargetPositions
+  {
+    public static double ROLLER_DEPLOYED_POSITION = 90;
+    public static double ROLLER_RETRACT_POSITION = 0;
+    public static double ROLLER_LIM_POSITION = 73;
+    public static double ROLLER_LIM_START = 20;
+  }
+   public static class Conversions
+  {
+  public static double ROT_TO_DEGREES = 360;
+  public static double DEGREES_TO_ROT = 1/360;
+
+}
+
 }
