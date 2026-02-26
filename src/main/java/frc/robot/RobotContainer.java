@@ -50,9 +50,9 @@ import frc.robot.subsystems.ShooterSubsytem;
  */
 public class RobotContainer {
   // // The robot's subsystems and commands are defined here...
-  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
+  private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-  // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
+  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
   Pose3d robotPose = new Pose3d();
   Pose3d testFiringAreaPose3d = new Pose3d( 8.3, 3.8, 4, new Rotation3d(0 ,0 ,0));
 
@@ -82,13 +82,13 @@ public class RobotContainer {
         () -> m_driverController.getRightX()
         )
     );
-    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
-    // m_TurretSubsystem.setDefaultCommand(
-    //     m_TurretSubsystem.targettingCommand(
-    //       () -> m_swerveDrive.getRobotPose(),
-    //       m_swerveDrive
-    //   )
-    // );
+    m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
+    m_TurretSubsystem.setDefaultCommand(
+        m_TurretSubsystem.targettingCommand(
+          () -> m_swerveDrive.getRobotPose(),
+          m_swerveDrive
+      )
+    );
   }
 
   /**>
@@ -107,10 +107,10 @@ public class RobotContainer {
    */
   private void configureBindings() {
     
-    // m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-    // m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-    // m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
-    // m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
+    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
+    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
+    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
+    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
 
   }
 
