@@ -36,14 +36,16 @@ public class IntakeSubsystem extends SubsystemBase {
   SparkFlex IntakeExtendMotor;
   SparkFlex IntakeRollerMotor;
    SparkFlexConfig IntakeConfig;
+
  private final FlywheelSim m_flywheelSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(DCMotor.getNeoVortex(1), 2.0, 1.0), new DCMotor(12, 3.6, 211, 3.6, 710.4, 1));
 private SparkFlexSim IntakeRollerSimMotor;
 private SparkFlexSim IntakeExtendSimMotor;
 private SparkFlexSim IntakeRetractSimMotor;
 private SparkClosedLoopController ExtendController;
+
 private AbsoluteEncoder encoder;
- 
-  
+
+boolean deployed;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -54,10 +56,11 @@ private AbsoluteEncoder encoder;
 
     SparkFlexConfig IntakeConfig = new SparkFlexConfig();
     SparkFlexConfig ExtendConfig = new SparkFlexConfig();
-  
+
+  //speed based on 'error'
     ExtendController = IntakeExtendMotor.getClosedLoopController();
     ExtendConfig.closedLoop
-        .p(0.003) //we need to figure out the gear ratio then # of units per rotation
+        .p(0.003) 
         .i(0)
         .d(0.001)
         .outputRange(0, 1); //limits
@@ -72,43 +75,32 @@ private AbsoluteEncoder encoder;
 
     IntakeConfig.inverted(false);
     IntakeRollerMotor.set(0);
-    IntakeExtendMotor.set(0);//sets speed for Extension motor to 100%
+    IntakeExtendMotor.set(0);//sets initial speed for Extension motor
 
-    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(3));
-    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(3));
-    IntakeRetractSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(3));
-
-
-    encoder = IntakeExtendMotor.getAbsoluteEncoder();
-
-
+    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(2));
+    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(2));
+   
+    // encoder = IntakeExtendMotor.getAbsoluteEncoder();
   }
-
-  /*
-   * Example command factory method.
-   *
-   * return a command
-   */
 
    
   public Command deployRollers() {
 
-        return runOnce(() ->{
+     return runOnce(() ->{
 
-  ExtendController.setSetpoint((TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), ControlType.kPosition);
+      ExtendController.setSetpoint(
+       (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
+        ControlType.kPosition);
+           
+  encoder.getPosition();
 
-          
-    encoder.getPosition();
-
-   if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
- ExtendController.setSetpoint((TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), ControlType.kPosition);
-
-  }
-        else{
-    
-   }
-
-    });
+     if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
+            
+       ExtendController.setSetpoint(
+         (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
+          ControlType.kPosition);
+ }
+    else{} });
   }
 
   public Command retractRollers(){
@@ -120,6 +112,25 @@ private AbsoluteEncoder encoder;
 
   }
 
+  public Command DeployUndeplyRollers(){
+
+    return run(()->{
+     encoder = IntakeExtendMotor.getAbsoluteEncoder();
+      if ( encoder.getPosition() < TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+          deployed = false;
+        }
+       else if( encoder.getPosition() > TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+          deployed = true;
+        };
+      
+    if (deployed == false){
+      deployRollers();
+
+    }else{
+      retractRollers();
+    }
+  });
+}
 public Command speed(double x){
 
       return run(()->{
@@ -131,19 +142,19 @@ public Command speed(double x){
 
 };
       
-/ public Command runRollers() {
+public Command runRollers() {
 
         return run(()->{
          IntakeRollerMotor.set(1);     // runs when command stops being called 
             
          } );
-}*/
+}
   
 
         
  @Override
   public void periodic() {
-     SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.get);
+    // SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.get);
   }
 
    @Override

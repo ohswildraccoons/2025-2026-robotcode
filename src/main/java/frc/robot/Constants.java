@@ -62,6 +62,7 @@ public final class Constants {
     public static double ROLLER_DEPLOYED_POSITION = 90;
     public static double ROLLER_RETRACT_POSITION = 0;
     public static double ROLLER_LIM_POSITION = 73;
+    public static double ROLLER_LIM_START = 20;
   }
    public static class Conversions
   {
