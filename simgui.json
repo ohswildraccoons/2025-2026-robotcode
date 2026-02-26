@@ -3,6 +3,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
@@ -16,7 +17,9 @@
       "/SmartDashboard/Mechanisms/Commands/TurretMotor/ZeroEncoder": "Command",
       "/SmartDashboard/Mechanisms/Commands/TurretSubsystem/Live Tuning": "Command",
       "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pigeon IMU [13]": "Gyro",
+      "/SmartDashboard/Pigeon IMU [9]": "Gyro",
       "/SmartDashboard/PivotExample/mechanism": "Mechanism2d",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/ShooterMech/mechanism": "Mechanism2d",
@@ -74,17 +77,26 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "Scheduler": {
-          "open": true
-        },
         "open": true
       }
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Elastic@2": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "Server": {
+      "open": true
+    },
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

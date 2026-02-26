@@ -10,22 +10,30 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+// import dev.doglog.DogLog;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,10 +50,26 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
+
 import frc.robot.Constants;
-import frc.robot.Constants.MotorConstants;;
+import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.FieldConstants;
+
 
 public class TurretSubsystem extends SubsystemBase{ 
+
+  double angle = 0;
+  double botRelativeXPos;
+  double botRelativeYPos;
+  Pose2d turretFieldRelativePose;
+  boolean isManualSetpointTargeting = false;
+  public enum TurretSide {
+    LEFT,
+    RIGHT
+  }
+  TurretSide turretSide;
+  Supplier<Pose3d> target;
+
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
@@ -85,7 +109,7 @@ public class TurretSubsystem extends SubsystemBase{
    * Set the angle of the arm.
    * @param angle Angle to go to.
    */
-  public Command setAngle(Supplier<Angle> angle) { 
+  public Command setAngle(Supplier<Angle> angle) {
     return turrePivot.setAngle(() -> {
       return angle.get();
     });
@@ -97,41 +121,159 @@ public class TurretSubsystem extends SubsystemBase{
  */
 public Angle getAngle(){return turrePivot.getAngle();}
 
-  /**
-   * Move the arm up and down.
-   * @param dutycycle [-1, 1] speed to set the arm too.
-   */
-  public Command set(double dutycycle) { return turrePivot.set(dutycycle);}
+  /*
+  * Gets the field relative position of the turret, by taking the bot rotation, position, and the bot relative pos
+  * @ BotRelative Pos
+  */
+  public Pose2d getFieldPos(Pose2d botPose){
 
-  /**
-   * Run sysId on the {@link Arm}
-   */
-  public Command sysId() { return turrePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));}
+    double botX = botPose.getX();
+    double botY = botPose.getY();
+    Rotation2d rotation = botPose.getRotation();
+    Rotation2d turretAngle = new Rotation2d(turrePivot.getAngle());
 
-  public Command joystickTurret(DoubleSupplier x, DoubleSupplier y) {
-    return turrePivot.setAngle(() -> {
-        double angle = Math.atan2(y.getAsDouble(), x.getAsDouble());
-        double angleDeg = Math.toDegrees(angle) * -1;
-        SmartDashboard.putNumber("TEST", angleDeg);
-        // turrePivot.setAngle(Degrees.of(angleDeg));
-        return Degrees.of(angleDeg);
-    });
-}
-
-  public Command targetPose(Supplier<Pose2d> targetPose, Pose3d robotPose, SwerveSubsystem swerveSubsystem) {
-    return turrePivot.setAngle(() -> {
-        
-        Pose2d virtualTargetPose = ghostTargetPose(targetPose.get(), robotPose, 10.0, swerveSubsystem);
-        double deltaX = virtualTargetPose.getX() - robotPose.getX();
-        double deltaY = virtualTargetPose.getY() - robotPose.getY();
-        double angle = Math.atan2(deltaY * -1, deltaX * -1);
-        double angleDeg = Math.toDegrees(angle);
-        SmartDashboard.putNumber("Turret Target Angle", angleDeg);
-        return Degrees.of(angleDeg);
-    });
+    double fieldRelativeXPos = Math.cos(rotation.getRadians()) * botRelativeXPos - Math.sin(rotation.getRadians()) * botRelativeYPos + botX;
+    double fieldRelativeYPos = Math.sin(rotation.getRadians()) * botRelativeXPos + Math.cos(rotation.getRadians()) * botRelativeYPos + botY;
+    
+    return new Pose2d(fieldRelativeXPos, fieldRelativeYPos, turretAngle);
   }
 
-  private Pose2d ghostTargetPose(Pose2d targetPose, Pose3d botPose3d, double bulletVelocity, SwerveSubsystem swerveSubsystem){
+    /**
+     * Move the arm up and down.
+     * @param dutycycle [-1, 1] speed to set the arm too.
+     */
+    public Command set(double dutycycle) { return turrePivot.set(dutycycle);}
+
+    /**
+     * Run sysId on the {@link Arm}
+     */
+    public Command sysId() { return turrePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));}
+
+    public Command joystickTurret(DoubleSupplier x, DoubleSupplier y) {
+      return turrePivot.setAngle(() -> {
+          angle = Math.atan2(y.getAsDouble() * -1, x.getAsDouble());
+          double angleDeg = Math.toDegrees(angle) * -1;
+          SmartDashboard.putNumber("TEST", angleDeg);
+          // turrePivot.setAngle(Degrees.of(angleDeg));
+          return Degrees.of(angleDeg);
+      });
+  }
+
+    public Command targetPose(Supplier<Pose2d> robotPose, Supplier<Pose3d> targetPose, SwerveSubsystem swerveSubsystem) {
+      return turrePivot.setAngle(() -> {
+        turretFieldRelativePose = getFieldPos(robotPose.get());
+          SmartDashboard.putString("Field Section", getFieldSection(robotPose.get()).name());
+        Pose2d virtualTargetPose = ghostTargetPose(targetPose.get().toPose2d(), turretFieldRelativePose, 10.0, swerveSubsystem);
+        double deltaX = virtualTargetPose.getX() - turretFieldRelativePose.getX();
+        double deltaY = virtualTargetPose.getY() - turretFieldRelativePose.getY();
+        double angle = Math.atan2(deltaY, deltaX);
+        double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
+        SmartDashboard.putNumber("Turret Target Angle", angleDeg);
+        
+
+        return Degrees.of(angleDeg);
+      });
+    }
+
+    public double adjustAngleToFieldRelative(Supplier<Pose2d> robotPose, Supplier<Double> angle) {
+        double fieldRelativeAngle = angle.get() - robotPose.get().getRotation().getDegrees();
+        return fieldRelativeAngle;
+    }
+
+    public Command autoFindTargetPose(Supplier<Pose2d> robotPose, SwerveSubsystem swerveSubsystem) {
+
+        Supplier<Pose3d> targetPose = () -> {
+            switch (getFieldSection(robotPose.get())) {
+                case BLUE_HUB:
+                    return FieldConstants.blueHub;
+                case RED_HUB:
+                    return FieldConstants.redHub;
+                case BLUE_LEFT:
+                    return FieldConstants.blueLeftDeposit;
+                case BLUE_RIGHT:
+                    return FieldConstants.blueRightDeposit;
+                case RED_LEFT:
+                    return FieldConstants.redLeftDeposit;
+                case RED_RIGHT:
+                    return FieldConstants.redRightDeposit;
+                case BLUE_MIDDLE:
+                    if (turretSide == TurretSide.LEFT) {
+                        return FieldConstants.blueLeftDeposit;
+                    } else {
+                        return FieldConstants.blueRightDeposit;
+                    }
+                default:
+                    return FieldConstants.middleField;
+            }
+        };
+        return targetPose(robotPose, targetPose, swerveSubsystem);
+    }
+
+    public Command targettingCommand(Supplier<Pose2d> robotPose, SwerveSubsystem swerveSubsystem) {
+        if (isManualSetpointTargeting == false) {
+            return autoFindTargetPose(robotPose, swerveSubsystem);
+        } else {
+            return targetPose(robotPose, target, swerveSubsystem);
+        }
+        
+    }
+
+    public Command setAutoTargettingOff() {
+        return runOnce(() -> {
+            isManualSetpointTargeting = false;
+        });
+    }
+
+    public Command setManualTarget(Supplier<Pose3d> target) {
+        return runOnce(() -> {
+            this.target = target;
+            isManualSetpointTargeting = true;
+        });
+    }
+
+    
+
+    public FieldConstants.FieldSection getFieldSection(Pose2d robotPose) {
+        Pose2d turretFieldRelativePose = getFieldPos(robotPose);
+        double x = turretFieldRelativePose.getX();
+        double y = turretFieldRelativePose.getY();
+
+        
+
+        if (x < 4) {
+          return FieldConstants.FieldSection.BLUE_HUB;
+        }
+        else if (y > 5.4  && (x > 4 && x < 8.4)){
+          return FieldConstants.FieldSection.BLUE_LEFT;
+        }
+        else if (y < 2.6 && (x > 4 && x < 8.4)){
+          return FieldConstants.FieldSection.BLUE_RIGHT;
+        }
+        else if ((y <5.4 && y > 2.6)  && (x > 4 && x < 8.4)){
+          return FieldConstants.FieldSection.BLUE_MIDDLE;
+        }
+
+        else if (x > 12.5){
+          return FieldConstants.FieldSection.RED_HUB;
+        }
+        else if (y > 5.4  && (x > 8.4 && x < 12.5)){
+          return FieldConstants.FieldSection.RED_RIGHT;
+        }
+        else if (y < 2.6 && (x > 8.4 && x < 12.5)){
+          return FieldConstants.FieldSection.RED_LEFT;
+        }
+        else if ((y < 5.4 && y > 2.6)  && (x > 8.4 && x < 12.5)){
+          return FieldConstants.FieldSection.RED_MIDDLE;
+        }
+        else{
+          return FieldConstants.FieldSection.UNKNOWN;
+        }
+            
+    }
+
+
+
+  private Pose2d ghostTargetPose(Pose2d targetPose, Pose2d botPose3d, double bulletVelocity, SwerveSubsystem swerveSubsystem){
       // inputs
       float Bx = (float) botPose3d.getX(), By = (float) botPose3d.getY();      // bot position
       float Vx = (float) swerveSubsystem.getVelocity().vxMetersPerSecond;      // bot velocity
@@ -186,44 +328,25 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
 
   /** Creates a new ExampleSubsystem. */
-  public TurretSubsystem() {
-    SmartDashboard.putData(this);
-    SmartDashboard.putData("wake me up bruih" , set(-9.9));
+  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide) {
+    this.botRelativeXPos = botRelativeXPos;
+    this.botRelativeYPos = botRelativeYPos;
+    this.turretSide = turretSide;
+
+    
   }
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-
+ 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     turrePivot.updateTelemetry();
+    
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     turrePivot.simIterate();
+    // DogLog.log("Turret Angle", angle);
   }
 }

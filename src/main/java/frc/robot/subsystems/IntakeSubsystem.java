@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
     IntakeConfig.idleMode(IdleMode.kBrake);
 
     IntakeConfig.inverted(false);
-    IntakeRollerMotor.set(.8);
+    IntakeRollerMotor.set(0);
   }
 
   /**
@@ -51,7 +51,8 @@ public class IntakeSubsystem extends SubsystemBase {
         () -> {
                       /* one-time action goes here */
 
-          IntakeRollerMotor.set(1.0);
+          IntakeRollerMotor.set(0.8);
+          
 
         });
 
@@ -70,7 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.ge);
+    // SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.ge);
   }
 
   @Override
