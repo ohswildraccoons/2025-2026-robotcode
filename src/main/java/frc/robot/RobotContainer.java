@@ -35,6 +35,8 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.ShooterSubsytem;
 
+
+
 // import dev.doglog.DogLog;
 // import dev.doglog.DogLogOptions;
 
@@ -92,7 +94,7 @@ public class RobotContainer {
     );
 
 
-     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.speed(m_mechController.getLeftTriggerAxis()));
+     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean()));
      
     
     

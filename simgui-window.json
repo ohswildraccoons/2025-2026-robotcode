@@ -39,6 +39,11 @@
       "Pos": "282,97",
       "Size": "1119,629"
     },
+    "###/SmartDashboard/Motors": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "300,150"
+    },
     "###/SmartDashboard/Swerve Drive": {
       "Collapsed": "0",
       "Pos": "60,60",
@@ -52,12 +57,12 @@
     "###FMS": {
       "Collapsed": "0",
       "Pos": "4,607",
-      "Size": "336,158"
+      "Size": "202,214"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "1648,764",
-      "Size": "976,82"
+      "Pos": "1300,171",
+      "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -76,7 +81,7 @@
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1901,28",
+      "Pos": "1452,84",
       "Size": "250,695"
     },
     "###System Joysticks": {
@@ -87,7 +92,7 @@
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "162,168"
+      "Size": "162,194"
     },
     "Debug##Default": {
       "Collapsed": "0",

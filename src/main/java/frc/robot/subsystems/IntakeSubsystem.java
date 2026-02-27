@@ -75,10 +75,10 @@ boolean deployed;
 
     IntakeConfig.inverted(false);
     IntakeRollerMotor.set(0);
-    IntakeExtendMotor.set(0);//sets initial speed for Extension motor
+   // IntakeExtendMotor.set(0);//sets initial speed for Extension motor
 
-    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(2));
-    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(2));
+    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(1));
+    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(1));
    
     // encoder = IntakeExtendMotor.getAbsoluteEncoder();
   }
@@ -94,14 +94,15 @@ boolean deployed;
            
   encoder.getPosition();
 
-     if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
+     /*  if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
             
        ExtendController.setSetpoint(
          (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
           ControlType.kPosition);
- }
+ } 
     else{} });
-  }
+     } */});
+    };
 
   public Command retractRollers(){
       return runOnce(()->{
@@ -131,30 +132,37 @@ boolean deployed;
     }
   });
 }
-public Command speed(double x){
+//public Command speed(boolean x){
 
-      return run(()->{
+  //    return run(()->{
          
-      IntakeRollerMotor.set(x);
+   //   IntakeRollerMotor.set(x);
 
+   //   });
+//};
       
-      });
+public Command runRollers(boolean x) {
 
-};
-      
-public Command runRollers() {
+  return run(()->{
 
-        return run(()->{
-         IntakeRollerMotor.set(1);     // runs when command stops being called 
-            
-         } );
+    if(x == true){
+   IntakeRollerMotor.set(1);  
+  }
+  else{
+
+    IntakeRollerMotor.set(0);
+  }
+ } );
 }
   
 
         
  @Override
   public void periodic() {
-    // SmartDashboard.putNumber("Motorspeed", IntakeExtendMotor.get);
+
+  encoder = IntakeExtendMotor.getAbsoluteEncoder();
+
+     SmartDashboard.putNumber("Roller Motorspeed", IntakeRollerMotor.get());
   }
 
    @Override
@@ -162,13 +170,13 @@ public Command runRollers() {
     // This method will be called once per scheduler run during simulation
 m_flywheelSim.setInput(IntakeRollerSimMotor.getVelocity() * RobotController.getBatteryVoltage());
 m_flywheelSim.update(.02);
-IntakeRollerSimMotor.iterate( 1,  12, 0.02);
+IntakeRollerSimMotor.iterate( IntakeRollerSimMotor.getVelocity() ,  12, 0.02);
 
-IntakeExtendSimMotor.iterate( 1, 12, 0.02);
+IntakeExtendSimMotor.iterate( IntakeExtendMotor.getEncoder().getVelocity() , 12, 0.02);
 
-IntakeRetractSimMotor.iterate( 1, 12, 0.02);
+//IntakeRetractSimMotor.iterate( 1, 12, 0.02);
 
   }
 } 
-//why so serious?
-//joker stay yound beautiful and unique
+
+
