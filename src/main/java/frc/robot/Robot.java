@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -14,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.MotorConstants;
+
+import static edu.wpi.first.units.Units.Amps;;
 
 
 
@@ -30,6 +37,9 @@ public class Robot extends TimedRobot {
 /*  private final SparkFlex mFlexInake;
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
+  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
+   
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -39,17 +49,11 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_TalonFX.set(1);
 
-    /*mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlexInake.set(0);
-    mFlexShooterPath = new SparkFlex(MotorConstants.kTravelMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlexShooterPath.set(0.8);
-    mFlexShooterOutake = new SparkFlex(MotorConstants.kShooterMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlexShooterOutake.set(1);*/
-    
-    // mFlexInake = new SparkFlex(13, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    // mFlexInake.set(-1);
-
+    // mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    // mFlexInake.set(0);
+   
     SmartDashboard.putData(CommandScheduler.getInstance());
 
 
