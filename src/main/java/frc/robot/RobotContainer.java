@@ -66,7 +66,8 @@ public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
  private final CommandXboxController m_mechController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort + 1);
+      OperatorConstants.kDriverControllerPort + 1); //TODO: are you sure you want to do it this way? port and port+1 or just hardcode it
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -94,7 +95,8 @@ public class RobotContainer {
     );
 
 
-     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean()));
+     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean())); //TODO: shouldnt be getting anything, use command and configurebindings
+
      
     
     
@@ -117,7 +119,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     
-    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
+    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit)); //TODO: Need driver indicator for targeting info 
+
     m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
     m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
     m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());

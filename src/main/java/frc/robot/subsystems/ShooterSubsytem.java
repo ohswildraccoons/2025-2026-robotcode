@@ -67,7 +67,7 @@ public class ShooterSubsytem extends SubsystemBase  {
     private SparkMax spark = new SparkMax(41, MotorType.kBrushless);
 
     // Create our SmartMotorController from our Spark and config with the NEO.
-    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);//TODO: change to 2xMinion, thanks yams
 
   
     private final FlyWheelConfig shooterConfig = new FlyWheelConfig(sparkSmartMotorController)

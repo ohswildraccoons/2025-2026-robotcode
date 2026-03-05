@@ -48,7 +48,8 @@ public final class Constants {
     // turret 41-50
 
     // shooter 51-60
-    public static final int kShooterMotorPort = 51;
+    public static final int kShooterMotorPort = 51; ////TODO: Time to enumerate multiple ports for 2x turret and shooter
+
     public static final int kTurretMotorPort = 52;
     
     

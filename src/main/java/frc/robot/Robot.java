@@ -34,11 +34,13 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-/*  private final SparkFlex mFlexInake;
+/*  private final SparkFlex mFlexInake; 
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
-  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);
-   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
+  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);//TODO: Clean this up, what doe it do?!
+
+   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();//TODO: Clean this up, what doe it do?!
+
    
 
   /**
@@ -49,7 +51,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_TalonFX.set(1);
+    m_TalonFX.set(1);  //TODO: Clean this up, what doe it do?!
 
     // mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     // mFlexInake.set(0);

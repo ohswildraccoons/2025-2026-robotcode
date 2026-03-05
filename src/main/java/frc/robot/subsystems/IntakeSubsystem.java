@@ -63,7 +63,8 @@ boolean deployed;
         .p(0.003) 
         .i(0)
         .d(0.001)
-        .outputRange(0, 1); //limits
+        .outputRange(0, 1); //limits //TODO:need to add motor travel limits (softlimit or could do hardlimit with switch, ask holden or jim)
+
         
     
 
@@ -100,7 +101,7 @@ boolean deployed;
          (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
           ControlType.kPosition);
  } 
-    else{} });
+    else{} }); //TODO: Clean this up, delete unused code
      } */});
     };
 
