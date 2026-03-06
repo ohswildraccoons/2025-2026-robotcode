@@ -6,9 +6,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -33,31 +35,32 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class IntakeSubsystem extends SubsystemBase {
+  //two total motors
   SparkFlex IntakeExtendMotor;
   SparkFlex IntakeRollerMotor;
    SparkFlexConfig IntakeConfig;
 
+   //the sim needs workin' on
  private final FlywheelSim m_flywheelSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(DCMotor.getNeoVortex(1), 2.0, 1.0), new DCMotor(12, 3.6, 211, 3.6, 710.4, 1));
 private SparkFlexSim IntakeRollerSimMotor;
 private SparkFlexSim IntakeExtendSimMotor;
 private SparkFlexSim IntakeRetractSimMotor;
 private SparkClosedLoopController ExtendController;
 
-private AbsoluteEncoder encoder;
+private SparkAbsoluteEncoder encoder1;
+private SparkAbsoluteEncoder encoder2;//can it be two encoders??
 
 boolean deployed;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-
     IntakeExtendMotor = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
 
     IntakeRollerMotor = new SparkFlex(MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
 
     SparkFlexConfig IntakeConfig = new SparkFlexConfig();
     SparkFlexConfig ExtendConfig = new SparkFlexConfig();
-
-  //speed based on 'error'
+    //speed based on 'error' / PID
     ExtendController = IntakeExtendMotor.getClosedLoopController();
     ExtendConfig.closedLoop
         .p(0.003) 
@@ -65,8 +68,6 @@ boolean deployed;
         .d(0.001)
         .outputRange(0, 1); //limits
         
-    
-
     IntakeConfig.smartCurrentLimit(40);
     IntakeConfig.openLoopRampRate(0.125);
 
@@ -74,16 +75,12 @@ boolean deployed;
 
 
     IntakeConfig.inverted(false);
-    IntakeRollerMotor.set(0);
-   // IntakeExtendMotor.set(0);//sets initial speed for Extension motor
-
+ 
     IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(1));
     IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(1));
-   
-    // encoder = IntakeExtendMotor.getAbsoluteEncoder();
   }
 
-   
+   //aren't these two commands == ????
   public Command deployRollers() {
 
      return runOnce(() ->{
@@ -91,92 +88,63 @@ boolean deployed;
       ExtendController.setSetpoint(
        (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
         ControlType.kPosition);
-           
-  encoder.getPosition();
-
-     /*  if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
-            
-       ExtendController.setSetpoint(
-         (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
-          ControlType.kPosition);
- } 
-    else{} });
-     } */});
-    };
+    });
+ };
 
   public Command retractRollers(){
       return runOnce(()->{
 
-    ExtendController.setSetpoint(TargetPositions.ROLLER_RETRACT_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO, ControlType.kPosition);//for standarization
-
-      });
-
-  }
+    ExtendController.setSetpoint
+    (TargetPositions.ROLLER_RETRACT_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO,
+     ControlType.kPosition);//for standarization
+    });
+ };
 
   public Command DeployUndeplyRollers(){
 
     return run(()->{
-     encoder = IntakeExtendMotor.getAbsoluteEncoder();
-      if ( encoder.getPosition() < TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+     encoder1 = IntakeExtendMotor.getAbsoluteEncoder(); 
+    
+      if ( encoder1.getPosition()<100 /*< TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO*/){
           deployed = false;
         }
-       else if( encoder.getPosition() > TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+       else if(encoder1.getPosition()>0 /*> TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO*/){
           deployed = true;
         };
-      
+      // false/true 
     if (deployed == false){
       deployRollers();
-
     }else{
       retractRollers();
     }
   });
-}
-//public Command speed(boolean x){
-
-  //    return run(()->{
-         
-   //   IntakeRollerMotor.set(x);
-
-   //   });
-//};
-      
-public Command runRollers(boolean x) {
+};      
+public Command runRollers() {
 
   return run(()->{
-
-    if(x == true){
    IntakeRollerMotor.set(1);  
-  }
-  else{
-
-    IntakeRollerMotor.set(0);
-  }
  } );
-}
-  
-
-        
+};
+public Command stopRollers(){
+return run(()->{
+IntakeRollerMotor.set(0);
+});
+};
  @Override
   public void periodic() {
-
-  encoder = IntakeExtendMotor.getAbsoluteEncoder();
-
-     SmartDashboard.putNumber("Roller Motorspeed", IntakeRollerMotor.get());
+//  SmartDashboard.putNumber("Roller Motorspeed", IntakeRollerMotor.get());
   }
-
    @Override
    public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    encoder1 = IntakeExtendMotor.getAbsoluteEncoder();
+    encoder2 = IntakeExtendMotor.getAbsoluteEncoder();
 m_flywheelSim.setInput(IntakeRollerSimMotor.getVelocity() * RobotController.getBatteryVoltage());
 m_flywheelSim.update(.02);
-IntakeRollerSimMotor.iterate( IntakeRollerSimMotor.getVelocity() ,  12, 0.02);
-
-IntakeExtendSimMotor.iterate( IntakeExtendMotor.getEncoder().getVelocity() , 12, 0.02);
-
+IntakeRollerSimMotor.iterate( encoder2.getVelocity() ,  12, 0.02);
+IntakeExtendSimMotor.iterate( encoder1.getVelocity() , 12, 0.02);
 //IntakeRetractSimMotor.iterate( 1, 12, 0.02);
-
   }
-} 
+}
 
 
