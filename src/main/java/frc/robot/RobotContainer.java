@@ -116,19 +116,13 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  boolean intakeToggle = false;
+  
   private void configureBindings() {
 
-    
-            Trigger leftTrigger = new Trigger(() -> m_mechController.getLeftTriggerAxis() > 0.2);
-       leftTrigger.onTrue(new InstantCommand(() -> {
-        intakeToggle = !intakeToggle;
-        if (intakeToggle) {
-            m_IntakeSubsystem.runRollers();
-        } else {
-            m_IntakeSubsystem.stopRollers();
-        }
-       }));
+      m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.runRollers());
+      Trigger leftTrigger = new Trigger(()-> m_mechController.getRightTriggerAxis()>0.2);
+      leftTrigger.whileTrue(m_IntakeSubsystem.runRollers());
+      leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
       m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
     
     m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
