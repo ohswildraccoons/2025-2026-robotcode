@@ -12,12 +12,14 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.RPM;
 
-
+import frc.robot.Constants;
+import frc.robot.Constants.MotorConstants;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -64,7 +66,7 @@ public class ShooterSubsytem extends SubsystemBase  {
 
     
     // Vendor motor controller object
-    private SparkMax spark = new SparkMax(41, MotorType.kBrushless);
+    private SparkMax spark = new SparkMax(Constants.MotorConstants.kShooterMotorPort, MotorType.kBrushless);
 
     // Create our SmartMotorController from our Spark and config with the NEO.
     private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -98,7 +100,10 @@ public class ShooterSubsytem extends SubsystemBase  {
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(AngularVelocity speed) {return shooter.setSpeed(speed);}
+  public Command setSpeed(AngularVelocity speed) {return shooter.setSpeed(speed);}
+  
+
+
 
   /**
    * Set the dutycycle of the shooter.

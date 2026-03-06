@@ -7,9 +7,13 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,10 +41,28 @@ public class Robot extends TimedRobot {
 /*  private final SparkFlex mFlexInake;
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
-  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+  TalonFX m_IntakeFX;
+  TalonFXS m_shooter;
    TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
-   
+   final TalonFXConfiguration commonConfigs = new TalonFXConfiguration()
+   .withMotorOutput(
+      new MotorOutputConfigs()
+         .withNeutralMode(NeutralModeValue.Brake)
+   )
+   .withCurrentLimits(
+      new CurrentLimitsConfigs()
+         .withStatorCurrentLimit(Amps.of(120))
+         .withStatorCurrentLimitEnable(true)
+   );
 
+
+  // SparkFlex m_flexIntakeExtend;
+  SparkMax m_intakeTraveler;
+  SparkMax m_intakeExtend;
+  SparkMax m_intakeTube;
+  
+   
+ 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -49,9 +71,37 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_TalonFX.set(1);
+    // m_IntakeFX.set(-0.6);
+    // m_shooter.set(0.6); 
+    // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    // m_intakeTraveler.set(0.6);
+    
+    // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+    // m_intakeExtend.set(0.4);
 
-    // mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    // m_intakeTube = new SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+    // m_intakeTube.set(0.6);
+    m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+    m_shooter = new TalonFXS(MotorConstants.kShooterMotorPort);
+    m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+    m_intakeTube = new SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+
+    m_IntakeFX.set(-0.6);
+    m_shooter.set(0.6);
+    m_intakeTraveler.set(0.6);
+    m_intakeExtend.set(0.0);
+    m_intakeTube.set(1);
+
+
+
+  //   // m_TalonFX.setControl(new DutyCycleOut(1.0));
+  //   var talonFXConfigurator = m_TalonFX.getConfigurator();
+  //  talonFXConfigurator.apply(commonConfigs);
+
+//    m_flexIntakeExtend = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
+// m_flexIntakeExtend.set(0.1);
+    // mFlexInake  = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     // mFlexInake.set(0);
    
     SmartDashboard.putData(CommandScheduler.getInstance());

@@ -59,15 +59,15 @@ boolean deployed;
 
   //speed based on 'error'
     ExtendController = IntakeExtendMotor.getClosedLoopController();
-    ExtendConfig.closedLoop
-        .p(0.003) 
-        .i(0)
-        .d(0.001)
-        .outputRange(0, 1); //limits
+    // ExtendConfig.closedLoop
+    //     .p(0.003)
+    //     .i(0)
+    //     .d(0.001)
+    //     .outputRange(0, 1); //limits
         
     
 
-    IntakeConfig.smartCurrentLimit(40);
+    IntakeConfig.smartCurrentLimit(40); 
     IntakeConfig.openLoopRampRate(0.125);
 
     IntakeConfig.idleMode(IdleMode.kBrake);
@@ -96,7 +96,7 @@ boolean deployed;
 
      /*  if(encoder.getPosition() < (TargetPositions.ROLLER_LIM_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO)){
             
-       ExtendController.setSetpoint(
+       ExtendController.setSetpoint
          (TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
           ControlType.kPosition);
  } 
@@ -109,7 +109,7 @@ boolean deployed;
 
     ExtendController.setSetpoint(TargetPositions.ROLLER_RETRACT_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO, ControlType.kPosition);//for standarization
 
-      });
+      });   
 
   }
 
@@ -117,15 +117,16 @@ boolean deployed;
 
     return run(()->{
      encoder = IntakeExtendMotor.getAbsoluteEncoder();
-      if ( encoder.getPosition() < TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
-          deployed = false;
-        }
-       else if( encoder.getPosition() > TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
-          deployed = true;
-        };
+      // if ( encoder.getPosition() < TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+      //     deployed = false;
+      //   }
+      //  else if( encoder.getPosition() > TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO){
+      //     deployed = true;
+      //   };
       
     if (deployed == false){
       deployRollers();
+      deployed = true;
 
     }else{
       retractRollers();
