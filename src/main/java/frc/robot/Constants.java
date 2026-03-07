@@ -125,7 +125,7 @@ public final class Constants {
   {
   public static double ROT_TO_DEGREES = 360;
   public static double DEGREES_TO_ROT = 1.0/360.0;
-  public static double SPEED_FACTOR = 50;
+  public static double SPEED_FACTOR = 4;
 
 }
 

@@ -11,22 +11,12 @@
           "open": true
         }
       },
-      "SPARK Flex [12] ABSOLUTE ENCODER": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK Flex [12] RELATIVE ENCODER": {
         "header": {
           "open": true
         }
       },
       "SPARK Flex [13]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK Flex [13] RELATIVE ENCODER": {
         "header": {
           "open": true
         }
@@ -111,6 +101,9 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "MapleSim": {
+          "open": true
+        },
         "open": true
       }
     }

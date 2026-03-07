@@ -57,12 +57,12 @@
     "###FMS": {
       "Collapsed": "0",
       "Pos": "7,543",
-      "Size": "336,158"
+      "Size": "202,214"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "1105,865",
-      "Size": "976,82"
+      "Pos": "803,813",
+      "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -71,7 +71,7 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "8,684",
+      "Pos": "10,597",
       "Size": "750,479"
     },
     "###NetworkTables Info": {
