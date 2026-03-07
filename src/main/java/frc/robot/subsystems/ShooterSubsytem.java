@@ -77,7 +77,7 @@ public class ShooterSubsytem extends SubsystemBase  {
     .withMass(Pounds.of(1))
     // Maximum speed of the shooter.
     
-    .withUpperSoftLimit(RPM.of(1000))
+    .withUpperSoftLimit(RPM.of(1000)) //TODO: this might need to be higher
     // Telemetry name and verbosity for the arm.  
     .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
 
@@ -139,6 +139,13 @@ public class ShooterSubsytem extends SubsystemBase  {
   public void periodic() {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
+
+     //TODO Alert Posting 
+    // Failure modes we can deal with:
+    // Single shooter motor has failed - slows ramp speed
+    // Both shooter motors have failed
+    // Single shooter sleceted off (undetected failure - mechanical etc)
+    //  Shooter outside validated Range
   }
 
   @Override

@@ -177,6 +177,12 @@ IntakeExtendSimMotor.iterate( IntakeExtendMotor.getEncoder().getVelocity() , 12,
 
 //IntakeRetractSimMotor.iterate( 1, 12, 0.02);
 
+    //TODO Alert Posting 
+    // Failure modes we can deal with:
+    // Rollers are not rolling
+    //deploy or undeploy is stuck
+    //deploy or undeploy has exceeded limits
+    //
   }
 } 
 

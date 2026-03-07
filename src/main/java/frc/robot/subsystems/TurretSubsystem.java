@@ -340,6 +340,16 @@ public Angle getAngle(){return turrePivot.getAngle();}
   @Override
   public void periodic() {
     turrePivot.updateTelemetry();
+
+    //TODO Alert Posting 
+    // Failure modes we can deal with:
+    // Turret motor has failed: Targeting to Drivetrain (Can we )
+    // Turret position is invalid: 
+    // Robot position is invalid (lock turret straight forwards and eyeball it)
+    // Turret has met or exceeded limits (Just turn the other way)
+    // Turret is not in a validated range for shooting
+    
+
     
   }
 
@@ -347,6 +357,9 @@ public Angle getAngle(){return turrePivot.getAngle();}
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     turrePivot.simIterate();
-    // DogLog.log("Turret Angle", angle);
+    if(angle != null){ // Attempting this? -HS
+    DogLog.log("Turret Angle", angle);
+
+    }
   }
 }
