@@ -134,10 +134,10 @@ public class RobotContainer {
       //  }));
       // m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
     
-    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
-    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
+    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueLeftDeposit));
+    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueRightDeposit));
+    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueHub));
+    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOn());
 
 
 

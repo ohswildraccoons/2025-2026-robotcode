@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -37,6 +38,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -64,13 +67,15 @@ public class TurretSubsystem extends SubsystemBase{
   double botRelativeXPos;
   double botRelativeYPos;
   Pose3d turretFieldRelativePose;
-  boolean isManualSetpointTargeting = false;
+  Boolean manual = false;
+  BooleanSupplier isManualSetpointTargeting = () ->manual;
   public enum TurretSide {
     LEFT,
     RIGHT
   }
   TurretSide turretSide;
-  Supplier<Pose3d> target;
+  Pose3d currentlyTargetedPose = Constants.FieldConstants.middleField;
+  Supplier<Pose3d> target = () -> currentlyTargetedPose;
 
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
@@ -79,7 +84,7 @@ public class TurretSubsystem extends SubsystemBase{
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(10, 1)))
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 1)))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -91,7 +96,7 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkFlex spark = new SparkFlex(Constants.MotorConstants.kTurretMotorPort, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(Constants.MotorConstants.kTurretMotorPort, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -112,9 +117,7 @@ public class TurretSubsystem extends SubsystemBase{
    * @param angle Angle to go to.
    */
   public Command setAngle(Supplier<Angle> angle) {
-    return turrePivot.setAngle(() -> {
-      return angle.get();
-    });
+    return turrePivot.setAngle(angle);
   }
 
 /*
@@ -173,13 +176,15 @@ public Angle getAngle(){return turrePivot.getAngle();}
         double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
         SmartDashboard.putNumber("Turret Target Angle", angleDeg);
         
+        SmartDashboard.putNumber("v-target x", virtualTargetPose.getX());
+        SmartDashboard.putNumber("v-target y", virtualTargetPose.getY());
 
         return Degrees.of(angleDeg);
       });
     }
 
     public double adjustAngleToFieldRelative(Supplier<Pose3d> robotPose, Supplier<Double> angle) {
-        double fieldRelativeAngle = angle.get() - robotPose.get().getRotation().getZ();
+        double fieldRelativeAngle = angle.get() - (robotPose.get().getRotation().getZ()) * (Math.PI/180);
         return fieldRelativeAngle;
     }
 
@@ -209,28 +214,31 @@ public Angle getAngle(){return turrePivot.getAngle();}
                     return FieldConstants.middleField;
             }
         };
-        return targetPose(robotPose, targetPose, swerveSubsystem);
+          return targetPose(robotPose, targetPose, swerveSubsystem);
     }
 
     public Command targettingCommand(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
-        if (isManualSetpointTargeting == false) {
-            return autoFindTargetPose(robotPose, swerveSubsystem);
-        } else {
-            return targetPose(robotPose, target, swerveSubsystem);
-        }
-        
+// // TODO
+        return new ConditionalCommand(
+            targetPose(robotPose, target, swerveSubsystem),
+            autoFindTargetPose(robotPose, swerveSubsystem),
+            isManualSetpointTargeting
+        );
+
     }
 
-    public Command setAutoTargettingOff() {
+    public Command setAutoTargettingOn() {
         return runOnce(() -> {
-            isManualSetpointTargeting = false;
+            manual = false;
         });
     }
 
-    public Command setManualTarget(Supplier<Pose3d> target) {
+    public Command setManualTarget(Pose3d target) {
         return runOnce(() -> {
-            this.target = target;
-            isManualSetpointTargeting = true;
+            currentlyTargetedPose = target;
+            manual = true;
+            SmartDashboard.putString("Target x", Double.toString(target.getX()));
+            SmartDashboard.putString("Target y", Double.toString(target.getY()));
         });
     }
 
@@ -332,6 +340,13 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
       // Aim turret at (virtualX, virtualY)
 
+      SmartDashboard.putNumber("t-bot x", swerveSubsystem.getPose().getX());
+      SmartDashboard.putNumber("t-bot y", swerveSubsystem.getPose().getY());
+     
+      SmartDashboard.putNumber("virtualx", virtualX);
+      SmartDashboard.putNumber("virtualy", virtualY);
+
+
       return new Pose3d(virtualX, virtualY, targetPose.getZ(), targetPose.getRotation());
   }
 
@@ -362,14 +377,13 @@ public Angle getAngle(){return turrePivot.getAngle();}
     this.botRelativeYPos = botRelativeYPos;
     this.turretSide = turretSide;
 
-    
   }
 
  
   @Override
   public void periodic() {
     turrePivot.updateTelemetry();
-    
+    SmartDashboard.putBoolean("Turret Manual Targeting", isManualSetpointTargeting.getAsBoolean());
   }
 
   @Override

@@ -71,16 +71,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // m_IntakeFX.set(-0.6);
-    // m_shooter.set(0.6); 
-    // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
-    // m_intakeTraveler.set(0.6);
-    
-    // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-    // m_intakeExtend.set(0.4);
 
-    // m_intakeTube = new SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
-    // m_intakeTube.set(0.6);
+    
     m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
     m_shooter = new TalonFXS(MotorConstants.kShooterMotorPort);
     m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
@@ -88,10 +80,10 @@ public class Robot extends TimedRobot {
     m_intakeTube = new SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
 
     m_IntakeFX.set(-0.6);
-    m_shooter.set(0.6);
+    m_shooter.set(-1);
     m_intakeTraveler.set(0.6);
     m_intakeExtend.set(0.0);
-    m_intakeTube.set(1);
+    m_intakeTube.set(0.6);
 
 
 
