@@ -121,7 +121,7 @@ public class RobotContainer {
   private void configureBindings() {
 
       m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.runRollers());
-      Trigger leftTrigger = new Trigger(()-> m_mechController.getRightTriggerAxis()>0.2);
+      Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
       leftTrigger.whileTrue(m_IntakeSubsystem.runRollers());
       leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
       m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());

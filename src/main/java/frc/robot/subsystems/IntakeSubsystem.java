@@ -5,14 +5,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.PersistMode;
+//import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -36,53 +37,49 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.revrobotics.RelativeEncoder;
 
 
 public class IntakeSubsystem extends SubsystemBase {
-  //two total motors
-  SparkFlex IntakeExtendMotor;
-  SparkFlex IntakeRollerMotor;
-   SparkFlexConfig RollerConfig;
-   SparkFlexConfig ExtendConfig;
+  /** Creates a new ExampleSubsystem. */
 
-   //the sim needs workin' on
- private final FlywheelSim m_flywheelSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(DCMotor.getNeoVortex(1), 2.0, 1.0), new DCMotor(12, 3.6, 211, 3.6, 710.4, 1));
+SparkFlex IntakeExtendMotor;
+SparkFlex IntakeRollerMotor;
+    SparkFlexConfig RollerConfig;
+    SparkFlexConfig ExtendConfig;
+
+private SparkClosedLoopController ExtendController;
+
+
+//sim motors
 private SparkFlexSim IntakeRollerSimMotor;
 private SparkFlexSim IntakeExtendSimMotor;
-private SparkFlexSim IntakeRetractSimMotor;
-private SparkClosedLoopController ExtendController;
-//can it be two encoders??
-
-boolean deployed=false;
-private SparkAbsoluteEncoder encoder1;
-private SparkAbsoluteEncoder encoder2;
-
-private double simPosition = TargetPositions.ROLLER_DEPLOYED_POSITION;
+//encoder
+private RelativeEncoder encoder;
+//doubles
+double simPosition = TargetPositions.ROLLER_DEPLOYED_POSITION;
 double lastSimPosition = simPosition;
+boolean deployed = false;
 
-  /** Creates a new IntakeSubsystem. */
+
+
   public IntakeSubsystem() {
-    IntakeExtendMotor = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-encoder1 = IntakeExtendMotor.getAbsoluteEncoder();
-    IntakeRollerMotor = new SparkFlex(MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
-//encoder2 = IntakeRollerMotor.getAbsoluteEncoder();
 
-    RollerConfig = new SparkFlexConfig();
-    ExtendConfig = new SparkFlexConfig();
-  
-     //configure(ExtendConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters) <-- doesn't work with ExtendConfig bc /= SparkBase
+IntakeExtendMotor = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+encoder = IntakeExtendMotor.getEncoder(); 
+IntakeRollerMotor = new SparkFlex(MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
 
-    //IntakeExtendMotor.configure(ExtendConfig, null, null)
-    //IntakeExtendMotor.configure(ExtendConfig, null, null)
+  RollerConfig = new SparkFlexConfig();
+   ExtendConfig = new SparkFlexConfig();
 
-    //speed based on 'error' / PID
-    //IntakeExtendMotor.configure(ExtendConfig, );//what's reset and persist mode?
-    ExtendController = IntakeExtendMotor.getClosedLoopController();
+
+
+ExtendController = IntakeExtendMotor.getClosedLoopController();
     ExtendConfig.closedLoop
         .p(0.003) 
         .i(0)
         .d(0.001)
-        .outputRange(0, 1); //limits
+        .outputRange(-1, 1); //limits
         
     RollerConfig.smartCurrentLimit(40);
     ExtendConfig.smartCurrentLimit(40);
@@ -95,54 +92,34 @@ encoder1 = IntakeExtendMotor.getAbsoluteEncoder();
 
     RollerConfig.inverted(false);
     ExtendConfig.inverted(false);
- 
-    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getNeoVortex(1));
-    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(1));
-     // IntakeExtendMotor.configure(ExtendConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); // k or kNo
 
-    
+
+    IntakeExtendMotor.configure(ExtendConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    IntakeRollerMotor.configure(RollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+ 
+    IntakeRollerSimMotor = new SparkFlexSim(IntakeRollerMotor, DCMotor.getKrakenX44(1));//correct motor?
+    IntakeExtendSimMotor = new SparkFlexSim(IntakeExtendMotor, DCMotor.getNeoVortex(1));
+
   }
 
-/*  public Command deployRollers() {
 
-     return runOnce(() ->{
-
-     
- }; */
-
-  /*public Command retractRollers(){
-      return runOnce(()->{
-
-    ExtendController.setSetpoint
-    (TargetPositions.ROLLER_RETRACT_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO,
-     ControlType.kPosition);//for standarization
-    });
- };
- */
- public Command DeployUndeplyRollers(){
+  public Command DeployUndeplyRollers(){
 
     return runOnce(()->{
-     
-     deployed = !deployed; //! turns t->F, F->T
-     // if ( encoder1.getPosition()>90 ){/*< TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO*/
-     //    deployed = false;
-     //   }
-     //  else if(encoder1.getPosition()<90){ /*> TargetPositions.ROLLER_LIM_START*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO*/
-     //     deployed = true;
-     //   };
-      // false/true 
-
-    if (deployed == true){
-      /*deployRollers();*/ 
+           deployed = !deployed;
+ if (deployed == true){
       ExtendController.setSetpoint(
        (TargetPositions.ROLLER_RETRACT_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO), 
-        ControlType.kPosition);}
-    else{
-     /* retractRollers(); */ExtendController.setSetpoint((TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO),
+        ControlType.kPosition);  
+  }
+ else{
+      ExtendController.setSetpoint((TargetPositions.ROLLER_DEPLOYED_POSITION * Conversions.DEGREES_TO_ROT * GearRatios.INTAKE_DEPLOY_GEAR_RATIO * GearRatios.PULLEY_RATIO),
      ControlType.kPosition);
     }
  });
 }
+
 public Command runRollers() {
 
   return run(()->{ 
@@ -154,57 +131,63 @@ return runOnce(()->{
 IntakeRollerMotor.set(0);
 });
 };
- @Override
+
+  /**
+   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   *
+   * return value of some boolean subsystem state, such as a digital sensor.
+   */
+  /*public boolean exampleCondition() {
+    // Query some boolean state, such as a digital sensor.
+    return false;
+  }*/
+
+  @Override
   public void periodic() {
-  SmartDashboard.putNumber("Sim Position (deg)", simPosition);
-  SmartDashboard.putBoolean("Are we Deployed?", deployed);
-  SmartDashboard.putNumber("Motor Velocity", encoder1.getVelocity());
+    // This method will be called once per scheduler run
+
+     SmartDashboard.putBoolean("Are we Deployed?", deployed);
+  SmartDashboard.putNumber("Intake encoder Position", encoder.getPosition());
   SmartDashboard.putNumber("Roller Velocity", (IntakeRollerMotor.getAppliedOutput() * Conversions.SPEED_FACTOR));
-      double intakePosition = RobotBase.isSimulation() ? simPosition : encoder1.getPosition() * Conversions.ROT_TO_DEGREES;
-
+      double intakePosition = RobotBase.isSimulation() ? simPosition : encoder.getPosition() * Conversions.ROT_TO_DEGREES;
   SmartDashboard.putNumber("Intake Position", intakePosition);
-  };
-   //degrees
-   @Override
-   public void simulationPeriodic() {
+  SmartDashboard.putNumber("Intake applied output", IntakeExtendMotor.getAppliedOutput()*40);
+  }
+
+  @Override
+  public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    
 
+    double targetPosition = deployed ? TargetPositions.ROLLER_RETRACT_POSITION : 
+    TargetPositions.ROLLER_DEPLOYED_POSITION;
 
+  ExtendController.setSetpoint(targetPosition*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO, ControlType.kPosition);
 
-double ExtendOutput = IntakeExtendMotor.getAppliedOutput();
- 
+  double ExtendOutput = IntakeExtendMotor.getAppliedOutput();
 simPosition += ExtendOutput * Conversions.SPEED_FACTOR * .02; // degrees/second (tune); this goes into constants
     if(simPosition > TargetPositions.ROLLER_DEPLOYED_POSITION) simPosition = TargetPositions.ROLLER_DEPLOYED_POSITION; //make these constants
-    if(simPosition < TargetPositions.ROLLER_RETRACT_POSITION) simPosition = TargetPositions.ROLLER_RETRACT_POSITION;
+    if(simPosition < TargetPositions.ROLLER_RETRACT_POSITION) simPosition = TargetPositions.ROLLER_RETRACT_POSITION; //deployed=90
 
-   IntakeExtendSimMotor.setPosition(simPosition * Conversions.DEGREES_TO_ROT);
+     double motorVelocity = ((simPosition - lastSimPosition)/0.02);
+ lastSimPosition = simPosition; 
 
- double targetPosition = deployed ? TargetPositions.ROLLER_RETRACT_POSITION*Conversions.DEGREES_TO_ROT*GearRatios.INTAKE_DEPLOY_GEAR_RATIO*GearRatios.PULLEY_RATIO : TargetPositions.ROLLER_DEPLOYED_POSITION;
- ExtendController.setReference(targetPosition, ControlType.kPosition);
+  IntakeExtendSimMotor.iterate( motorVelocity , 12, 0.02); 
+   
+    double rollerOutput = IntakeRollerMotor.getAppliedOutput();
+double rollerVelocity = rollerOutput * Conversions.SPEED_FACTOR; //conversion factor; arbitrary rn
 
-double rollerOutput = IntakeRollerMotor.getAppliedOutput();
-double rollerVelocity = rollerOutput * 400; //comversion factor; arbitrary rn
+ IntakeRollerSimMotor.iterate( rollerVelocity ,  12, 0.02);
 
-
-m_flywheelSim.setInput(IntakeRollerSimMotor.getVelocity() * RobotController.getBatteryVoltage());
-m_flywheelSim.update(.02);
-IntakeRollerSimMotor.iterate( rollerVelocity ,  12, 0.02);
-
-
-double motorVelocity = (simPosition - lastSimPosition)/0.02;
-lastSimPosition = simPosition;
-SmartDashboard.putNumber("Motor Velocity", motorVelocity);
-
-
-IntakeExtendSimMotor.iterate( encoder1.getVelocity() , 12, 0.02);
-//IntakeRetractSimMotor.iterate( 1, 12, 0.02);
+      SmartDashboard.putNumber("Sim Position", simPosition);
+      SmartDashboard.putNumber("Motor Velocity", motorVelocity);
+      SmartDashboard.putNumber("Motor Velocity", rollerVelocity);
     //TODO Alert Posting 
     // Failure modes we can deal with:
     // Rollers are not rolling
     //deploy or undeploy is stuck
     //deploy or undeploy has exceeded limits
-    //
+    // j
+    
   }
 }
-
-
