@@ -28,6 +28,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -95,11 +96,10 @@ public class RobotContainer {
     );
 
 
-     m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean())); //TODO: shouldnt be getting anything, use command and configurebindings
+    
 
-     
     
-    
+
 
   }
 
@@ -117,10 +117,16 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+  
   private void configureBindings() {
-    
-    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit)); //TODO: Need driver indicator for targeting info 
 
+      m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.runRollers());
+      Trigger leftTrigger = new Trigger(()-> m_mechController.getRightTriggerAxis()>0.2);
+      leftTrigger.whileTrue(m_IntakeSubsystem.runRollers());
+      leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
+      m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
+    
+    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
     m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
     m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
     m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
