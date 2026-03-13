@@ -74,6 +74,12 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+
+
+
+
+
+
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
@@ -119,16 +125,20 @@ public class RobotContainer {
   
   private void configureBindings() {
 
-      m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.runRollers());
-      Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
-      leftTrigger.whileTrue(m_IntakeSubsystem.runRollers());
-      leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
-      m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
+    m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+    m_mechController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
+
+    m_mechController.
+    //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
+    //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
+    //   leftTrigger.whileTrue(m_IntakeSubsystems.runRollers());
+    //   leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
+    //   m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
     
-    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
-    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
+     m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
+     m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
+     m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
+     m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
 
   }
 

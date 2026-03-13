@@ -27,11 +27,16 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Arm/mechanism": "Mechanism2d",
       "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/JSON": "Alerts",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/IntakeSubsystem/Live Tuning": "Command",
       "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Down": "Command",
       "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Up": "Command",
       "/SmartDashboard/Mechanisms/Commands/ShooterMotor/ZeroEncoder": "Command",
@@ -40,6 +45,9 @@
       "/SmartDashboard/Mechanisms/Commands/TurretMotor/Up": "Command",
       "/SmartDashboard/Mechanisms/Commands/TurretMotor/ZeroEncoder": "Command",
       "/SmartDashboard/Mechanisms/Commands/TurretSubsystem/Live Tuning": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/ZeroEncoder": "Command",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pigeon IMU [13]": "Gyro",
@@ -50,6 +58,7 @@
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/TurretPivot/mechanism": "Mechanism2d",
       "/SmartDashboard/TurretSubsystem": "Subsystem",
+      "/SmartDashboard/arm/mechanism": "Mechanism2d",
       "/SmartDashboard/wake me up bruih": "Command"
     },
     "windows": {
@@ -92,6 +101,11 @@
         }
       },
       "/SmartDashboard/TurretPivot/mechanism": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/arm/mechanism": {
         "window": {
           "visible": true
         }
