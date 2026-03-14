@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
 
    TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();//TODO: Clean this up, what doe it do?!
 
-   Alert OpType = new Alert ("Robot In Startup", AlertType.kInfo)
+   Alert OpType = new Alert ("Robot In Startup", AlertType.kInfo);
 
   /**
    * This function is run when the robot is first started up and should be used for any

@@ -61,7 +61,7 @@
     },
     "###/SmartDashboard/arm/mechanism": {
       "Collapsed": "0",
-      "Pos": "609,156",
+      "Pos": "658,208",
       "Size": "305,200"
     },
     "###FMS": {
@@ -71,7 +71,7 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "970,419",
+      "Pos": "949,783",
       "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
@@ -91,7 +91,7 @@
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1445,63",
+      "Pos": "1446,71",
       "Size": "250,695"
     },
     "###System Joysticks": {

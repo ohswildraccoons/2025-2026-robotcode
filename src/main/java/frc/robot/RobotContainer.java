@@ -123,13 +123,25 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  
+   private boolean deployed = false;
   private void configureBindings() {
 
     m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
     m_mechController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
+    
+   
+     m_mechController.rightBumper().onTrue(
+      new InstantCommand(() -> {
+        if (!deployed) {
+          m_IntakeSubsystem.rollMotors().schedule();
+        } else {
+          m_IntakeSubsystem.stopMotors().schedule();
+        }
+        deployed = !deployed;
+      })
+    );
 
-    m_mechController.
+   // m_mechController.
     //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
     //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
     //   leftTrigger.whileTrue(m_IntakeSubsystems.runRollers());

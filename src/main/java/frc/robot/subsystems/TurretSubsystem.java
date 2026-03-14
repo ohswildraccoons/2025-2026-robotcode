@@ -357,9 +357,8 @@ public Angle getAngle(){return turrePivot.getAngle();}
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     turrePivot.simIterate();
-    if(angle != null){ // Attempting this? -HS
-    DogLog.log("Turret Angle", angle);
+    // if(angle != null){ // Attempting this? -HS
+    // DogLog.log("Turret Angle", angle);
 
     }
   }
-}
