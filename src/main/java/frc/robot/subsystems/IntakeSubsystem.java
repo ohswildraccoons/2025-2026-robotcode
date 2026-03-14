@@ -21,6 +21,9 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -51,21 +54,24 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class IntakeSubsystem extends SubsystemBase {
 SparkFlex rollerMotor;
  boolean deployed;
+SparkFlexSim rollerMotorSim;
 
   public IntakeSubsystem() {
-    rollerMotor = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+    rollerMotor = new SparkFlex(Constants.MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
     deployed = false;
-
+    rollerMotorSim = new SparkFlexSim(rollerMotor, DCMotor.getNeoVortex(1));
     SparkFlexConfig rollerConfig = new SparkFlexConfig();
     rollerConfig.idleMode(IdleMode.kBrake);
     rollerConfig.smartCurrentLimit(40);
+    
+    rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
   }
 
 
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(0.8, 0.0, 0.1)
+  .withClosedLoopController(1.0, 0.05, 0.1)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
@@ -85,7 +91,7 @@ SparkFlex rollerMotor;
   
 
   // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNeoVortex(1), smcConfig);
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
@@ -152,25 +158,39 @@ SparkFlex rollerMotor;
         });
   }
 
+  public Command stopMotors() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+
+          rollerMotor.set(0);
+
+          /* one-time action goes here */
+        });
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *
-   * @return value of some boolean subsystem state, such as a digital sensor.
+   *  return value of some boolean subsystem state, such as a digital sensor.
    */
-  public boolean exampleCondition() {
+  //public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.
-    return false;
-  }
+    //return false;
+  //}
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     arm.updateTelemetry();
+    
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     arm.simIterate();
+    rollerMotorSim.iterate(rollerMotor.getAppliedOutput(),12, 0.02);
+
   }
 }

@@ -67,7 +67,8 @@ public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
  private final CommandXboxController m_mechController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort + 1);
+      OperatorConstants.kDriverControllerPort + 1); //TODO: are you sure you want to do it this way? port and port+1 or just hardcode it
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

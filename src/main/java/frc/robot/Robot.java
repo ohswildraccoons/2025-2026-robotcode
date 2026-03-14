@@ -11,7 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,12 +36,14 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
-/*  private final SparkFlex mFlexInake;
+/*  private final SparkFlex mFlexInake; 
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
-  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);
-   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
-   
+  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);//TODO: Clean this up, what doe it do?!
+
+   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();//TODO: Clean this up, what doe it do?!
+
+   Alert OpType = new Alert ("Robot In Startup", AlertType.kInfo)
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -48,16 +52,15 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    OpType.set(true);
     m_robotContainer = new RobotContainer();
-    m_TalonFX.set(1);
+    m_TalonFX.set(1);  //TODO: Clean this up, what doe it do?!
 
     // mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     // mFlexInake.set(0);
    
     SmartDashboard.putData(CommandScheduler.getInstance());
-
-
-
+    OpType.set(true);
     
   }
 
@@ -80,7 +83,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+
+    OpType.set(false);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -88,6 +94,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    OpType.set(false);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)

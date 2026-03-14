@@ -67,7 +67,7 @@ public class ShooterSubsytem extends SubsystemBase  {
     private SparkMax spark = new SparkMax(41, MotorType.kBrushless);
 
     // Create our SmartMotorController from our Spark and config with the NEO.
-    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);//TODO: change to 2xMinion, thanks yams
 
   
     private final FlyWheelConfig shooterConfig = new FlyWheelConfig(sparkSmartMotorController)
@@ -77,7 +77,7 @@ public class ShooterSubsytem extends SubsystemBase  {
     .withMass(Pounds.of(1))
     // Maximum speed of the shooter.
     
-    .withUpperSoftLimit(RPM.of(1000))
+    .withUpperSoftLimit(RPM.of(1000)) //TODO: this might need to be higher
     // Telemetry name and verbosity for the arm.  
     .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
 
@@ -139,6 +139,13 @@ public class ShooterSubsytem extends SubsystemBase  {
   public void periodic() {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
+
+     //TODO Alert Posting 
+    // Failure modes we can deal with:
+    // Single shooter motor has failed - slows ramp speed
+    // Both shooter motors have failed
+    // Single shooter sleceted off (undetected failure - mechanical etc)
+    //  Shooter outside validated Range
   }
 
   @Override
