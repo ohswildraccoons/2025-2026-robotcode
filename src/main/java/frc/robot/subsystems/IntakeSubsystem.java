@@ -94,9 +94,9 @@ SparkFlexSim rollerMotorSim;
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNeoVortex(1), smcConfig);
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
-      .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
-      .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-10.0), Degrees.of(100)) // Hard limit bc wiring prevents infinite spinning
+      .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
+      .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
+      .withHardLimit(Degrees.of(-10.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(15)); // MOI Calculation
      
