@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units; 
 
+
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -36,21 +38,23 @@ public final class Constants {
     public static final int kRightRearSteerMotorPort = 8;
    
     // intake 11 - 20
-    public static final int kIntakeTravelerMotorPort = 11;
+    public static final int kIntakeMotorPort = 11;
     public static final int kIntakeExtendMotorPort = 12;
-    public static final int kIntakeMotorPort = 13;
 
-    // hopper 21 - 30
-    public static final int kTravelMotorPort = 21;
+    // indexer 21 - 30
+    public static final int kIntakeTravellerMotorPort = 21;
+    public static final int kIntakeTubeMotorPort = 22;
 
-    // indexer 31 - 40
+    // Camera 41-50
 
-    // turret 41-50
+    // Turret 51-60
+    public static final int kLeftShooterMotorPort = 51;
+    public static final int kLeftShooterMotorPortTop = 52;
+    public static final int kLeftTurretMotorPort = 53;
 
-    // shooter 51-60
-    public static final int kShooterMotorPort = 51; ////TODO: Time to enumerate multiple ports for 2x turret and shooter
-
-    public static final int kTurretMotorPort = 52;
+    public static final int kRightShooterMotorPort = 54;
+    public static final int kRightShooterMotorPortTop = 55;
+    public static final int kRightTurretMotorPort = 56;
     
     
   } 
@@ -102,6 +106,26 @@ public final class Constants {
       public static final double rightBackRoll = Units.degreesToRadians(0.0);
       public static final double rightBackPitch = Units.degreesToRadians(0.0);
       public static final double rightBackYaw = Units.degreesToRadians(-168.69);
+    }
+
+    public static final class TurretConstants{
+      
+      public static final double leftTurretInchesX = 11.5;
+      public static final double leftTurretInchesY = 11.5;
+
+      public static final double leftTurretMetersX = Units.inchesToMeters(leftTurretInchesX);
+      public static final double leftTurretMetersY = Units.inchesToMeters(leftTurretInchesY);
+
+      public static final double launchAngleDegrees = 50;
+      public static final double launchAngle = launchAngleDegrees * (Math.PI/180);
+    }
+
+    public static final class ShooterConstants{
+      public static final double shooterWheelRadiusInches = 3;
+      public static final double shooterWheelRadiusMeters = Units.inchesToMeters(shooterWheelRadiusInches);
+
+      public static final double[] shooterRPMs = {1000, 2000, 3000, 4000, 5000};
+      public static final double[] shooterDistances = {1, 2, 3, 4, 5};
     }
 
 

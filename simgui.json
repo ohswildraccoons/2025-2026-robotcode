@@ -50,6 +50,7 @@
       "/SmartDashboard/Mechanisms/Commands/arm/ZeroEncoder": "Command",
       "/SmartDashboard/Motors": "Alerts",
       "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Pigeon 2 (v6) [9]": "Gyro",
       "/SmartDashboard/Pigeon IMU [13]": "Gyro",
       "/SmartDashboard/Pigeon IMU [9]": "Gyro",
       "/SmartDashboard/PivotExample/mechanism": "Mechanism2d",
@@ -115,7 +116,7 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "MapleSim": {
+        "PathPlanner": {
           "open": true
         },
         "open": true

@@ -15,7 +15,9 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.lang.annotation.Target;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -30,12 +32,15 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -53,31 +58,36 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.FieldConstants;
 
 
 public class TurretSubsystem extends SubsystemBase{ 
 
+  int turretId;
   double angle = 0;
   double botRelativeXPos;
   double botRelativeYPos;
-  Pose2d turretFieldRelativePose;
-  boolean isManualSetpointTargeting = false;
+  Pose3d turretFieldRelativePose;
+  Boolean manual = false;
+  BooleanSupplier isManualSetpointTargeting = () ->manual;
   public enum TurretSide {
     LEFT,
     RIGHT
   }
   TurretSide turretSide;
-  Supplier<Pose3d> target;
+  Pose3d currentlyTargetedPose = Constants.FieldConstants.middleField;
+  Supplier<Pose3d> target = () -> currentlyTargetedPose;
+  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
 
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(4.0, 0.0, 0.0)
+  .withClosedLoopController(2.0, 0.001, 0.0)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(10, 1)))
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 1)))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -89,7 +99,7 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkFlex spark = new SparkFlex(Constants.MotorConstants.kTurretMotorPort, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(turretId, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -97,7 +107,7 @@ public class TurretSubsystem extends SubsystemBase{
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-7200000.0), Degrees.of(720000000)) // Hard limit bc wiring prevents infinite spinning
+      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("TurretPivot", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
      
@@ -110,9 +120,7 @@ public class TurretSubsystem extends SubsystemBase{
    * @param angle Angle to go to.
    */
   public Command setAngle(Supplier<Angle> angle) {
-    return turrePivot.setAngle(() -> {
-      return angle.get();
-    });
+    return turrePivot.setAngle(angle);
   }
 
 /*
@@ -125,17 +133,17 @@ public Angle getAngle(){return turrePivot.getAngle();}
   * Gets the field relative position of the turret, by taking the bot rotation, position, and the bot relative pos
   * @ BotRelative Pos
   */
-  public Pose2d getFieldPos(Pose2d botPose){
+  public Pose3d getFieldPos(Pose3d botPose){
 
     double botX = botPose.getX();
     double botY = botPose.getY();
-    Rotation2d rotation = botPose.getRotation();
+    Rotation2d rotation = botPose.getRotation().toRotation2d();
     Rotation2d turretAngle = new Rotation2d(turrePivot.getAngle());
-
+    Rotation3d turretRotation = new Rotation3d(0, 0, turretAngle.getRadians());
     double fieldRelativeXPos = Math.cos(rotation.getRadians()) * botRelativeXPos - Math.sin(rotation.getRadians()) * botRelativeYPos + botX;
     double fieldRelativeYPos = Math.sin(rotation.getRadians()) * botRelativeXPos + Math.cos(rotation.getRadians()) * botRelativeYPos + botY;
     
-    return new Pose2d(fieldRelativeXPos, fieldRelativeYPos, turretAngle);
+    return new Pose3d(fieldRelativeXPos, fieldRelativeYPos, 0, turretRotation);
   }
 
     /**
@@ -159,82 +167,101 @@ public Angle getAngle(){return turrePivot.getAngle();}
       });
   }
 
-    public Command targetPose(Supplier<Pose2d> robotPose, Supplier<Pose3d> targetPose, SwerveSubsystem swerveSubsystem) {
+    public Command targetPose(Supplier<Pose3d> robotPose, Supplier<Pose3d> targetPose, SwerveSubsystem swerveSubsystem) {
       return turrePivot.setAngle(() -> {
         turretFieldRelativePose = getFieldPos(robotPose.get());
           SmartDashboard.putString("Field Section", getFieldSection(robotPose.get()).name());
-        Pose2d virtualTargetPose = ghostTargetPose(targetPose.get().toPose2d(), turretFieldRelativePose, 10.0, swerveSubsystem);
+        Pose3d virtualTargetPose = ghostTargetPose(targetPose.get(), turretFieldRelativePose, swerveSubsystem);
         double deltaX = virtualTargetPose.getX() - turretFieldRelativePose.getX();
         double deltaY = virtualTargetPose.getY() - turretFieldRelativePose.getY();
+        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+
         double angle = Math.atan2(deltaY, deltaX);
         double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
         SmartDashboard.putNumber("Turret Target Angle", angleDeg);
         
+        SmartDashboard.putNumber("v-target x", virtualTargetPose.getX());
+        SmartDashboard.putNumber("v-target y", virtualTargetPose.getY());
 
         return Degrees.of(angleDeg);
       });
     }
 
-    public double adjustAngleToFieldRelative(Supplier<Pose2d> robotPose, Supplier<Double> angle) {
-        double fieldRelativeAngle = angle.get() - robotPose.get().getRotation().getDegrees();
+    public double adjustAngleToFieldRelative(Supplier<Pose3d> robotPose, Supplier<Double> angle) {
+        double fieldRelativeAngle = angle.get() - (robotPose.get().getRotation().getZ()) * (Math.PI/180);
         return fieldRelativeAngle;
     }
 
-    public Command autoFindTargetPose(Supplier<Pose2d> robotPose, SwerveSubsystem swerveSubsystem) {
+    public Command autoFindTargetPose(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
 
         Supplier<Pose3d> targetPose = () -> {
             switch (getFieldSection(robotPose.get())) {
                 case BLUE_HUB:
-                    return FieldConstants.blueHub;
+                    target = () -> FieldConstants.blueHub;
+                    return target.get();
                 case RED_HUB:
-                    return FieldConstants.redHub;
+                    target = () -> FieldConstants.redHub;
+                    return target.get();
                 case BLUE_LEFT:
-                    return FieldConstants.blueLeftDeposit;
+                    target = () -> FieldConstants.blueLeftDeposit;
+                    return target.get();
                 case BLUE_RIGHT:
-                    return FieldConstants.blueRightDeposit;
+                    target = () -> FieldConstants.blueRightDeposit;
+                    return target.get();
                 case RED_LEFT:
-                    return FieldConstants.redLeftDeposit;
+                    target = () -> FieldConstants.redLeftDeposit;
+                    return target.get();
                 case RED_RIGHT:
-                    return FieldConstants.redRightDeposit;
+                    target = () -> FieldConstants.redRightDeposit;
+                    return target.get();
                 case BLUE_MIDDLE:
                     if (turretSide == TurretSide.LEFT) {
-                        return FieldConstants.blueLeftDeposit;
+                        target = () -> FieldConstants.blueLeftDeposit;
+                        return target.get();
                     } else {
-                        return FieldConstants.blueRightDeposit;
+                        target = () -> FieldConstants.blueRightDeposit;
+                        return target.get();
                     }
                 default:
                     return FieldConstants.middleField;
             }
         };
-        return targetPose(robotPose, targetPose, swerveSubsystem);
+          return targetPose(robotPose, targetPose, swerveSubsystem);
     }
 
-    public Command targettingCommand(Supplier<Pose2d> robotPose, SwerveSubsystem swerveSubsystem) {
-        if (isManualSetpointTargeting == false) {
-            return autoFindTargetPose(robotPose, swerveSubsystem);
-        } else {
-            return targetPose(robotPose, target, swerveSubsystem);
-        }
-        
+    public Command targettingCommand(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
+// // TODO
+        return new ConditionalCommand(
+            targetPose(robotPose, target, swerveSubsystem),
+            autoFindTargetPose(robotPose, swerveSubsystem),
+            isManualSetpointTargeting
+        );
+
     }
 
-    public Command setAutoTargettingOff() {
+    public Command setAutoTargettingOn() {
         return runOnce(() -> {
-            isManualSetpointTargeting = false;
+            manual = false;
         });
     }
 
-    public Command setManualTarget(Supplier<Pose3d> target) {
+    public Command setManualTarget(Pose3d target) {
         return runOnce(() -> {
-            this.target = target;
-            isManualSetpointTargeting = true;
+            currentlyTargetedPose = target;
+            manual = true;
+            SmartDashboard.putString("Target x", Double.toString(target.getX()));
+            SmartDashboard.putString("Target y", Double.toString(target.getY()));
         });
+    }
+
+    public Supplier<Pose3d> getTarget(){
+        return target;
     }
 
     
 
-    public FieldConstants.FieldSection getFieldSection(Pose2d robotPose) {
-        Pose2d turretFieldRelativePose = getFieldPos(robotPose);
+    public FieldConstants.FieldSection getFieldSection(Pose3d robotPose) {
+        Pose3d turretFieldRelativePose = getFieldPos(robotPose);
         double x = turretFieldRelativePose.getX();
         double y = turretFieldRelativePose.getY();
 
@@ -273,84 +300,91 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
 
 
-  private Pose2d ghostTargetPose(Pose2d targetPose, Pose2d botPose3d, double bulletVelocity, SwerveSubsystem swerveSubsystem){
-      // inputs
-      float Bx = (float) botPose3d.getX(), By = (float) botPose3d.getY();      // bot position
-      float Vx = (float) swerveSubsystem.getVelocity().vxMetersPerSecond;      // bot velocity
-      float Vy = (float) swerveSubsystem.getVelocity().vyMetersPerSecond;      // bot velocity
-      float Tx = (float) targetPose.getX(), Ty = (float) targetPose.getY();    // target position (stationary)
-      float s = (float) bulletVelocity;                                        // bullet speed (relative to bot)
+private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsystem swerveSubsystem) {
+    double botX = botPose3d.getX();
+    double botY = botPose3d.getY();
 
-      // relative position
-      float Rx = Tx - Bx;
-      float Ry = Ty - By;
+    // Robot velocity (field-relative)
+    double botVx = swerveSubsystem.getVelocity().vxMetersPerSecond;
+    double botVy = swerveSubsystem.getVelocity().vyMetersPerSecond;
 
-      // precompute scalars
-      float v2 = Vx*Vx + Vy*Vy;
-      float RV = Rx*Vx + Ry*Vy;
-      float R2 = Rx*Rx + Ry*Ry;
+    // Target position (stationary)
+    double targetX = targetPose.getX();
+    double targetY = targetPose.getY();
 
-      // quadratic coefficients
-      float a = s*s - v2;
-      float b = 2.0f * RV;
-      float c = -R2;
+    // Target diff from robot
+    double targetDiffX = targetX - botX;
+    double targetDiffY = targetY - botY; 
+    double alpha = Math.atan2(targetDiffY, targetDiffX);
 
-      // solve discriminant
-      float disc = b*b - 4.0f*a*c;
-      if (disc < 0.0f) {
-          // no solution: can't hit with current speed
-          // fall back to aiming at actual target or something else
-      }
+    double velocity = CalcVelocity(targetPose, botPose3d);
+    double shooterAngle = Constants.TurretConstants.launchAngle;
 
-      float sqrtDisc = (float) Math.sqrt(disc);
-      float t1 = (-b + sqrtDisc) / (2.0f * a);
-      float t2 = (-b - sqrtDisc) / (2.0f * a);
+    double parallelToGroundVelocity = velocity * Math.cos(shooterAngle);
+    double parallelToGroundVelocityX = parallelToGroundVelocity * Math.cos(alpha);
+    double parallelToGroundVelocityY = parallelToGroundVelocity * Math.sin(alpha);
 
-      // pick smallest positive time
-      float t = -1.0f;
-      if (t1 > 0.0f && t2 > 0.0f) t = (t1 < t2) ? t1 : t2;
-      else if (t1 > 0.0f) t = t1;
-      else if (t2 > 0.0f) t = t2;
+    double requiredBulletVelocityX = parallelToGroundVelocityX - botVx;
+    double requiredBulletVelocityY = parallelToGroundVelocityY - botVy;
+    double requiredTurretAngle = Math.atan2(requiredBulletVelocityY,requiredBulletVelocityX);
 
-      if (t <= 0.0f) {
-          // no valid positive intercept time
-          // again, fall back as needed
-      }
+    double t = parallelToGroundVelocityX / targetDiffX; 
 
-      // virtual target position
-      float virtualTx = Tx - Vx * t;
-      float virtualTy = Ty - Vy * t;
+    Pose3d ghostPose = new Pose3d((requiredBulletVelocityX * t) + botX, (requiredBulletVelocityY * t) + botY, targetPose.getZ(), targetPose.getRotation());
 
-      // now aim your turret at (virtualTx, virtualTy)
+  SmartDashboard.putNumber("velocity", velocity);
+  SmartDashboard.putNumber("shooterAngle", shooterAngle);
 
-      return new Pose2d(virtualTx, virtualTy, targetPose.getRotation());
+  SmartDashboard.putNumber("parallelToGroundVelocity", parallelToGroundVelocity);
+  SmartDashboard.putNumber("parallelToGroundVelocityX", parallelToGroundVelocityX);
+  SmartDashboard.putNumber("parallelToGroundVelocityY", parallelToGroundVelocityY);
+  SmartDashboard.putNumber("alpha", 180*alpha/3.145);
+  SmartDashboard.putNumber("requiredTurretAngle", 180*requiredTurretAngle/3.145);
+  
+  SmartDashboard.putNumber("Ghost Pose X", ghostPose.getX());
+  SmartDashboard.putNumber("Ghost Pose Y", ghostPose.getY());
+  SmartDashboard.putNumber("Target Pose X", targetPose.getX());
+  SmartDashboard.putNumber("Target Pose Y", targetPose.getY());
+
+    return ghostPose;
+
+}
+
+/*
+   * calculates the required velocity needed to hit the set point
+   * 
+   * @param targetLocation
+   */
+  public double CalcVelocity(Pose3d TargetLocation, Pose3d RobotLocation){
+    double g = 9.8;
+    double height = TargetLocation.getZ() - RobotLocation.getZ();
+
+    double xDistance = Math.abs(TargetLocation.getX() - RobotLocation.getX());
+    double yDistance = Math.abs(TargetLocation.getY()- RobotLocation.getY());
+    double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+
+    double numerator = g*Math.pow(distance, 2);
+    double denominator = 2*Math.pow(Math.cos(Constants.TurretConstants.launchAngle), 2)*(distance * Math.tan(Constants.TurretConstants.launchAngle) - height);
+
+    double velocity = Math.sqrt(numerator/denominator);
+
+    return velocity;
   }
 
-
   /** Creates a new ExampleSubsystem. */
-  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide) {
+  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide, int turretId) {
     this.botRelativeXPos = botRelativeXPos;
     this.botRelativeYPos = botRelativeYPos;
     this.turretSide = turretSide;
+    this.turretId = turretId;
 
-    
   }
 
  
   @Override
   public void periodic() {
     turrePivot.updateTelemetry();
-
-    //TODO Alert Posting 
-    // Failure modes we can deal with:
-    // Turret motor has failed: Targeting to Drivetrain (Can we )
-    // Turret position is invalid: 
-    // Robot position is invalid (lock turret straight forwards and eyeball it)
-    // Turret has met or exceeded limits (Just turn the other way)
-    // Turret is not in a validated range for shooting
-    
-
-    
+    SmartDashboard.putBoolean("Turret Manual Targeting", isManualSetpointTargeting.getAsBoolean());
   }
 
   @Override

@@ -7,9 +7,13 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -39,12 +43,30 @@ public class Robot extends TimedRobot {
 /*  private final SparkFlex mFlexInake; 
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
-  TalonFX m_TalonFX = new TalonFX(MotorConstants.kIntakeMotorPort);//TODO: Clean this up, what doe it do?!
+  TalonFX m_IntakeFX;
+   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
+   final TalonFXConfiguration commonConfigs = new TalonFXConfiguration()
+   .withMotorOutput(
+      new MotorOutputConfigs()
+         .withNeutralMode(NeutralModeValue.Brake)
+   )
+   .withCurrentLimits(
+      new CurrentLimitsConfigs()
+         .withStatorCurrentLimit(Amps.of(120))
+         .withStatorCurrentLimitEnable(true)
+   );
 
-   TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();//TODO: Clean this up, what doe it do?!
 
-   Alert OpType = new Alert ("Robot In Startup", AlertType.kInfo);
+  // SparkMax m_intakeTraveler;
+  // SparkMax m_intakeExtend;
+  TalonFX m_intakeTube;
+  TalonFX m_rightShooterBottom;
+  SparkMax m_rightShooterTop;
 
+  TalonFX m_leftShooterBottom;
+  TalonFX m_leftShooterTop;
+   
+ 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -52,15 +74,39 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    OpType.set(true);
     m_robotContainer = new RobotContainer();
-    m_TalonFX.set(1);  //TODO: Clean this up, what doe it do?!
 
-    // mFlexInake = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    
+    // m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+    m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
+    m_rightShooterTop = new SparkMax(MotorConstants.kLeftShooterMotorPortTop, MotorType.kBrushless);
+    m_leftShooterBottom = new TalonFX(MotorConstants.kRightShooterMotorPort);
+    m_leftShooterTop = new TalonFX(MotorConstants.kRightShooterMotorPortTop);
+    // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+    m_intakeTube = new TalonFX(MotorConstants.kIntakeTubeMotorPort);
+
+    // m_IntakeFX.set(-0.6);
+    // m_rightShooterBottom.set(1);
+    // m_rightShooterTop.set(1);
+    m_leftShooterBottom.set(1);
+    m_leftShooterTop.set(-1);
+    // m_intakeTraveler.set(0.85);
+    // m_intakeExtend.set(0.0);
+    m_intakeTube.set(1);
+
+
+
+  //   // m_TalonFX.setControl(new DutyCycleOut(1.0));
+  //   var talonFXConfigurator = m_TalonFX.getConfigurator();
+  //  talonFXConfigurator.apply(commonConfigs);
+
+//    m_flexIntakeExtend = new SparkFlex(MotorConstants.kIntakeExtendMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless); 
+// m_flexIntakeExtend.set(0.1);
+    // mFlexInake  = new SparkFlex(MotorConstants.kIntakeMotorPort, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     // mFlexInake.set(0);
    
     SmartDashboard.putData(CommandScheduler.getInstance());
-    OpType.set(true);
     
   }
 
@@ -84,8 +130,6 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-
-    OpType.set(false);
   }
 
   @Override
@@ -94,7 +138,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    OpType.set(false);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -118,29 +161,4 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
-
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
-
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {
-
-
-  }
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {
-  }
 }

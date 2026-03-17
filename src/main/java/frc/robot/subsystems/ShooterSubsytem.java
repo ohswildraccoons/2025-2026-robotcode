@@ -10,17 +10,25 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.Supplier;
+
 import static edu.wpi.first.units.Units.RPM;
 
-
+import frc.robot.Constants;
+import frc.robot.Constants.MotorConstants;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
@@ -30,13 +38,18 @@ import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.local.SparkWrapper;
-
+import yams.motorcontrollers.remote.TalonFXSWrapper;
+import yams.motorcontrollers.remote.TalonFXWrapper;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 
 public class ShooterSubsytem extends SubsystemBase  {
+
+  int ShooterMotorIDLeft;
+  int ShooterMotorIDRight;
+  
         
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
@@ -64,15 +77,16 @@ public class ShooterSubsytem extends SubsystemBase  {
 
     
     // Vendor motor controller object
-    private SparkMax spark = new SparkMax(41, MotorType.kBrushless);
+    private TalonFX talonLeft = new TalonFX(ShooterMotorIDLeft);
+    private TalonFX talonRight = new TalonFX(ShooterMotorIDRight);
+    
 
-    // Create our SmartMotorController from our Spark and config with the NEO.
-    private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);//TODO: change to 2xMinion, thanks yams
+    private TalonFXWrapper sparkSmartMotorController = new TalonFXWrapper(talonLeft, DCMotor.getKrakenX44(1), smcConfig);
 
   
     private final FlyWheelConfig shooterConfig = new FlyWheelConfig(sparkSmartMotorController)
     // Diameter of the flywheel.
-    .withDiameter(Inches.of(4))
+    .withDiameter(Inches.of(Constants.ShooterConstants.shooterWheelRadiusInches))
     // Mass of the flywheel.
     .withMass(Pounds.of(1))
     // Maximum speed of the shooter.
@@ -98,7 +112,69 @@ public class ShooterSubsytem extends SubsystemBase  {
    * @param speed Speed to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command setVelocity(AngularVelocity speed) {return shooter.setSpeed(speed);}
+  public Command setSpeed(AngularVelocity speed) {return shooter.setSpeed(speed);}
+  
+  public Command setVelocityOfFire(double velocity) {
+    
+  double distanceGround = findDistanceBasedOnVelocity(velocity);
+
+  double prevDistance = 0;
+  double previousRPM = 0;
+  int id = 0;
+  
+
+  for (double distance: Constants.ShooterConstants.shooterDistances) {
+    if (distance == distanceGround){
+      return shooter.setSpeed(RPM.of(Constants.ShooterConstants.shooterRPMs[id]));
+    }else if (distance >= distanceGround){
+      double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPMs[id] - previousRPM);
+      double interpolatedRPM = previousRPM + slope * (distanceGround - prevDistance);
+      return shooter.setSpeed(RPM.of(interpolatedRPM));
+    }else{
+      prevDistance = distance;
+      previousRPM = Constants.ShooterConstants.shooterRPMs[id];
+      id++;
+    }
+  }
+  return shooter.setSpeed(RPM.of(Constants.ShooterConstants.shooterRPMs[Constants.ShooterConstants.shooterRPMs.length - 1]));
+  }
+
+  public Command autoSetVelocityOfFire(Supplier<Pose3d> TargetLocation, Supplier<Pose3d> shooterLocation) {
+    double velocity = CalcVelocity(TargetLocation.get(), shooterLocation.get());
+    return setVelocityOfFire(velocity);
+  }
+
+  /*
+   * calculates the required velocity needed to hit the set point
+   * 
+   * @param targetLocation
+   */
+  public double CalcVelocity(Pose3d TargetLocation, Pose3d RobotLocation){
+    double g = 9.8;
+    double height = TargetLocation.getZ() - RobotLocation.getZ();
+
+    double xDistance = Math.abs(TargetLocation.getX() - RobotLocation.getX());
+    double yDistance = Math.abs(TargetLocation.getY()- RobotLocation.getY());
+    double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+
+    double numerator = g*Math.pow(distance, 2);
+    double denominator = 2*Math.pow(Math.cos(Constants.TurretConstants.launchAngle), 2)*(distance * Math.tan(Constants.TurretConstants.launchAngle) - height);
+
+    double velocity = Math.sqrt(numerator/denominator);
+
+    return velocity;
+  }
+
+  /*
+   * Calculates given a distance in the air, the distance it will be on the ground
+   * 
+   * @param target Location
+   * @param RobotLocation
+   */
+  public double findDistanceBasedOnVelocity(double velocity){
+    double distance = (Math.pow(velocity, 2)*Math.sin(2*Constants.TurretConstants.launchAngle))/9.8;
+    return distance;
+  }
 
   /**
    * Set the dutycycle of the shooter.
@@ -109,7 +185,10 @@ public class ShooterSubsytem extends SubsystemBase  {
   public Command set(double dutyCycle) {return shooter.set(dutyCycle);}
 
   /** Creates a new ExampleSubsystem. */
-  public ShooterSubsytem() {}
+  public ShooterSubsytem(int ShooterMotorIDLeft, int ShooterMotorIDRight) {
+    this.ShooterMotorIDLeft = ShooterMotorIDLeft;
+    this.ShooterMotorIDRight = ShooterMotorIDRight;
+  }
 
   /**
    * Example command factory method.
@@ -139,13 +218,6 @@ public class ShooterSubsytem extends SubsystemBase  {
   public void periodic() {
     // This method will be called once per scheduler run
     shooter.updateTelemetry();
-
-     //TODO Alert Posting 
-    // Failure modes we can deal with:
-    // Single shooter motor has failed - slows ramp speed
-    // Both shooter motors have failed
-    // Single shooter sleceted off (undetected failure - mechanical etc)
-    //  Shooter outside validated Range
   }
 
   @Override
