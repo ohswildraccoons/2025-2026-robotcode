@@ -53,14 +53,14 @@ import frc.robot.subsystems.ShooterSubsytem;
  */
 public class RobotContainer {
   // // The robot's subsystems and commands are defined here...
-  private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
-  private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
+ // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
+//  private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
+//  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   Pose3d robotPose = new Pose3d();
   Pose3d testFiringAreaPose3d = new Pose3d( 8.3, 3.8, 4, new Rotation3d(0 ,0 ,0));
 
-  private final SendableChooser<Command> autoChooser;
+  //private final SendableChooser<Command> autoChooser;
   
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -81,25 +81,25 @@ public class RobotContainer {
 
 
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    //autoChooser = AutoBuilder.buildAutoChooser();
+    //SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
     configureBindings();
 
-    m_swerveDrive.setDefaultCommand(
-      m_swerveDrive.driveCommand(
-        () -> m_driverController.getLeftX(),
-        () -> m_driverController.getLeftY() * -1,
-        () -> m_driverController.getRightX()
-        )
-    );
-    m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
-    m_TurretSubsystem.setDefaultCommand(
-        m_TurretSubsystem.targettingCommand(
-          () -> m_swerveDrive.getRobotPose(),
-          m_swerveDrive
-      )
-    );
+    // m_swerveDrive.setDefaultCommand(
+    //   m_swerveDrive.driveCommand(
+    //     () -> m_driverController.getLeftX(),
+    //     () -> m_driverController.getLeftY() * -1,
+    //     () -> m_driverController.getRightX()
+    //     )
+    // );
+    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
+    // m_TurretSubsystem.setDefaultCommand(
+    //     m_TurretSubsystem.targettingCommand(
+    //       () -> m_swerveDrive.getRobotPose(),
+    //       m_swerveDrive
+    //   )
+    // );
 
 
     
@@ -141,6 +141,7 @@ public class RobotContainer {
       })
     );
 
+
    // m_mechController.
     //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
     //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
@@ -148,10 +149,10 @@ public class RobotContainer {
     //   leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
     //   m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
     
-     m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-     m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-     m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
-     m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
+    //  m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
+    //  m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
+    //  m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
+    //  m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
 
   }
 
@@ -162,6 +163,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    return null;//autoChooser.getSelected();
   }
 }

@@ -38,6 +38,7 @@ import frc.robot.Constants.GearRatios;
 import frc.robot.Constants.MotorConstants;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
+import yams.gearing.Sprocket;
 import yams.mechanisms.SmartMechanism;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.PivotConfig;
@@ -52,11 +53,17 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 
 public class IntakeSubsystem extends SubsystemBase {
+
 SparkFlex rollerMotor;
- boolean deployed;
+boolean deployed;
 SparkFlexSim rollerMotorSim;
+Pivot arm;
+SmartMotorController sparkSmartMotorController;
+
+
 
   public IntakeSubsystem() {
+
     rollerMotor = new SparkFlex(Constants.MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
     deployed = false;
     rollerMotorSim = new SparkFlexSim(rollerMotor, DCMotor.getNeoVortex(1));
@@ -65,17 +72,12 @@ SparkFlexSim rollerMotorSim;
     rollerConfig.smartCurrentLimit(40);
     
     rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
-  }
 
-
-  private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-  .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(1.0, 0.05, 0.1)
-  //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
-//  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
-  // Configure Motor and Mechanism properties
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages((51/30), 100)))
+   SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
+  //.withControlMode(ControlMode.CLOSED_LOOP)
+  .withSubsystem(this)
+  .withClosedLoopController(0.65, 0.00, 0.0)
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("31:50")))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -87,23 +89,28 @@ SparkFlexSim rollerMotorSim;
 
   
   // Vendor motor controller object
-  private SparkFlex spark = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-  
+   SparkFlex RetractMC = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNeoVortex(1), smcConfig);
+   sparkSmartMotorController = new SparkWrapper(RetractMC, DCMotor.getNeoVortex(1), smcConfig);
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
+   //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
       .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
       .withHardLimit(Degrees.of(-10.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
-      .withMOI(Feet.of(0.25), Pounds.of(15)); // MOI Calculation
-     
+      .withMOI(Feet.of(0.25), Pounds.of(15));// MOI Calculation
+      
 
   // Arm Mechanism
-  private Pivot arm = new Pivot(m_config);
+   arm = new Pivot(m_config);
 
+    
+  }
+
+
+ 
   /**
    * Set the angle of the arm.
    * @param angle Angle to go to.
@@ -182,6 +189,9 @@ SparkFlexSim rollerMotorSim;
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    System.out.println("Arm Angle: " + (arm.getAngle().in(Degrees)));
+    System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
+
     arm.updateTelemetry();
     
   }
