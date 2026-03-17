@@ -44,11 +44,17 @@ public final class Constants {
     // indexer 21 - 30
     public static final int kIntakeTravellerMotorPort = 21;
     public static final int kIntakeTubeMotorPort = 22;
-    // turret 41-50
 
-    // shooter 51-60
-    public static final int kShooterMotorPort = 51;
-    public static final int kTurretMotorPort = 52;
+    // Camera 41-50
+
+    // Turret 51-60
+    public static final int kLeftShooterMotorPort = 51;
+    public static final int kLeftShooterMotorPortTop = 52;
+    public static final int kLeftTurretMotorPort = 53;
+
+    public static final int kRightShooterMotorPort = 54;
+    public static final int kRightShooterMotorPortTop = 55;
+    public static final int kRightTurretMotorPort = 56;
     
     
   } 
@@ -110,8 +116,16 @@ public final class Constants {
       public static final double leftTurretMetersX = Units.inchesToMeters(leftTurretInchesX);
       public static final double leftTurretMetersY = Units.inchesToMeters(leftTurretInchesY);
 
+      public static final double launchAngleDegrees = 50;
+      public static final double launchAngle = launchAngleDegrees * (Math.PI/180);
+    }
 
-      public static final double launchAngle = 50 * (Math.PI/180);
+    public static final class ShooterConstants{
+      public static final double shooterWheelRadiusInches = 3;
+      public static final double shooterWheelRadiusMeters = Units.inchesToMeters(shooterWheelRadiusInches);
+
+      public static final double[] shooterRPMs = {1000, 2000, 3000, 4000, 5000};
+      public static final double[] shooterDistances = {1, 2, 3, 4, 5};
     }
 
 

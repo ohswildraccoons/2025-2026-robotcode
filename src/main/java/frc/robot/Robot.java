@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
   private final SparkFlex mFlexShooterPath;
   private final SparkFlex mFlexShooterOutake; */
   TalonFX m_IntakeFX;
-  TalonFXS m_shooter;
    TalonFXConfiguration mTalonFXConfig = new TalonFXConfiguration();
    final TalonFXConfiguration commonConfigs = new TalonFXConfiguration()
    .withMotorOutput(
@@ -56,11 +55,14 @@ public class Robot extends TimedRobot {
    );
 
 
-  // SparkFlex m_flexIntakeExtend;
-  SparkMax m_intakeTraveler;
-  SparkMax m_intakeExtend;
-  SparkMax m_intakeTube;
-  
+  // SparkMax m_intakeTraveler;
+  // SparkMax m_intakeExtend;
+  TalonFX m_intakeTube;
+  TalonFX m_rightShooterBottom;
+  SparkMax m_rightShooterTop;
+
+  TalonFX m_leftShooterBottom;
+  TalonFX m_leftShooterTop;
    
  
   /**
@@ -73,17 +75,23 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     
-    m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
-    m_shooter = new TalonFXS(MotorConstants.kShooterMotorPort);
-    m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
-    m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-    m_intakeTube = new SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+    // m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+    m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
+    m_rightShooterTop = new SparkMax(MotorConstants.kLeftShooterMotorPortTop, MotorType.kBrushless);
+    m_leftShooterBottom = new TalonFX(MotorConstants.kRightShooterMotorPort);
+    m_leftShooterTop = new TalonFX(MotorConstants.kRightShooterMotorPortTop);
+    // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+    m_intakeTube = new TalonFX(MotorConstants.kIntakeTubeMotorPort);
 
-    m_IntakeFX.set(-0.6);
-    m_shooter.set(-1);
-    m_intakeTraveler.set(0.6);
-    m_intakeExtend.set(0.0);
-    m_intakeTube.set(0.6);
+    // m_IntakeFX.set(-0.6);
+    // m_rightShooterBottom.set(1);
+    // m_rightShooterTop.set(1);
+    m_leftShooterBottom.set(1);
+    m_leftShooterTop.set(-1);
+    // m_intakeTraveler.set(0.85);
+    // m_intakeExtend.set(0.0);
+    m_intakeTube.set(1);
 
 
 
@@ -155,7 +163,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // SmartDashboard.putNumber("Shooter1",);
+  }
 
   @Override
   public void testInit() {

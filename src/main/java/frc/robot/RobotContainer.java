@@ -55,9 +55,9 @@ import frc.robot.subsystems.ShooterSubsytem;
  */
 public class RobotContainer {
   // // The robot's subsystems and commands are defined here...
-  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
+  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, TurretSubsystem.TurretSide.LEFT);
+  // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kTurretMotorPort);
   // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   Pose3d robotPose = new Pose3d();
 
@@ -82,18 +82,18 @@ public class RobotContainer {
 
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
-        () -> m_driverController.getLeftX(),
+        () -> m_driverController.getLeftX() * -1,
         () -> m_driverController.getLeftY() * -1,
-        () -> m_driverController.getRightX()
+        () -> m_driverController.getRightX() * -1
         )
     );
-    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
-    m_TurretSubsystem.setDefaultCommand(
-        m_TurretSubsystem.targettingCommand(
-          () -> new Pose3d(m_swerveDrive.getPose()),
-          m_swerveDrive
-      )
-    );
+    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
+    // m_TurretSubsystem.setDefaultCommand(
+    //     m_TurretSubsystem.targettingCommand(
+    //       () -> new Pose3d(m_swerveDrive.getPose()),
+    //       m_swerveDrive
+    //   )
+    // );
 
 
     //  m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean()));
@@ -134,10 +134,10 @@ public class RobotContainer {
       //  }));
       // m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
     
-    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueLeftDeposit));
-    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueRightDeposit));
-    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueHub));
-    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOn());
+    // m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueLeftDeposit));
+    // m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueRightDeposit));
+    // m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(FieldConstants.blueHub));
+    // m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOn());
 
 
 

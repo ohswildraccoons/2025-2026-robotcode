@@ -51,8 +51,8 @@
     },
     "###/SmartDashboard/TurretPivot/mechanism": {
       "Collapsed": "0",
-      "Pos": "1706,580",
-      "Size": "367,250"
+      "Pos": "1395,444",
+      "Size": "505,391"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -61,8 +61,8 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "1397,73",
-      "Size": "976,278"
+      "Pos": "1418,98",
+      "Size": "976,82"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -71,7 +71,7 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "8,684",
+      "Pos": "50,724",
       "Size": "750,479"
     },
     "###NetworkTables Info": {

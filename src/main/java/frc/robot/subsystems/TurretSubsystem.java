@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.lang.annotation.Target;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -63,6 +64,7 @@ import frc.robot.Constants.FieldConstants;
 
 public class TurretSubsystem extends SubsystemBase{ 
 
+  int turretId;
   double angle = 0;
   double botRelativeXPos;
   double botRelativeYPos;
@@ -76,11 +78,12 @@ public class TurretSubsystem extends SubsystemBase{
   TurretSide turretSide;
   Pose3d currentlyTargetedPose = Constants.FieldConstants.middleField;
   Supplier<Pose3d> target = () -> currentlyTargetedPose;
+  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
 
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(4.0, 0.0, 0.0)
+  .withClosedLoopController(2.0, 0.001, 0.0)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
@@ -96,7 +99,7 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkMax spark = new SparkMax(Constants.MotorConstants.kTurretMotorPort, MotorType.kBrushless);
+  private SparkMax spark = new SparkMax(turretId, MotorType.kBrushless);
 
   // Create our SmartMotorController from our Spark and config with the NEO.
   private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
@@ -104,7 +107,7 @@ public class TurretSubsystem extends SubsystemBase{
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-7200000.0), Degrees.of(720000000)) // Hard limit bc wiring prevents infinite spinning
+      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("TurretPivot", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
      
@@ -137,7 +140,6 @@ public Angle getAngle(){return turrePivot.getAngle();}
     Rotation2d rotation = botPose.getRotation().toRotation2d();
     Rotation2d turretAngle = new Rotation2d(turrePivot.getAngle());
     Rotation3d turretRotation = new Rotation3d(0, 0, turretAngle.getRadians());
-
     double fieldRelativeXPos = Math.cos(rotation.getRadians()) * botRelativeXPos - Math.sin(rotation.getRadians()) * botRelativeYPos + botX;
     double fieldRelativeYPos = Math.sin(rotation.getRadians()) * botRelativeXPos + Math.cos(rotation.getRadians()) * botRelativeYPos + botY;
     
@@ -172,6 +174,8 @@ public Angle getAngle(){return turrePivot.getAngle();}
         Pose3d virtualTargetPose = ghostTargetPose(targetPose.get(), turretFieldRelativePose, swerveSubsystem);
         double deltaX = virtualTargetPose.getX() - turretFieldRelativePose.getX();
         double deltaY = virtualTargetPose.getY() - turretFieldRelativePose.getY();
+        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+
         double angle = Math.atan2(deltaY, deltaX);
         double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
         SmartDashboard.putNumber("Turret Target Angle", angleDeg);
@@ -193,22 +197,30 @@ public Angle getAngle(){return turrePivot.getAngle();}
         Supplier<Pose3d> targetPose = () -> {
             switch (getFieldSection(robotPose.get())) {
                 case BLUE_HUB:
-                    return FieldConstants.blueHub;
+                    target = () -> FieldConstants.blueHub;
+                    return target.get();
                 case RED_HUB:
-                    return FieldConstants.redHub;
+                    target = () -> FieldConstants.redHub;
+                    return target.get();
                 case BLUE_LEFT:
-                    return FieldConstants.blueLeftDeposit;
+                    target = () -> FieldConstants.blueLeftDeposit;
+                    return target.get();
                 case BLUE_RIGHT:
-                    return FieldConstants.blueRightDeposit;
+                    target = () -> FieldConstants.blueRightDeposit;
+                    return target.get();
                 case RED_LEFT:
-                    return FieldConstants.redLeftDeposit;
+                    target = () -> FieldConstants.redLeftDeposit;
+                    return target.get();
                 case RED_RIGHT:
-                    return FieldConstants.redRightDeposit;
+                    target = () -> FieldConstants.redRightDeposit;
+                    return target.get();
                 case BLUE_MIDDLE:
                     if (turretSide == TurretSide.LEFT) {
-                        return FieldConstants.blueLeftDeposit;
+                        target = () -> FieldConstants.blueLeftDeposit;
+                        return target.get();
                     } else {
-                        return FieldConstants.blueRightDeposit;
+                        target = () -> FieldConstants.blueRightDeposit;
+                        return target.get();
                     }
                 default:
                     return FieldConstants.middleField;
@@ -240,6 +252,10 @@ public Angle getAngle(){return turrePivot.getAngle();}
             SmartDashboard.putString("Target x", Double.toString(target.getX()));
             SmartDashboard.putString("Target y", Double.toString(target.getY()));
         });
+    }
+
+    public Supplier<Pose3d> getTarget(){
+        return target;
     }
 
     
@@ -284,71 +300,55 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
 
 
-  private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsystem swerveSubsystem){
-     // Inputs
-      double botX = botPose3d.getX();
-      double botY = botPose3d.getY();
+private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsystem swerveSubsystem) {
+    double botX = botPose3d.getX();
+    double botY = botPose3d.getY();
 
-      double botVx = swerveSubsystem.getVelocity().vxMetersPerSecond;
-      double botVy = swerveSubsystem.getVelocity().vyMetersPerSecond;
+    // Robot velocity (field-relative)
+    double botVx = swerveSubsystem.getVelocity().vxMetersPerSecond;
+    double botVy = swerveSubsystem.getVelocity().vyMetersPerSecond;
 
-      double targetX = targetPose.getX();
-      double targetY = targetPose.getY();
+    // Target position (stationary)
+    double targetX = targetPose.getX();
+    double targetY = targetPose.getY();
 
-      double v = CalcVelocity(targetPose, botPose3d);
-      double bulletSpeed = v * Math.cos(Constants.TurretConstants.launchAngle);
+    // Target diff from robot
+    double targetDiffX = targetX - botX;
+    double targetDiffY = targetY - botY; 
+    double alpha = Math.atan2(targetDiffY, targetDiffX);
 
-      // Relative position from bot to target
-      double relX = targetX - botX;
-      double relY = targetY - botY;
+    double velocity = CalcVelocity(targetPose, botPose3d);
+    double shooterAngle = Constants.TurretConstants.launchAngle;
 
-      // Precompute scalars
-      double botV2 = botVx * botVx + botVy * botVy;   // |V|^2
-      double relDotV = relX * botVx + relY * botVy;   // R·V
-      double rel2 = relX * relX + relY * relY;        // |R|^2
+    double parallelToGroundVelocity = velocity * Math.cos(shooterAngle);
+    double parallelToGroundVelocityX = parallelToGroundVelocity * Math.cos(alpha);
+    double parallelToGroundVelocityY = parallelToGroundVelocity * Math.sin(alpha);
 
-      // Quadratic coefficients
-      double a = bulletSpeed * bulletSpeed - botV2;
-      double b = 2.0 * relDotV;
-      double c = -rel2;
+    double requiredBulletVelocityX = parallelToGroundVelocityX - botVx;
+    double requiredBulletVelocityY = parallelToGroundVelocityY - botVy;
+    double requiredTurretAngle = Math.atan2(requiredBulletVelocityY,requiredBulletVelocityX);
 
-      // Discriminant
-      double disc = b * b - 4.0 * a * c;
-      if (disc < 0.0) {
-          // No solution — bullet too slow to intercept
-          // fallback behavior
-      }
+    double t = parallelToGroundVelocityX / targetDiffX; 
 
-      double sqrtDisc = Math.sqrt(disc);
-      double t1 = (-b + sqrtDisc) / (2.0 * a);
-      double t2 = (-b - sqrtDisc) / (2.0 * a);
+    Pose3d ghostPose = new Pose3d((requiredBulletVelocityX * t) + botX, (requiredBulletVelocityY * t) + botY, targetPose.getZ(), targetPose.getRotation());
 
-      // Choose smallest positive intercept time
-      double t = -1.0;
-      if (t1 > 0.0 && t2 > 0.0) t = Math.min(t1, t2);
-      else if (t1 > 0.0) t = t1;
-      else if (t2 > 0.0) t = t2;
+  SmartDashboard.putNumber("velocity", velocity);
+  SmartDashboard.putNumber("shooterAngle", shooterAngle);
 
-      if (t <= 0.0) {
-          // No valid positive intercept time
-          // fallback behavior
-      }
+  SmartDashboard.putNumber("parallelToGroundVelocity", parallelToGroundVelocity);
+  SmartDashboard.putNumber("parallelToGroundVelocityX", parallelToGroundVelocityX);
+  SmartDashboard.putNumber("parallelToGroundVelocityY", parallelToGroundVelocityY);
+  SmartDashboard.putNumber("alpha", 180*alpha/3.145);
+  SmartDashboard.putNumber("requiredTurretAngle", 180*requiredTurretAngle/3.145);
+  
+  SmartDashboard.putNumber("Ghost Pose X", ghostPose.getX());
+  SmartDashboard.putNumber("Ghost Pose Y", ghostPose.getY());
+  SmartDashboard.putNumber("Target Pose X", targetPose.getX());
+  SmartDashboard.putNumber("Target Pose Y", targetPose.getY());
 
-      // Virtual target (lead point)
-      double virtualX = targetX - botVx * t;
-      double virtualY = targetY - botVy * t;
+    return ghostPose;
 
-      // Aim turret at (virtualX, virtualY)
-
-      SmartDashboard.putNumber("t-bot x", swerveSubsystem.getPose().getX());
-      SmartDashboard.putNumber("t-bot y", swerveSubsystem.getPose().getY());
-     
-      SmartDashboard.putNumber("virtualx", virtualX);
-      SmartDashboard.putNumber("virtualy", virtualY);
-
-
-      return new Pose3d(virtualX, virtualY, targetPose.getZ(), targetPose.getRotation());
-  }
+}
 
 /*
    * calculates the required velocity needed to hit the set point
@@ -372,10 +372,11 @@ public Angle getAngle(){return turrePivot.getAngle();}
   }
 
   /** Creates a new ExampleSubsystem. */
-  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide) {
+  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide, int turretId) {
     this.botRelativeXPos = botRelativeXPos;
     this.botRelativeYPos = botRelativeYPos;
     this.turretSide = turretSide;
+    this.turretId = turretId;
 
   }
 

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 7.909455555555555,
+        "y": 2.086111111111111
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 7.090922222222223,
+        "y": 1.9789222222222225
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RFNZ2"
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 8.250511111111111,
+        "y": 0.7706111111111102
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 7.967922222222221,
+        "y": 1.0434555555555551
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RFONZ"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -88.99491399474593
   },
   "useDefaultConstraints": true
 }
