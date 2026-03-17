@@ -34,6 +34,11 @@
       "Pos": "60,60",
       "Size": "181,167"
     },
+    "###/SmartDashboard/Arm/mechanism": {
+      "Collapsed": "0",
+      "Pos": "406,31",
+      "Size": "558,455"
+    },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
       "Pos": "282,97",
@@ -51,11 +56,22 @@
     },
     "###/SmartDashboard/TurretPivot/mechanism": {
       "Collapsed": "0",
+<<<<<<< HEAD
       "Pos": "1395,444",
       "Size": "505,391"
+=======
+      "Pos": "1526,914",
+      "Size": "367,250"
+>>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
+    },
+    "###/SmartDashboard/arm/mechanism": {
+      "Collapsed": "0",
+      "Pos": "681,360",
+      "Size": "305,200"
     },
     "###FMS": {
       "Collapsed": "0",
+<<<<<<< HEAD
       "Pos": "7,543",
       "Size": "336,158"
     },
@@ -63,30 +79,43 @@
       "Collapsed": "0",
       "Pos": "1418,98",
       "Size": "976,82"
+=======
+      "Pos": "3,521",
+      "Size": "202,214"
+    },
+    "###Joysticks": {
+      "Collapsed": "0",
+      "Pos": "949,783",
+      "Size": "976,278"
+>>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
     },
     "###Keyboard 0 Settings": {
-      "Collapsed": "0",
+      "Collapsed": "1",
       "Pos": "10,50",
       "Size": "300,560"
     },
     "###NetworkTables": {
       "Collapsed": "0",
+<<<<<<< HEAD
       "Pos": "50,724",
+=======
+      "Pos": "34,676",
+>>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
       "Size": "750,479"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
-      "Pos": "900,801",
+      "Pos": "829,742",
       "Size": "750,403"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1452,84",
+      "Pos": "1446,71",
       "Size": "250,695"
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "7,356",
+      "Pos": "-20,337",
       "Size": "232,254"
     },
     "###Timing": {

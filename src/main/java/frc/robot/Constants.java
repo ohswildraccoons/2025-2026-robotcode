@@ -135,8 +135,10 @@ public final class Constants {
 // ROLLER_DEPLOYED_POSITION * DEGREES_TO_ROT * INTAKE_DEPLOY_GEAR_RATIO * INTAKE_DEPLOY * PULLEY_RATIO
   public static class GearRatios
   {
-    public static double INTAKE_DEPLOY_GEAR_RATIO = (1/100);
-    public static double PULLEY_RATIO = (30/51);
+   // public static double INTAKE_EXTEND_GEAR_RATIO = (1.0/100.0);
+   // public static double PULLEY_RATIO = (30.0/51.0);
+    //  |
+    /*  - >  */ // public static final String[] GEARBOX = {"30:510"};
   }
 
   public static class TargetPositions
@@ -149,7 +151,8 @@ public final class Constants {
    public static class Conversions
   {
   public static double ROT_TO_DEGREES = 360;
-  public static double DEGREES_TO_ROT = 1/360;
+  public static double DEGREES_TO_ROT = 1.0/360.0;
+  public static double SPEED_FACTOR = 4;
 
 }
 

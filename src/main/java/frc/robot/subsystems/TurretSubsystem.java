@@ -391,6 +391,8 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     turrePivot.simIterate();
+    // if(angle != null){ // Attempting this? -HS
     // DogLog.log("Turret Angle", angle);
+
+    }
   }
-}

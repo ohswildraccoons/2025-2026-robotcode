@@ -81,9 +81,6 @@ public class ShooterSubsytem extends SubsystemBase  {
     private TalonFX talonRight = new TalonFX(ShooterMotorIDRight);
     
 
-
-
-    // Create our SmartMotorController from our Spark and config with the NEO.
     private TalonFXWrapper sparkSmartMotorController = new TalonFXWrapper(talonLeft, DCMotor.getKrakenX44(1), smcConfig);
 
   
@@ -94,7 +91,7 @@ public class ShooterSubsytem extends SubsystemBase  {
     .withMass(Pounds.of(1))
     // Maximum speed of the shooter.
     
-    .withUpperSoftLimit(RPM.of(1000))
+    .withUpperSoftLimit(RPM.of(1000)) //TODO: this might need to be higher
     // Telemetry name and verbosity for the arm.  
     .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH);
 

@@ -11,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -209,6 +210,9 @@ public class CameraSubsystem extends SubsystemBase {
       // This method will be called once per scheduler run
       SmartDashboard.putBoolean("Target Detected",  detectsTarget());//puts whether a target has been detected to the dashboard
       SmartDashboard.putBoolean("Estimation", getPose().isPresent());      
+      //TODO: error logging and alerting
+
+
     }
   
     @Override
