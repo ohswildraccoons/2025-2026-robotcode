@@ -22,6 +22,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkFlex;
@@ -33,6 +34,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.GearRatios;
 import frc.robot.Constants.MotorConstants;
@@ -59,7 +61,7 @@ boolean deployed;
 SparkFlexSim rollerMotorSim;
 Pivot arm;
 SmartMotorController sparkSmartMotorController;
-
+RelativeEncoder rollEndcoder;
 
 
   public IntakeSubsystem() {
@@ -72,6 +74,7 @@ SmartMotorController sparkSmartMotorController;
     rollerConfig.smartCurrentLimit(40);
     
     rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rollEndcoder = rollerMotor.getEncoder();
 
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
@@ -84,6 +87,7 @@ SmartMotorController sparkSmartMotorController;
   .withTelemetry("arm", TelemetryVerbosity.HIGH)
   // Power Optimization
   .withStatorCurrentLimit(Amps.of(40))
+  .withSupplyCurrentLimit(Amps.of(30.0))
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25));
 
@@ -105,6 +109,8 @@ SmartMotorController sparkSmartMotorController;
 
   // Arm Mechanism
    arm = new Pivot(m_config);
+
+
 
     
   }
@@ -186,11 +192,22 @@ SmartMotorController sparkSmartMotorController;
     //return false;
   //}
 
+  public Command unjam() {
+    return runOnce(() -> {
+       set(-1.0)
+      .andThen(new WaitCommand(.25))
+      .andThen(rollMotors())
+          });
+
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    System.out.println("Arm Angle: " + (arm.getAngle().in(Degrees)));
-    System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
+    if (rollerMotor.getOutputCurrent()>30.0 && (rollEndcoder.getVelocity()<1.0) && (rollEndcoder.getVelocity()>-1.0) )
+    {
+      System.out.println("Intake is jammed! Unjamming");
+    }
 
     arm.updateTelemetry();
     
