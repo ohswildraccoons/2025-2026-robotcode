@@ -23,6 +23,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkFlex;
@@ -35,6 +36,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.GearRatios;
 import frc.robot.Constants.MotorConstants;
@@ -74,6 +76,7 @@ BooleanSupplier deployedSupplier = ()->deployed;
     rollerConfig.smartCurrentLimit(40);
     
     rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // rollEndcoder = rollerMotor.getEncoder();
 
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
@@ -86,6 +89,7 @@ BooleanSupplier deployedSupplier = ()->deployed;
   .withTelemetry("arm", TelemetryVerbosity.HIGH)
   // Power Optimization
   .withStatorCurrentLimit(Amps.of(40))
+  .withSupplyCurrentLimit(Amps.of(30.0))
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25));
 
@@ -107,6 +111,8 @@ BooleanSupplier deployedSupplier = ()->deployed;
 
   // Arm Mechanism
    arm = new Pivot(m_config);
+
+
 
     
   }
@@ -210,6 +216,15 @@ public Command toggleDeploy() {
     // Query some boolean state, such as a digital sensor.
     //return false;
   //}
+
+  // public Command unjam() {
+  //   return runOnce(() -> {
+  //      set(-1.0)
+  //     .andThen(new WaitCommand(.25))
+  //     .andThen(rollMotors())
+  //         });
+
+  // }
 
   @Override
   public void periodic() {
