@@ -48,18 +48,23 @@ public class Robot extends TimedRobot {
    final TalonFXConfiguration commonConfigs = new TalonFXConfiguration()
    .withMotorOutput(
       new MotorOutputConfigs()
-         .withNeutralMode(NeutralModeValue.Brake)
+         .withNeutralMode(NeutralModeValue.Coast)
+    
    )
    .withCurrentLimits(
       new CurrentLimitsConfigs()
          .withStatorCurrentLimit(Amps.of(120))
          .withStatorCurrentLimitEnable(true)
+         .withSupplyCurrentLimit(Amps.of(40))
+         .withSupplyCurrentLimitEnable(true)
+  
    );
+  //  .OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
 
 
   // SparkMax m_intakeTraveler;
   // SparkMax m_intakeExtend;
-  TalonFX m_intakeTube;
+  SparkFlex m_intakeTube;
   TalonFX m_rightShooterBottom;
   SparkMax m_rightShooterTop;
 
@@ -78,22 +83,22 @@ public class Robot extends TimedRobot {
 
     
     // m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
-    m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
-    m_rightShooterTop = new SparkMax(MotorConstants.kLeftShooterMotorPortTop, MotorType.kBrushless);
-    m_leftShooterBottom = new TalonFX(MotorConstants.kRightShooterMotorPort);
-    m_leftShooterTop = new TalonFX(MotorConstants.kRightShooterMotorPortTop);
+    // m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
+    // m_rightShooterTop = new SparkMax(MotorConstants.kLeftShooterMotorPortTop, MotorType.kBrushless);
+    // m_leftShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
+    // m_leftShooterTop = new TalonFX(MotorConstants.kLeftShooterMotorPortTop);
     // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
     // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-    m_intakeTube = new TalonFX(MotorConstants.kIntakeTubeMotorPort);
+    m_intakeTube = new SparkFlex(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
 
     // m_IntakeFX.set(-0.6);
     // m_rightShooterBottom.set(1);
     // m_rightShooterTop.set(1);
-    m_leftShooterBottom.set(1);
-    m_leftShooterTop.set(-1);
+    // m_leftShooterBottom.set(1);
+    // m_leftShooterTop.set(-1);
     // m_intakeTraveler.set(0.85);
     // m_intakeExtend.set(0.0);
-    m_intakeTube.set(1);
+    // m_intakeTube .set(1);
 
 
 

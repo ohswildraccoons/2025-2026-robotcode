@@ -21,6 +21,11 @@
       "Column 1  Weight": "1.0000",
       "RefScale": "13"
     },
+    "0x965B9C9E,2": {
+      "Column 0  Width": "160",
+      "Column 1  Weight": "1.0000",
+      "RefScale": "16"
+    },
     "0xE56EC1C2,4": {
       "Column 0  Weight": "1.0000",
       "Column 1  Weight": "1.0000",
@@ -44,6 +49,11 @@
       "Pos": "282,97",
       "Size": "1119,629"
     },
+    "###/SmartDashboard/Left turret/mechanism": {
+      "Collapsed": "0",
+      "Pos": "367,730",
+      "Size": "511,323"
+    },
     "###/SmartDashboard/Motors": {
       "Collapsed": "0",
       "Pos": "60,60",
@@ -56,38 +66,28 @@
     },
     "###/SmartDashboard/TurretPivot/mechanism": {
       "Collapsed": "0",
-<<<<<<< HEAD
       "Pos": "1395,444",
       "Size": "505,391"
-=======
-      "Pos": "1526,914",
-      "Size": "367,250"
->>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
     },
     "###/SmartDashboard/arm/mechanism": {
       "Collapsed": "0",
-      "Pos": "681,360",
+      "Pos": "1165,84",
       "Size": "305,200"
+    },
+    "###/SmartDashboard/right Turret/mechanism": {
+      "Collapsed": "0",
+      "Pos": "924,719",
+      "Size": "501,302"
     },
     "###FMS": {
       "Collapsed": "0",
-<<<<<<< HEAD
       "Pos": "7,543",
-      "Size": "336,158"
-    },
-    "###Joysticks": {
-      "Collapsed": "0",
-      "Pos": "1418,98",
-      "Size": "976,82"
-=======
-      "Pos": "3,521",
       "Size": "202,214"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "949,783",
+      "Pos": "1418,98",
       "Size": "976,278"
->>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "1",
@@ -96,16 +96,12 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-<<<<<<< HEAD
-      "Pos": "50,724",
-=======
-      "Pos": "34,676",
->>>>>>> 6bbf84bf810f407c8695be211f21dadcf4896891
+      "Pos": "31,498",
       "Size": "750,479"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
-      "Pos": "829,742",
+      "Pos": "907,441",
       "Size": "750,403"
     },
     "###Other Devices": {
@@ -113,9 +109,14 @@
       "Pos": "1446,71",
       "Size": "250,695"
     },
+    "###RoboRIO": {
+      "Collapsed": "0",
+      "Pos": "5,125",
+      "Size": "141,164"
+    },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "-20,337",
+      "Pos": "59,349",
       "Size": "232,254"
     },
     "###Timing": {

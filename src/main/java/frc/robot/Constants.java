@@ -48,12 +48,12 @@ public final class Constants {
     // Camera 41-50
 
     // Turret 51-60
-    public static final int kLeftShooterMotorPort = 51;
-    public static final int kLeftShooterMotorPortTop = 52;
+    public static final int kLeftShooterMotorPortLeft = 51;
+    public static final int kLeftShooterMotorPortRight = 52;
     public static final int kLeftTurretMotorPort = 53;
 
-    public static final int kRightShooterMotorPort = 54;
-    public static final int kRightShooterMotorPortTop = 55;
+    public static final int kRightShooterMotorPortLeft = 54;
+    public static final int kRightShooterMotorPortRight = 55;
     public static final int kRightTurretMotorPort = 56;
     
     
@@ -79,33 +79,35 @@ public final class Constants {
   
   public static final class CameraConstants{
 
-      public static final double topFrontX = Units.inchesToMeters(3.0);
-      public static final double topFrontY = Units.inchesToMeters(13.0);
-      public static final double topFrontZ = Units.inchesToMeters(32.5);
-      public static final double topFrontRoll = Units.degreesToRadians(0.0);
-      public static final double topFrontPitch = Units.degreesToRadians(-40.0);
-      public static final double topFrontYaw = Units.degreesToRadians(0.0);
+      public static final double frontRightX = Units.inchesToMeters(13.25);
+      public static final double frontRightY = Units.inchesToMeters(7.2);
+      public static final double frontRightZ = Units.inchesToMeters(3.75);
+      public static final double frontRightRoll = Units.degreesToRadians(0.0);
+      public static final double frontRightPitch = Units.degreesToRadians(-9.74);
+      public static final double frontRightYaw = Units.degreesToRadians(11.3);
 
-      public static final double bottomFrontX = Units.inchesToMeters(8.5);
-      public static final double bottomFrontY = Units.inchesToMeters(1.5);
-      public static final double bottomFrontZ = Units.inchesToMeters(11.0);
-      public static final double bottomFrontRoll = Units.degreesToRadians(0.0);
-      public static final double bottomFrontPitch = Units.degreesToRadians(0.0);     
-      public static final double bottomFrontYaw = Units.degreesToRadians(0.0);
+      public static final double frontLeftX = Units.inchesToMeters(13.25);
+      public static final double frontLeftY = Units.inchesToMeters(-7.2);
+      public static final double frontLeftZ = Units.inchesToMeters(3.75);
+      public static final double frontLeftRoll = Units.degreesToRadians(0.0);
+      public static final double frontLeftPitch = Units.degreesToRadians(9.74);     
+      public static final double frontLeftYaw = Units.degreesToRadians(-11.3);
+
+      public static final double backRightX =  Units.inchesToMeters(-13.5);
+      public static final double backRightY =  Units.inchesToMeters(-12.875);
+      public static final double backRightZ = Units.inchesToMeters(23.0);
+      public static final double backRightRoll = Units.degreesToRadians(0.0);
+      public static final double backRightPitch = Units.degreesToRadians(0.0);
+      public static final double backRightYaw = Units.degreesToRadians(-168.69);
  
-      public static final double leftBackX = Units.inchesToMeters(-13.5);
-      public static final double leftBackY = Units.inchesToMeters(12.875);
-      public static final double leftBackZ = Units.inchesToMeters(23.0);
-      public static final double leftBackRoll = Units.degreesToRadians(0.0);
-      public static final double leftBackPitch = Units.degreesToRadians(0.0);
-      public static final double leftBackYaw = Units.degreesToRadians(168.69);
+      public static final double backLeftX = Units.inchesToMeters(-13.5);
+      public static final double backLeftY = Units.inchesToMeters(12.875);
+      public static final double backLeftZ = Units.inchesToMeters(23.0);
+      public static final double backLeftRoll = Units.degreesToRadians(0.0);
+      public static final double backLeftPitch = Units.degreesToRadians(0.0);
+      public static final double backLeftYaw = Units.degreesToRadians(168.69);
           
-      public static final double rightBackX =  Units.inchesToMeters(-13.5);
-      public static final double rightBackY =  Units.inchesToMeters(-12.875);
-      public static final double rightBackZ = Units.inchesToMeters(23.0);
-      public static final double rightBackRoll = Units.degreesToRadians(0.0);
-      public static final double rightBackPitch = Units.degreesToRadians(0.0);
-      public static final double rightBackYaw = Units.degreesToRadians(-168.69);
+
     }
 
     public static final class TurretConstants{
@@ -116,6 +118,12 @@ public final class Constants {
       public static final double leftTurretMetersX = Units.inchesToMeters(leftTurretInchesX);
       public static final double leftTurretMetersY = Units.inchesToMeters(leftTurretInchesY);
 
+      public static final double rightTurretInchesX = -11.5;
+      public static final double rightTurretInchesY = 11.5;
+
+      public static final double rightTurretMetersX = Units.inchesToMeters(rightTurretInchesX);
+      public static final double rightTurretMetersY = Units.inchesToMeters(rightTurretInchesY);
+
       public static final double launchAngleDegrees = 50;
       public static final double launchAngle = launchAngleDegrees * (Math.PI/180);
     }
@@ -125,7 +133,7 @@ public final class Constants {
       public static final double shooterWheelRadiusMeters = Units.inchesToMeters(shooterWheelRadiusInches);
 
       public static final double[] shooterRPMs = {1000, 2000, 3000, 4000, 5000};
-      public static final double[] shooterDistances = {1, 2, 3, 4, 5};
+      public static final double[] shooterDistances = {1, 2, 3, 4, 5}; // in 
     }
 
 

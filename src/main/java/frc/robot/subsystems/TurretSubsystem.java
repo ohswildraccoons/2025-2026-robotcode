@@ -78,12 +78,13 @@ public class TurretSubsystem extends SubsystemBase{
   TurretSide turretSide;
   Pose3d currentlyTargetedPose = Constants.FieldConstants.middleField;
   Supplier<Pose3d> target = () -> currentlyTargetedPose;
+  Pose3d currentGhostTarget = Constants.FieldConstants.middleField;
   // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
 
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(2.0, 0.001, 0.0)
+  .withClosedLoopController(2.0, 0.00, 0.0)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
@@ -99,21 +100,16 @@ public class TurretSubsystem extends SubsystemBase{
 
   
   // Vendor motor controller object
-  private SparkMax spark = new SparkMax(turretId, MotorType.kBrushless);
+  private SparkMax spark;
 
   // Create our SmartMotorController from our Spark and config with the NEO.
-  private SmartMotorController sparkSmartMotorController = new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+  private SmartMotorController sparkSmartMotorController;
 
-  PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
-      .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
-      .withWrapping(Degrees.of(0), Degrees.of(360)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
-      .withTelemetry("TurretPivot", TelemetryVerbosity.HIGH) // Telemetry
-      .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
+  PivotConfig                m_config;
      
 
   // Arm Mechanism
-  private Pivot turrePivot = new Pivot(m_config);
+  private Pivot turrePivot;
 
   /**
    * Set the angle of the arm.
@@ -171,25 +167,27 @@ public Angle getAngle(){return turrePivot.getAngle();}
       return turrePivot.setAngle(() -> {
         turretFieldRelativePose = getFieldPos(robotPose.get());
           SmartDashboard.putString("Field Section", getFieldSection(robotPose.get()).name());
-        Pose3d virtualTargetPose = ghostTargetPose(targetPose.get(), turretFieldRelativePose, swerveSubsystem);
-        double deltaX = virtualTargetPose.getX() - turretFieldRelativePose.getX();
-        double deltaY = virtualTargetPose.getY() - turretFieldRelativePose.getY();
+         currentGhostTarget = ghostTargetPose(targetPose.get(), turretFieldRelativePose, swerveSubsystem);
+        double deltaX = currentGhostTarget.getX() - turretFieldRelativePose.getX();
+        double deltaY = currentGhostTarget.getY() - turretFieldRelativePose.getY();
         double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
         double angle = Math.atan2(deltaY, deltaX);
         double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
         SmartDashboard.putNumber("Turret Target Angle", angleDeg);
         
-        SmartDashboard.putNumber("v-target x", virtualTargetPose.getX());
-        SmartDashboard.putNumber("v-target y", virtualTargetPose.getY());
+        SmartDashboard.putNumber("v-target x", currentGhostTarget.getX());
+        SmartDashboard.putNumber("v-target y", currentGhostTarget.getY());
 
+
+        SmartDashboard.putNumber("angle of Turret", angleDeg);
         return Degrees.of(angleDeg);
       });
     }
 
     public double adjustAngleToFieldRelative(Supplier<Pose3d> robotPose, Supplier<Double> angle) {
-        double fieldRelativeAngle = angle.get() - (robotPose.get().getRotation().getZ()) * (Math.PI/180);
-        return fieldRelativeAngle;
+        double robotAngleDeg = Math.toDegrees(robotPose.get().getRotation().getZ());
+        return angle.get() - robotAngleDeg;
     }
 
     public Command autoFindTargetPose(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
@@ -239,6 +237,14 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
     }
 
+    public Supplier<Pose3d> getGhostSupplier(){
+      return ()-> currentGhostTarget;
+    }
+    public Supplier<Pose3d> getTurretFieldPosSupplier(){
+      return () -> turretFieldRelativePose;
+    }
+
+
     public Command setAutoTargettingOn() {
         return runOnce(() -> {
             manual = false;
@@ -254,9 +260,32 @@ public Angle getAngle(){return turrePivot.getAngle();}
         });
     }
 
+    public Command setSplitTarget(Alliance alliance){
+      if(alliance == Alliance.Red){
+        if (turretSide == TurretSide.LEFT){
+          return setManualTarget(Constants.FieldConstants.blueLeftDeposit);
+        }else {
+          return setManualTarget(Constants.FieldConstants.blueRightDeposit);
+        }
+      }else if(alliance ==Alliance.Red){
+        if (turretSide == TurretSide.LEFT){
+          return setManualTarget(Constants.FieldConstants.redLeftDeposit);
+        }else {
+          return setManualTarget(Constants.FieldConstants.redRightDeposit);
+        }
+      } else{
+        if (turretSide == TurretSide.LEFT){
+          return setManualTarget(currentlyTargetedPose);
+        }else {
+          return setManualTarget(currentlyTargetedPose);
+        }
+      }
+    }
+
     public Supplier<Pose3d> getTarget(){
         return target;
     }
+
 
     
 
@@ -377,8 +406,20 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
     this.botRelativeYPos = botRelativeYPos;
     this.turretSide = turretSide;
     this.turretId = turretId;
+    String name = (turretSide == TurretSide.LEFT) ? "Left turret" : "right Turret";
 
+    spark = new SparkMax(turretId, MotorType.kBrushless);
+    sparkSmartMotorController= new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+    m_config= new PivotConfig(sparkSmartMotorController)
+      .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
+      // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping disabled bc the pivot cant spin infinitely
+      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
+      .withTelemetry(name, TelemetryVerbosity.HIGH) // Telemetry
+      .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
+    turrePivot = new Pivot(m_config);
   }
+
+
 
  
   @Override

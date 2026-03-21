@@ -4,11 +4,17 @@
 
 package frc.robot.subsystems;
 
+import frc.robot.subsystems.CameraSubsystem;
+
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
+
+import org.photonvision.EstimatedRobotPose;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -43,7 +49,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 public class SwerveSubsystem extends SubsystemBase { 
   // bBot is 14 14
   private final SwerveDrive swerveDrive;
-
+  private final CameraSubsystem cameras = CameraSubsystem.getInstance();
   
 
   /** Creates a new SwerveSubsystem. */
@@ -142,6 +148,20 @@ public class SwerveSubsystem extends SubsystemBase {
   {
     return swerveDrive.getPose();
   }
+
+  public void setPose(Pose2d pose)
+  {
+    Optional<EstimatedRobotPose> estimation = cameras.getPose();
+    if (estimation.isPresent()) {
+        Pose3d estimatedPose = estimation.get().estimatedPose;
+
+         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+            estimatedPose.toPose2d(),
+             estimation.get().timestampSeconds// jetts a doo doo head
+         );
+    } 
+  }
+
   /**
    * Resets odometry to the given pose. Gyro angle and module positions do not need to be reset when calling this
    * method.  However, if either gyro angle or module position is reset, this must be called in order for odometry to
@@ -179,7 +199,26 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+
+    Optional<EstimatedRobotPose> vision = cameras.getPose();
+
+    if (vision.isPresent()) {
+      EstimatedRobotPose est = vision.get();
+      Pose2d visionPose = est.estimatedPose.toPose2d();
+
+      double error = getPose().getTranslation().getDistance(visionPose.getTranslation());
+
+      if (error < 1.0) {  // Only trust vision if it's not crazy
+          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
+              visionPose,
+              est.timestampSeconds
+        );
+      }
+
+    }
+
+
+
 
     SmartDashboard.putNumber("bot x", getPose().getX());
     SmartDashboard.putNumber("bot y", getPose().getY());

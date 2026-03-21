@@ -27,10 +27,10 @@ import edu.wpi.first.math.util.Units;
 public class CameraSubsystem extends SubsystemBase {
     private static CameraSubsystem m_instance;
   
-    PhotonPoseEstimator photonPoseEstimatorTF;
-    PhotonPoseEstimator photonPoseEstimatorBF;
-    PhotonPoseEstimator photonPoseEstimatorLB;
-    PhotonPoseEstimator photonPoseEstimatorRB;
+    PhotonPoseEstimator photonPoseEstimatorFR;
+    PhotonPoseEstimator photonPoseEstimatorFL;
+    PhotonPoseEstimator photonPoseEstimatorBR;
+    PhotonPoseEstimator photonPoseEstimatorBL;
     PhotonPoseEstimator photonPoseEstimatorA;
   
     Pose2d previPose2d = new Pose2d();
@@ -47,10 +47,10 @@ public class CameraSubsystem extends SubsystemBase {
     }
 
     public static enum Camera {
-      TF,
-      BF,
-      LB,
-      RB,
+      FR,
+      FL,
+      BR,
+      BL,
     }
   
     public static CameraSubsystem getInstance() {
@@ -61,10 +61,10 @@ public class CameraSubsystem extends SubsystemBase {
       return m_instance;
     }
     
-    PhotonCamera cameraTF;
-    PhotonCamera cameraBF;
-    PhotonCamera cameraLB;
-    PhotonCamera cameraRB;
+    PhotonCamera cameraFR;
+    PhotonCamera cameraFL;
+    PhotonCamera cameraBR;
+    PhotonCamera cameraBL;
 
     /** Creates a new CameraSubsystem. */
     private CameraSubsystem() {
@@ -75,32 +75,32 @@ public class CameraSubsystem extends SubsystemBase {
       AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
      
       //creating two cameras and assigning them a position relative to the center of the bot
-      cameraTF = new PhotonCamera("Camera TF");
-      Transform3d robotToCamTF = new Transform3d(
-        new Translation3d(CameraConstants.topFrontX, CameraConstants.topFrontY , CameraConstants.topFrontZ),
-        new Rotation3d(CameraConstants.topFrontRoll, CameraConstants.topFrontPitch, CameraConstants.topFrontYaw)
+      cameraFR = new PhotonCamera("Camera FR");
+      Transform3d robotToCamFR = new Transform3d(
+        new Translation3d(CameraConstants.frontRightX, CameraConstants.frontRightY , CameraConstants.frontRightZ),
+        new Rotation3d(CameraConstants.frontRightRoll, CameraConstants.frontRightPitch, CameraConstants.frontRightYaw)
       ); //Cam mounted facing forward, upper left of the robot
-      cameraBF = new PhotonCamera("Camera BF");
-      Transform3d robotToCamBF = new Transform3d(
-        new Translation3d(CameraConstants.bottomFrontX, CameraConstants.bottomFrontY, CameraConstants.bottomFrontZ),
-        new Rotation3d(CameraConstants.bottomFrontRoll, CameraConstants.bottomFrontPitch, CameraConstants.bottomFrontYaw)
+      cameraFL = new PhotonCamera("Camera FL");
+      Transform3d robotToCamFL = new Transform3d(
+        new Translation3d(CameraConstants.frontLeftX, CameraConstants.frontLeftY, CameraConstants.frontLeftZ),
+        new Rotation3d(CameraConstants.frontLeftRoll, CameraConstants.frontLeftPitch, CameraConstants.frontLeftYaw)
+      ); //Cam mounted facing forward, upper right of the robot
+      cameraBR = new PhotonCamera("Camera BR");
+      Transform3d robotToCamBR = new Transform3d(
+        new Translation3d(CameraConstants.backRightX, CameraConstants.backRightY, CameraConstants.backRightZ),
+        new Rotation3d(CameraConstants.backRightRoll, CameraConstants.backRightPitch, CameraConstants.backRightYaw)
+      ); //Cam mounted facing forward, lower left of the robot
+      cameraBL = new PhotonCamera("Camera BL");
+      Transform3d robotToCamBL = new Transform3d(
+        new Translation3d(CameraConstants.backLeftX, CameraConstants.backLeftY, CameraConstants.backLeftZ),
+        new Rotation3d(CameraConstants.backLeftRoll, CameraConstants.backLeftPitch, CameraConstants.backLeftYaw)
       ); //Cam mounted facing forward, in the bottom center of the robot
     
       //feeding in info for camera postion to photon pose estimator
-      photonPoseEstimatorTF = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamTF);
-
-      photonPoseEstimatorBF = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamBF);
- 
-    
-      //creating two cameras and assigning them a position relative to the center of the bot
-      cameraLB = new PhotonCamera("Camera LB");
-      Transform3d robotToCamLB = new Transform3d(new Translation3d(CameraConstants.leftBackX, CameraConstants.leftBackY, CameraConstants.leftBackZ), new Rotation3d(CameraConstants.leftBackRoll, CameraConstants.leftBackPitch, CameraConstants.leftBackYaw)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-      cameraRB = new PhotonCamera("Camera RB");
-      Transform3d robotToCamRB = new Transform3d(new Translation3d(CameraConstants.rightBackX, CameraConstants.rightBackY, CameraConstants.rightBackZ), new Rotation3d(CameraConstants.rightBackRoll, CameraConstants.rightBackPitch, CameraConstants.rightBackYaw)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-    
-      //feeding in info for camera postion to photon pose estimator
-      photonPoseEstimatorLB = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLB);
-      photonPoseEstimatorRB = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamRB);
+      photonPoseEstimatorFR = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamFR);
+      photonPoseEstimatorFL = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamFL);
+      photonPoseEstimatorBR = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamBR);
+      photonPoseEstimatorBL = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamBL);
     }
   
     /**
@@ -110,32 +110,32 @@ public class CameraSubsystem extends SubsystemBase {
      * @return The estimated robot pose if targets are detected, otherwise {@code Optional.none()}
      */ 
     public Optional<EstimatedRobotPose> getPose(){
-        PhotonPipelineResult cameraTfResult = cameraTF.getLatestResult();
-        if(cameraTfResult.hasTargets() && cameraTfResult.getBestTarget().getPoseAmbiguity() < 0.05 && (m_autoMode == AutoMode.kOff || m_autoMode == AutoMode.kCoralStation)) {
-          SmartDashboard.putString("Active Camera", "TF");
-          return photonPoseEstimatorTF.update(cameraTfResult);
+        PhotonPipelineResult cameraFRResult = cameraFR.getLatestResult();
+        if(cameraFRResult.hasTargets() && cameraFRResult.getBestTarget().getPoseAmbiguity() < 0.05 && (m_autoMode == AutoMode.kOff || m_autoMode == AutoMode.kCoralStation)) {
+          SmartDashboard.putString("Active Camera", "FR");
+          return photonPoseEstimatorFR.update(cameraFRResult);
         }
         
-        PhotonPipelineResult cameraBfResult = cameraBF.getLatestResult();
-        if(cameraBfResult.hasTargets() && cameraBfResult.getBestTarget().getPoseAmbiguity() < 0.05 && (m_autoMode == AutoMode.kOff || m_autoMode == AutoMode.kReef)) {
-          SmartDashboard.putString("Active Camera", "BF");
+        PhotonPipelineResult cameraFLResult = cameraFL.getLatestResult();
+        if(cameraFLResult.hasTargets() && cameraFLResult.getBestTarget().getPoseAmbiguity() < 0.05 && (m_autoMode == AutoMode.kOff || m_autoMode == AutoMode.kReef)) {
+          SmartDashboard.putString("Active Camera", "FL");
           
-          latestFiducial = cameraBfResult.getBestTarget().fiducialId;
+          latestFiducial = cameraFLResult.getBestTarget().fiducialId;
           latestDetected = System.nanoTime();
 
-          return photonPoseEstimatorBF.update(cameraBfResult);
+          return photonPoseEstimatorFL.update(cameraFLResult);
         }
     
-        PhotonPipelineResult cameraLbResult = cameraLB.getLatestResult();
-        if(cameraLbResult.hasTargets() && cameraLbResult.getBestTarget().getPoseAmbiguity() < 0.05 && m_autoMode == AutoMode.kOff) {
-          SmartDashboard.putString("Active Camera", "LB");
-          return photonPoseEstimatorLB.update(cameraLbResult);
+        PhotonPipelineResult cameraBRResult = cameraBR.getLatestResult();
+        if(cameraBRResult.hasTargets() && cameraBRResult.getBestTarget().getPoseAmbiguity() < 0.05 && m_autoMode == AutoMode.kOff) {
+          SmartDashboard.putString("Active Camera", "BR");
+          return photonPoseEstimatorBR.update(cameraBRResult);
         }
         
-        PhotonPipelineResult cameraRbResult = cameraRB.getLatestResult();
-        if(cameraRbResult.hasTargets() && cameraRbResult.getBestTarget().getPoseAmbiguity() < 0.05 && m_autoMode == AutoMode.kOff) {
-          SmartDashboard.putString("Active Camera", "RB");
-          return photonPoseEstimatorRB.update(cameraRbResult);
+        PhotonPipelineResult cameraBLResult = cameraBL.getLatestResult();
+        if(cameraBLResult.hasTargets() && cameraBLResult.getBestTarget().getPoseAmbiguity() < 0.05 && m_autoMode == AutoMode.kOff) {
+          SmartDashboard.putString("Active Camera", "BL");
+          return photonPoseEstimatorBL.update(cameraBLResult);
         }
       
         return Optional.empty();
@@ -159,11 +159,11 @@ public class CameraSubsystem extends SubsystemBase {
      */
     public boolean detectsTarget() {
       // Query some boolean state, such as a digital sensor.
-      boolean targetDetectedCameraTF = cameraTF.getLatestResult().hasTargets();// checks if camera(left) has detetected a target
-      boolean targetDetectedCameraBF = cameraBF.getLatestResult().hasTargets();// checks if camera(Right) has detetected a target
-      boolean targetDetectedCameraLB = cameraLB.getLatestResult().hasTargets();// checks if camera(left) has detetected a target
-      boolean targetDetectedCameraRB = cameraRB.getLatestResult().hasTargets();// checks if camera(Right) has detetected a target
-      boolean cameraA = targetDetectedCameraTF == true|targetDetectedCameraBF==true|targetDetectedCameraLB==true|targetDetectedCameraRB==true;//sets camera(all) to the combine value of both camera(left) and camera(right)
+      boolean targetDetectedCameraFR = cameraFR.getLatestResult().hasTargets();// checks if camera(left) has detetected a target
+      boolean targetDetectedCameraFL = cameraFL.getLatestResult().hasTargets();// checks if camera(Right) has detetected a target
+      boolean targetDetectedCameraBR = cameraBR.getLatestResult().hasTargets();// checks if camera(Right) has detetected a target
+      boolean targetDetectedCameraBL = cameraBL.getLatestResult().hasTargets();// checks if camera(left) has detetected a target
+      boolean cameraA = targetDetectedCameraFR == true|targetDetectedCameraFL==true|targetDetectedCameraBR==true|targetDetectedCameraBL==true;//sets camera(all) to the combine value of both camera(left) and camera(right)
        
       return cameraA;//returns whether a target has been detetected
     }
@@ -184,10 +184,10 @@ public class CameraSubsystem extends SubsystemBase {
      * 
      * @return all target info in a record
      */
-    public TargetInfo targetIdentTF() {
-      double yaw = cameraTF.getLatestResult().getBestTarget().getYaw(); //gets yaw from a april tag
-      double pitch  = cameraTF.getLatestResult().getBestTarget().getPitch();//gets Pitch from a april tag
-      double skew  = cameraTF.getLatestResult().getBestTarget().getSkew();//gets skew from a april tag
+    public TargetInfo targetIdentFR() {
+      double yaw = cameraFR.getLatestResult().getBestTarget().getYaw(); //gets yaw from a april tag
+      double pitch  = cameraFR.getLatestResult().getBestTarget().getPitch();//gets Pitch from a april tag
+      double skew  = cameraFR.getLatestResult().getBestTarget().getSkew();//gets skew from a april tag
   
       return new TargetInfo(yaw, pitch, skew);
     }
@@ -197,10 +197,10 @@ public class CameraSubsystem extends SubsystemBase {
      * 
      * @return all target info in a record
      */
-     public TargetInfo targetIdentBF() {
-      double yaw = cameraBF.getLatestResult().getBestTarget().getYaw();//gets yaw from a april tag
-      double pitch  = cameraBF.getLatestResult().getBestTarget().getPitch();//gets Pitch from a april tag
-      double skew  = cameraBF.getLatestResult().getBestTarget().getSkew();//gets skew from a april tag
+     public TargetInfo targetIdentFL() {
+      double yaw = cameraFL.getLatestResult().getBestTarget().getYaw();//gets yaw from a april tag
+      double pitch  = cameraFL.getLatestResult().getBestTarget().getPitch();//gets Pitch from a april tag
+      double skew  = cameraFL.getLatestResult().getBestTarget().getSkew();//gets skew from a april tag
   
       return new TargetInfo(yaw, pitch, skew);
     }
@@ -208,8 +208,8 @@ public class CameraSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      SmartDashboard.putBoolean("Target Detected",  detectsTarget());//puts whether a target has been detected to the dashboard
-      SmartDashboard.putBoolean("Estimation", getPose().isPresent());      
+    //  SmartDashboard.putBoolean("Target Detected",  detectsTarget());//puts whether a target has been detected to the dashboard
+     // SmartDashboard.putBoolean("Estimation", getPose().isPresent());      
       //TODO: error logging and alerting
 
 
