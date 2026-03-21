@@ -24,24 +24,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.serializerSubsystem;
+import frc.robot.subsystems.serializerSubsystem;
 import frc.robot.subsystems.ShooterSubsytem;
 
 
 
-// import dev.doglog.DogLog;
-// import dev.doglog.DogLogOptions;
+ import dev.doglog.DogLog;
+ import dev.doglog.DogLogOptions;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -55,20 +62,14 @@ import frc.robot.subsystems.ShooterSubsytem;
  */
 public class RobotContainer {
   // // The robot's subsystems and commands are defined here...
-<<<<<<< HEAD
- // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem();
-//  private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-//  private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(0, 0, TurretSubsystem.TurretSide.LEFT);
-  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
-=======
-  // private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
+  //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
-  // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kTurretMotorPort);
-  // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
->>>>>>> 78ba40ca471157391049657dd3c4f1c348eee35d
+  private final serializerSubsystem m_serializerSubsystem = new serializerSubsystem();
+   // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kTurretMotorPort);
+  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   Pose3d robotPose = new Pose3d();
 
-  //private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
   
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -86,27 +87,14 @@ public class RobotContainer {
 
 
 
+    NamedCommands.registerCommand("deploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+    NamedCommands.registerCommand("undeploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
 
-
-
-    //autoChooser = AutoBuilder.buildAutoChooser();
-    //SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
     configureBindings();
 
-<<<<<<< HEAD
-    // m_swerveDrive.setDefaultCommand(
-    //   m_swerveDrive.driveCommand(
-    //     () -> m_driverController.getLeftX(),
-    //     () -> m_driverController.getLeftY() * -1,
-    //     () -> m_driverController.getRightX()
-    //     )
-    // );
-    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.set(0)); 
-    // m_TurretSubsystem.setDefaultCommand(
-    //     m_TurretSubsystem.targettingCommand(
-    //       () -> m_swerveDrive.getRobotPose(),
-=======
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
         () -> m_driverController.getLeftX() * -1,
@@ -114,22 +102,21 @@ public class RobotContainer {
         () -> m_driverController.getRightX() * -1
         )
     );
-    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
-    // m_TurretSubsystem.setDefaultCommand(
-    //     m_TurretSubsystem.targettingCommand(
-    //       () -> new Pose3d(m_swerveDrive.getPose()),
->>>>>>> 78ba40ca471157391049657dd3c4f1c348eee35d
-    //       m_swerveDrive
-    //   )
-    // );
+    //  m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
+    //  m_TurretSubsystem.setDefaultCommand(
+    //      m_TurretSubsystem.targettingCommand(
+    //        () -> new Pose3d(m_swerveDrive.getPose()),
+    //        m_swerveDrive
+    //    )
+     //);
 
 
-    //  m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean()));
+      //m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.runRollers(m_mechController.x().getAsBoolean()));
      
-    
+      m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
 
-    
-
+      // m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+      // m_IntakeSubsystem.setDefaultCommand(m_IntakeSubsystem.DeployUndeploy());
 
   }
 
@@ -147,50 +134,40 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-   private boolean deployed = false;
+    
+    //private boolean jam=false;
   private void configureBindings() {
 
-  //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
-  //   m_mechController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
-    
    
-  //    m_mechController.rightBumper().onTrue(
-  //     new InstantCommand(() -> {
-  //       if (!deployed) {
-  //         m_IntakeSubsystem.rollMotors().schedule();
-  //       } else {
-  //         m_IntakeSubsystem.stopMotors().schedule();
-  //       }
-  //       deployed = !deployed;
-  //     })
-  //   );
+    // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(
+    //   m_IntakeSubsystem.swapDeploy()));
 
-<<<<<<< HEAD
+    m_driverController.rightBumper().onTrue(
+      new SequentialCommandGroup(
+        m_IntakeSubsystem.stopMotors(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+      )
+    );
+    m_driverController.leftBumper().onTrue(    new SequentialCommandGroup(
+        m_IntakeSubsystem.rollRollers(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(0))
+      )
+    );
 
-   // m_mechController.
-    //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
-    //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
-    //   leftTrigger.whileTrue(m_IntakeSubsystems.runRollers());
-    //   leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
-    //   m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
+    //  m_driverController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
+    //  m_driverController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+
     
-    //  m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-    //  m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-    //  m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
+    m_mechController.rightBumper().onChange(m_serializerSubsystem.activateJam());
+     
+
+      //leftTrigger.whileTrue(m_IntakeSubsystem.runRoller());
+    //  leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
+    
+    //   m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
+    //   m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
+    //   m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
     //  m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
-=======
-  //  // m_mechController.
-  //   //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
-  //   //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
-  //   //   leftTrigger.whileTrue(m_IntakeSubsystems.runRollers());
-  //   //   leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
-  //   //   m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
-    
-  //    m_mechController.x().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueLeftDeposit));
-  //    m_mechController.y().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueRightDeposit));
-  //    m_mechController.a().whileTrue(m_TurretSubsystem.setManualTarget(() -> FieldConstants.blueHub));
-  //    m_mechController.b().whileTrue(m_TurretSubsystem.setAutoTargettingOff());
->>>>>>> 78ba40ca471157391049657dd3c4f1c348eee35d
 
   }
 

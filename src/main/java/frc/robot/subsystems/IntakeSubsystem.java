@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -31,6 +32,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -55,17 +57,17 @@ import yams.motorcontrollers.local.SparkWrapper;
 public class IntakeSubsystem extends SubsystemBase {
 
 SparkFlex rollerMotor;
-boolean deployed;
 SparkFlexSim rollerMotorSim;
 Pivot arm;
 SmartMotorController sparkSmartMotorController;
-
+boolean deployed = false;
+BooleanSupplier deployedSupplier = ()->deployed;
 
 
   public IntakeSubsystem() {
 
     rollerMotor = new SparkFlex(Constants.MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
-    deployed = false;
+    //deployed = false;
     rollerMotorSim = new SparkFlexSim(rollerMotor, DCMotor.getNeoVortex(1));
     SparkFlexConfig rollerConfig = new SparkFlexConfig();
     rollerConfig.idleMode(IdleMode.kBrake);
@@ -96,7 +98,7 @@ SmartMotorController sparkSmartMotorController;
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
    //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
-      .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
+      .withStartingPosition(Degrees.of(90.0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
       .withHardLimit(Degrees.of(-10.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
@@ -108,8 +110,6 @@ SmartMotorController sparkSmartMotorController;
 
     
   }
-
-
  
   /**
    * Set the angle of the arm.
@@ -153,17 +153,31 @@ SmartMotorController sparkSmartMotorController;
    *
    * @return a command
    */
-  public Command rollMotors() {
+  public Command check(){
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-
-          rollerMotor.set(1.0);
-
-          /* one-time action goes here */
-        });
+    return runOnce(() -> {
+            if (deployed) {
+                rollerMotor.set(1.0);
+            } else {
+                rollerMotor.set(0.0);
+            }}
+          );
   }
+
+public Command toggleDeploy() {
+  return runOnce(() -> {
+    deployed = !deployed;
+
+    if (deployedSupplier.getAsBoolean()) {
+      SmartDashboard.putString("deployed status", "deployed");
+    } else {
+      SmartDashboard.putString("deployed status", "undeployed");
+    }
+
+    check();
+  });
+}
 
   public Command stopMotors() {
     // Inline construction of command goes here.
@@ -172,6 +186,17 @@ SmartMotorController sparkSmartMotorController;
         () -> {
 
           rollerMotor.set(0);
+
+          /* one-time action goes here */
+        });
+  }
+ public Command rollRollers() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+
+          rollerMotor.set(1.0);
 
           /* one-time action goes here */
         });
@@ -189,8 +214,8 @@ SmartMotorController sparkSmartMotorController;
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    System.out.println("Arm Angle: " + (arm.getAngle().in(Degrees)));
-    System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
+    // System.out.println("Arm Angle: " + (arm.getAngle().in(Degrees)));
+    // System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
 
     arm.updateTelemetry();
     
