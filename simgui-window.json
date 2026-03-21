@@ -11,8 +11,8 @@
       "style": "0",
       "userScale": "2",
       "width": "1920",
-      "xpos": "-381",
-      "ypos": "-1417"
+      "xpos": "0",
+      "ypos": "29"
     }
   },
   "Table": {
@@ -34,20 +34,10 @@
     }
   },
   "Window": {
-    "###/FMSInfo": {
-      "Collapsed": "0",
-      "Pos": "60,60",
-      "Size": "181,167"
-    },
-    "###/SmartDashboard/Arm/mechanism": {
-      "Collapsed": "0",
-      "Pos": "406,31",
-      "Size": "558,455"
-    },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "282,97",
-      "Size": "1119,629"
+      "Pos": "290,263",
+      "Size": "1218,564"
     },
     "###/SmartDashboard/Left turret/mechanism": {
       "Collapsed": "0",
@@ -56,13 +46,13 @@
     },
     "###/SmartDashboard/Motors": {
       "Collapsed": "0",
-      "Pos": "60,60",
+      "Pos": "171,173",
       "Size": "300,150"
     },
-    "###/SmartDashboard/Swerve Drive": {
+    "###/SmartDashboard/Scheduler": {
       "Collapsed": "0",
-      "Pos": "60,60",
-      "Size": "300,150"
+      "Pos": "703,236",
+      "Size": "400,200"
     },
     "###/SmartDashboard/TurretPivot/mechanism": {
       "Collapsed": "0",
@@ -90,9 +80,9 @@
       "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
-      "Collapsed": "1",
-      "Pos": "10,50",
-      "Size": "300,560"
+      "Collapsed": "0",
+      "Pos": "249,-5",
+      "Size": "200,347"
     },
     "###NetworkTables": {
       "Collapsed": "0",
@@ -106,8 +96,8 @@
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1446,71",
-      "Size": "250,695"
+      "Pos": "1520,13",
+      "Size": "312,868"
     },
     "###RoboRIO": {
       "Collapsed": "0",
@@ -121,7 +111,7 @@
     },
     "###Timing": {
       "Collapsed": "0",
-      "Pos": "5,150",
+      "Pos": "6,187",
       "Size": "162,194"
     },
     "Debug##Default": {

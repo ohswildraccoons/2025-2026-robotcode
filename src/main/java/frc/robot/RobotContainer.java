@@ -30,7 +30,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -39,17 +42,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.serializerSubsystem;
+import frc.robot.subsystems.serializerSubsystem;
 import frc.robot.subsystems.ShooterSubsytem;
 
 
 
-// import dev.doglog.DogLog;
-// import dev.doglog.DogLogOptions;
+ import dev.doglog.DogLog;
+ import dev.doglog.DogLogOptions;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -81,6 +87,10 @@ public class RobotContainer {
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
 
   // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
+  //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
+  private final serializerSubsystem m_serializerSubsystem = new serializerSubsystem();
+   // private final TurretSubsystem m_TurretSubsystem = new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kTurretMotorPort);
+  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   Pose3d robotPose = new Pose3d();
 
   private final SendableChooser<Command> autoChooser;
@@ -99,6 +109,12 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+
+
+
+    NamedCommands.registerCommand("deploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+    NamedCommands.registerCommand("undeploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
+
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
@@ -111,7 +127,13 @@ public class RobotContainer {
         () -> m_driverController.getRightX() * -1
         )
     );
-    // m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
+    //  m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
+    //  m_TurretSubsystem.setDefaultCommand(
+    //      m_TurretSubsystem.targettingCommand(
+    //        () -> new Pose3d(m_swerveDrive.getPose()),
+    //        m_swerveDrive
+    //    )
+     //);
 
     m_TurretSubsystemLeft.setDefaultCommand(
         m_TurretSubsystemLeft.targettingCommand(
@@ -130,7 +152,7 @@ public class RobotContainer {
     );
     m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(1000)));
     // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier()));
-
+    m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
   public static Alliance alliance() {
@@ -161,27 +183,25 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-  //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
-  //   m_mechController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
-    
    
-  //    m_mechController.rightBumper().onTrue(
-  //     new InstantCommand(() -> {
-  //       if (!deployed) {
-  //         m_IntakeSubsystem.rollMotors().schedule();
-  //       } else {
-  //         m_IntakeSubsystem.stopMotors().schedule();
-  //       }
-  //       deployed = !deployed;
-  //     })
-  //   );
+    // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(
+    //   m_IntakeSubsystem.swapDeploy()));
 
-  //  // m_mechController.
-  //   //   m_mechController.leftTrigger().onTrue(m_IntakeSubsystems.runRollers());
-  //   //   Trigger leftTrigger = new Trigger(()-> m_mechController.getLeftTriggerAxis()>0.2);
-  //   //   leftTrigger.whileTrue(m_IntakeSubsystems.runRollers());
-  //   //   leftTrigger.onFalse(m_IntakeSubsystem.stopRollers());
-  //   //   m_mechController.rightBumper().onTrue(m_IntakeSubsystem.DeployUndeplyRollers());
+    m_driverController.rightBumper().onTrue(
+      new SequentialCommandGroup(
+        m_IntakeSubsystem.stopMotors(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+      )
+    );
+    m_driverController.leftBumper().onTrue(    new SequentialCommandGroup(
+        m_IntakeSubsystem.rollRollers(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(0))
+      )
+    );
+
+    //  m_driverController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
+    //  m_driverController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
+
     
     if (alliance() == Alliance.Red){
       m_mechController.x().whileTrue( new ParallelCommandGroup(
@@ -219,7 +239,7 @@ public class RobotContainer {
       m_TurretSubsystemRight.setAutoTargettingOn()
     ));
 
-    //  m_mechController.b().whileTrue(m_TurretSubsystemLeft.setAutoTargettingOn());
+    m_mechController.rightBumper().onChange(m_serializerSubsystem.activateJam());
 
   }
 
@@ -230,6 +250,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    return null;//autoChooser.getSelected();
   }
 }

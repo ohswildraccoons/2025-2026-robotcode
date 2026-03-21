@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-// import dev.doglog.DogLog;
+ import dev.doglog.DogLog;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
