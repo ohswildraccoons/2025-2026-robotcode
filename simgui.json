@@ -10,6 +10,16 @@
         "header": {
           "open": true
         }
+      },
+      "SPARK MAX [53] RELATIVE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[11]": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
@@ -56,6 +66,11 @@
       "/SmartDashboard/wake me up bruih": "Command"
     },
     "windows": {
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "OdometryPose": {
           "arrowSize": 47,
@@ -112,8 +127,19 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "Retained Values": {
       "open": false
+    },
+    "retained": {
+      "SmartDashboard": {
+        "Auto Chooser": {
+          "open": true
+        },
+        "open": true
+      }
     },
     "transitory": {
       "FMSInfo": {
@@ -126,6 +152,12 @@
           },
           "open": true
         },
+        "open": true
+      },
+      "PathPlanner": {
+        "open": true
+      },
+      "Shuffleboard": {
         "open": true
       },
       "SmartDashboard": {
@@ -148,7 +180,8 @@
             "open": true
           },
           "open": true
-        }
+        },
+        "open": true
       }
     }
   },
@@ -169,8 +202,5 @@
       "open": true
     },
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

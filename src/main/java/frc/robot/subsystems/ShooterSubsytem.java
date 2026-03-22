@@ -76,7 +76,9 @@ import edu.wpi.first.wpilibj2.command.Command;
       // Motor properties to prevent over currenting.
       .withMotorInverted(false)
       .withIdleMode(MotorMode.COAST)
-      .withStatorCurrentLimit(Amps.of(40)); 
+      .withSupplyCurrentLimit(Amps.of(40))
+      .withStatorCurrentLimit(Amps.of(60)); 
+
 
       
       // Vendor motor controller object

@@ -79,12 +79,12 @@ public final class Constants {
   
   public static final class CameraConstants{
 
-      public static final double frontRightX = Units.inchesToMeters(13.25);
-      public static final double frontRightY = Units.inchesToMeters(7.2);
-      public static final double frontRightZ = Units.inchesToMeters(3.75);
+      public static final double frontRightX = Units.inchesToMeters(10.25);
+      public static final double frontRightY = Units.inchesToMeters(0.2);
+      public static final double frontRightZ = Units.inchesToMeters(17.75);
       public static final double frontRightRoll = Units.degreesToRadians(0.0);
-      public static final double frontRightPitch = Units.degreesToRadians(-9.74);
-      public static final double frontRightYaw = Units.degreesToRadians(11.3);
+      public static final double frontRightPitch = Units.degreesToRadians(-15.5);
+      public static final double frontRightYaw = Units.degreesToRadians(0);
 
       public static final double frontLeftX = Units.inchesToMeters(13.25);
       public static final double frontLeftY = Units.inchesToMeters(-7.2);
@@ -132,9 +132,9 @@ public final class Constants {
       public static final double shooterWheelRadiusInches = 3;
       public static final double shooterWheelRadiusMeters = Units.inchesToMeters(shooterWheelRadiusInches);
 
-      public static final double[] shooterRPMs = {1000, 2000, 3000, 4000, 5000};
-      public static final double[] shooterDistances = {1, 2, 3, 4, 5}; // in 
-    }
+      public static final double[] shooterRPMs = {25, 40, 50, 75, 80 ,85, 100};
+      public static final double[] shooterDistances = {10, 144 ,216, 348, 410 , 420, 432}; // in 
+    } 
 
 
   

@@ -82,14 +82,14 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     
-    // m_IntakeFX = new TalonFX(MotorConstants.kIntakeMotorPort);
+    // m_IntakeFX = new TalonF X(MotorConstants.kIntakeMotorPort);
     // m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
     // m_rightShooterTop = new SparkMax(MotorConstants.kLeftShooterMotorPortTop, MotorType.kBrushless);
     // m_leftShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
     // m_leftShooterTop = new TalonFX(MotorConstants.kLeftShooterMotorPortTop);
     // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
     // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-    m_intakeTube = new SparkFlex(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+    // m_intakeTube = new  SparkFlex(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
 
     // m_IntakeFX.set(-0.6);
     // m_rightShooterBottom.set(1);

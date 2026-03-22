@@ -86,6 +86,16 @@ SparkFlexConfig serialSepMotorConfig;
     return runOnce(() -> { jam = !jam; });
   }
 
+  public Command hardStopMotor(){
+    return runOnce(() -> {
+      serialTubeMotor.set(0.0);
+      serialSepMotor.set(0.0);
+    });
+  }
+
+  
+
+
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).

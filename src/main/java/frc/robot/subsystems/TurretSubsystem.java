@@ -84,7 +84,7 @@ public class TurretSubsystem extends SubsystemBase{
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(2.0, 0.00, 0.0)
+  .withClosedLoopController(0.5, 0.00, 0.0)
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
@@ -94,7 +94,7 @@ public class TurretSubsystem extends SubsystemBase{
   // Setup Telemetry
   .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH)
   // Power Optimization
-  .withStatorCurrentLimit(Amps.of(40))
+  .withStatorCurrentLimit(Amps.of(30))
   .withClosedLoopRampRate(Seconds.of(0.25))
   .withOpenLoopRampRate(Seconds.of(0.25));
 
@@ -190,48 +190,80 @@ public Angle getAngle(){return turrePivot.getAngle();}
         return angle.get() - robotAngleDeg;
     }
 
-    public Command autoFindTargetPose(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
+    public Command autoFindTargetPose(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem, Boolean isBlueAlliance) {
 
         Supplier<Pose3d> targetPose = () -> {
+          if (isBlueAlliance) {
             switch (getFieldSection(robotPose.get())) {
+
                 case BLUE_HUB:
-                    target = () -> FieldConstants.blueHub;
-                    return target.get();
+                    return FieldConstants.blueHub;
+
                 case RED_HUB:
-                    target = () -> FieldConstants.redHub;
-                    return target.get();
-                case BLUE_LEFT:
-                    target = () -> FieldConstants.blueLeftDeposit;
-                    return target.get();
-                case BLUE_RIGHT:
-                    target = () -> FieldConstants.blueRightDeposit;
-                    return target.get();
                 case RED_LEFT:
-                    target = () -> FieldConstants.redLeftDeposit;
-                    return target.get();
                 case RED_RIGHT:
-                    target = () -> FieldConstants.redRightDeposit;
-                    return target.get();
+                case RED_MIDDLE:
+                    return (turretSide == TurretSide.LEFT)
+                            ? FieldConstants.blueLeftDeposit
+                            : FieldConstants.blueRightDeposit;
+
+                case BLUE_LEFT:
+                    return FieldConstants.blueLeftDeposit;
+
+                case BLUE_RIGHT:
+                    return FieldConstants.blueRightDeposit;
+
                 case BLUE_MIDDLE:
-                    if (turretSide == TurretSide.LEFT) {
-                        target = () -> FieldConstants.blueLeftDeposit;
-                        return target.get();
-                    } else {
-                        target = () -> FieldConstants.blueRightDeposit;
-                        return target.get();
-                    }
+                    return (turretSide == TurretSide.LEFT)
+                            ? FieldConstants.blueLeftDeposit
+                            : FieldConstants.blueRightDeposit;
+
                 default:
                     return FieldConstants.middleField;
             }
+
+        } else { // RED ALLIANCE
+
+            switch (getFieldSection(robotPose.get())) {
+
+                case RED_HUB:
+                    return FieldConstants.redHub;
+
+                case BLUE_HUB:
+                case BLUE_LEFT:
+                case BLUE_RIGHT:
+                case BLUE_MIDDLE:
+                    return (turretSide == TurretSide.LEFT)
+                            ? FieldConstants.redLeftDeposit
+                            : FieldConstants.redRightDeposit;
+
+                case RED_LEFT:
+                    return FieldConstants.redLeftDeposit;
+
+                case RED_RIGHT:
+                    return FieldConstants.redRightDeposit;
+
+                case RED_MIDDLE:
+                    return (turretSide == TurretSide.LEFT)
+                            ? FieldConstants.redLeftDeposit
+                            : FieldConstants.redRightDeposit;
+
+                default:
+                    return FieldConstants.middleField;
+            }
+        }
+
+            
         };
           return targetPose(robotPose, targetPose, swerveSubsystem);
     }
 
-    public Command targettingCommand(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem) {
+    public Command targettingCommand(Supplier<Pose3d> robotPose, SwerveSubsystem swerveSubsystem, Alliance alliance) {
 // // TODO
+        boolean isBlueAlliance = (alliance == Alliance.Red) ? false : true;
         return new ConditionalCommand(
             targetPose(robotPose, target, swerveSubsystem),
-            autoFindTargetPose(robotPose, swerveSubsystem),
+            autoFindTargetPose(robotPose, swerveSubsystem, isBlueAlliance),
             isManualSetpointTargeting
         );
 
@@ -240,8 +272,8 @@ public Angle getAngle(){return turrePivot.getAngle();}
     public Supplier<Pose3d> getGhostSupplier(){
       return ()-> currentGhostTarget;
     }
-    public Supplier<Pose3d> getTurretFieldPosSupplier(){
-      return () -> turretFieldRelativePose;
+    public Supplier<Pose3d> getTurretFieldPosSupplier(Supplier<Pose3d> botPose3d){
+      return (turretFieldRelativePose != null) ?  () ->turretFieldRelativePose: botPose3d;
     }
 
 
@@ -261,7 +293,7 @@ public Angle getAngle(){return turrePivot.getAngle();}
     }
 
     public Command setSplitTarget(Alliance alliance){
-      if(alliance == Alliance.Red){
+      if(alliance == Alliance.Blue){
         if (turretSide == TurretSide.LEFT){
           return setManualTarget(Constants.FieldConstants.blueLeftDeposit);
         }else {

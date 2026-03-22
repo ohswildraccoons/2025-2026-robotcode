@@ -62,7 +62,7 @@ import frc.robot.subsystems.ShooterSubsytem;
  * Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in
  * 
- * the {@link Robot}
+ * the {@link Robot}a
  * periodic methods (other than the scheduler calls). Instead, the structure of
  * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
@@ -84,7 +84,7 @@ public class RobotContainer {
   private final ShooterSubsytem m_ShooterSubsystemLeft = 
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kLeftShooterMotorPortRight);
   private final ShooterSubsytem m_ShooterSubsystemRight = 
-    new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
+    new ShooterSubsytem(Constants.MotorConstants.kRightShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
 
   // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
@@ -122,36 +122,36 @@ public class RobotContainer {
 
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
-        () -> m_driverController.getLeftX() * -1,
-        () -> m_driverController.getLeftY() * -1,
-        () -> m_driverController.getRightX() * -1
+      () -> m_driverController.getLeftY(), //forward back  
+      () -> m_driverController.getLeftX() * -1, // left right
+        
+        
+        
+        () -> m_driverController.getRightX() //rotation
         )
     );
     //  m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
-    //  m_TurretSubsystem.setDefaultCommand(
-    //      m_TurretSubsystem.targettingCommand(
-    //        () -> new Pose3d(m_swerveDrive.getPose()),
-    //        m_swerveDrive
-    //    )
-     //);
 
-    m_TurretSubsystemLeft.setDefaultCommand(
-        m_TurretSubsystemLeft.targettingCommand(
-          () -> new Pose3d(m_swerveDrive.getPose()),
-          m_swerveDrive
-      )
-    );
-    m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(1000)));
-    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier()));
-
-    m_TurretSubsystemRight.setDefaultCommand(
-        m_TurretSubsystemRight.targettingCommand(
-          () -> new Pose3d(m_swerveDrive.getPose()),
-          m_swerveDrive
-      )
-    );
-    m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(1000)));
-    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier()));
+    // m_TurretSubsystemLeft.setDefaultCommand(
+    //     m_TurretSubsystemLeft.targettingCommand(
+    //       () -> new Pose3d(m_swerveDrive.getPose()),
+    //       m_swerveDrive,
+    //       alliance()
+    //   )
+    // );
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(75)));
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
+    
+    // m_TurretSubsystemRight.setDefaultCommand(
+    //     m_TurretSubsystemRight.targettingCommand(
+    //       () -> new Pose3d(m_swerveDrive.getPose()),
+    //       m_swerveDrive,x  x   
+    //       alliance()
+    //   )
+    // );
+        // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(75)));
+    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
+    
     m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
@@ -190,56 +190,66 @@ public class RobotContainer {
     m_driverController.rightBumper().onTrue(
       new SequentialCommandGroup(
         m_IntakeSubsystem.stopMotors(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(0)) ////TODO:game day hack (angles)
       )
     );
     m_driverController.leftBumper().onTrue(    new SequentialCommandGroup(
         m_IntakeSubsystem.rollRollers(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(0))
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
       )
     );
+
+    m_driverController.povRight().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(90)));
+    m_driverController.povUp().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(0)));
+    m_driverController.povLeft().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(-90)));
+
 
     //  m_driverController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
     //  m_driverController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
 
     
-    if (alliance() == Alliance.Red){
-      m_mechController.x().whileTrue( new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueLeftDeposit),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.blueLeftDeposit)
-        ));
-      m_mechController.b().whileTrue( new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueRightDeposit),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.blueRightDeposit)
-        ));
-      m_mechController.y().whileTrue(new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueHub),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.blueHub)
-        ));
-    }else if (alliance() == Alliance.Red){
-      m_mechController.x().whileTrue( new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.redLeftDeposit),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.redLeftDeposit)
-        ));
-      m_mechController.b().whileTrue( new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.redRightDeposit),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.redRightDeposit)
-        ));
-      m_mechController.y().whileTrue(new ParallelCommandGroup(
-        m_TurretSubsystemLeft.setManualTarget(FieldConstants.redHub),
-        m_TurretSubsystemRight.setManualTarget(FieldConstants.redHub)
-        ));
-    }
-    m_mechController.a().whileTrue(new ParallelCommandGroup(
-      m_TurretSubsystemLeft.setSplitTarget(alliance()),
-      m_TurretSubsystemRight.setSplitTarget(alliance())
-    ));
-    m_mechController.rightBumper().whileTrue(new ParallelCommandGroup(
-      m_TurretSubsystemLeft.setAutoTargettingOn(),
-      m_TurretSubsystemRight.setAutoTargettingOn()
-    ));
+    // if (alliance() == Alliance.Blue){
+    //   m_mechController.x().whileTrue( new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueLeftDeposit),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.blueLeftDeposit)
+    //     ));
+    //   m_mechController.b().whileTrue( new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueRightDeposit),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.blueRightDeposit)
+    //     ));
+    //   m_mechController.y().whileTrue(new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueHub),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.blueHub)
+    //     ));
+    // }else if (alliance() == Alliance.Red){
+    //   m_mechController.x().whileTrue( new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.redLeftDeposit),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.redLeftDeposit)
+    //     ));
+    //   m_mechController.b().whileTrue( new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.redRightDeposit),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.redRightDeposit)
+    //     ));
+    //   m_mechController.y().whileTrue(new ParallelCommandGroup(
+    //     m_TurretSubsystemLeft.setManualTarget(FieldConstants.redHub),
+    //     m_TurretSubsystemRight.setManualTarget(FieldConstants.redHub)
+    //     ));
+    // }
+    // m_mechController.a().whileTrue(new ParallelCommandGroup(
+    //   m_TurretSubsystemLeft.setSplitTarget(alliance()),
+    //   m_TurretSubsystemRight.setSplitTarget(alliance())
+    // ));
+    // m_mechController.rightBumper().whileTrue(new ParallelCommandGroup(
+    //   m_TurretSubsystemLeft.setAutoTargettingOn(),
+    //   m_TurretSubsystemRight.setAutoTargettingOn()
+    // ));
 
-    m_mechController.rightBumper().onChange(m_serializerSubsystem.activateJam());
+    m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
+    m_mechController.povDown().onChange(new ParallelCommandGroup(
+      m_IntakeSubsystem.stopMotors(),
+      m_serializerSubsystem.hardStopMotor()
+      ));
+    
 
   }
 
@@ -250,6 +260,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return null;//autoChooser.getSelected();
+    return autoChooser.getSelected();
   }
 }

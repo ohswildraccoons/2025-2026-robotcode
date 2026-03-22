@@ -22,6 +22,9 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -58,8 +61,8 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-SparkFlex rollerMotor;
-SparkFlexSim rollerMotorSim;
+TalonFX rollerMotor;
+TalonFXSimState rollerMotorSim;
 Pivot arm;
 SmartMotorController sparkSmartMotorController;
 boolean deployed = false;
@@ -68,14 +71,11 @@ BooleanSupplier deployedSupplier = ()->deployed;
 
   public IntakeSubsystem() {
 
-    rollerMotor = new SparkFlex(Constants.MotorConstants.kIntakeMotorPort, MotorType.kBrushless);
+    rollerMotor = new TalonFX(Constants.MotorConstants.kIntakeMotorPort);
     //deployed = false;
-    rollerMotorSim = new SparkFlexSim(rollerMotor, DCMotor.getNeoVortex(1));
-    SparkFlexConfig rollerConfig = new SparkFlexConfig();
-    rollerConfig.idleMode(IdleMode.kBrake);
-    rollerConfig.smartCurrentLimit(40);
+    rollerMotorSim = new TalonFXSimState(rollerMotor);
+    TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     
-    rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // rollEndcoder = rollerMotor.getEncoder();
 
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
@@ -102,9 +102,9 @@ BooleanSupplier deployedSupplier = ()->deployed;
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
    //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
-      .withStartingPosition(Degrees.of(90.0)) // Starting position of the Pivot
+      .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-10.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
+      .withHardLimit(Degrees.of(0.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(15));// MOI Calculation
       
@@ -240,7 +240,5 @@ public Command toggleDeploy() {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     arm.simIterate();
-    rollerMotorSim.iterate(rollerMotor.getAppliedOutput(),12, 0.02);
-
   }
 }

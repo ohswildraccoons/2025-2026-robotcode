@@ -19,6 +19,7 @@ import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -51,7 +52,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
   private final CameraSubsystem cameras = CameraSubsystem.getInstance();
   
-
+  private final Field2d field = new Field2d();
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
@@ -78,6 +79,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     setupPathPlanner();
+        SmartDashboard.putData("Field", field);
 
   };
 
@@ -149,18 +151,13 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive.getPose();
   }
 
-  public void setPose(Pose2d pose)
-  {
-    Optional<EstimatedRobotPose> estimation = cameras.getPose();
-    if (estimation.isPresent()) {
-        Pose3d estimatedPose = estimation.get().estimatedPose;
+ public void addVisionMeasurement(EstimatedRobotPose est) {
+swerveDrive.addVisionMeasurement(
+    est.estimatedPose.toPose2d(),
+    est.timestampSeconds
+);
 
-         swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-            estimatedPose.toPose2d(),
-             estimation.get().timestampSeconds// jetts a doo doo head
-         );
-    } 
-  }
+}
 
   /**
    * Resets odometry to the given pose. Gyro angle and module positions do not need to be reset when calling this
@@ -197,35 +194,34 @@ public class SwerveSubsystem extends SubsystemBase {
     return false;
   }
 
-  @Override
-  public void periodic() {
-
-    Optional<EstimatedRobotPose> vision = cameras.getPose();
-
-    if (vision.isPresent()) {
-      EstimatedRobotPose est = vision.get();
-      Pose2d visionPose = est.estimatedPose.toPose2d();
-
-      double error = getPose().getTranslation().getDistance(visionPose.getTranslation());
-
-      if (error < 1.0) {  // Only trust vision if it's not crazy
-          swerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(
-              visionPose,
-              est.timestampSeconds
-        );
-      }
-
-    }
+@Override
+public void periodic() {
 
 
+    Optional<EstimatedRobotPose> vision = cameras.getPose(getPose());
+
+    vision.ifPresent(est -> addVisionMeasurement(est));
 
 
-    SmartDashboard.putNumber("bot x", getPose().getX());
-    SmartDashboard.putNumber("bot y", getPose().getY());
-  }
+    field.setRobotPose(getPose());
+
+
+SmartDashboard.putBoolean("Vision Update Fired", false);
+
+vision.ifPresent(est -> {
+    SmartDashboard.putBoolean("Vision Update Fired", true);
+    SmartDashboard.putNumber("Vision X", est.estimatedPose.getX());
+    SmartDashboard.putNumber("Vision Y", est.estimatedPose.getY());
+});
+
+}
+
+
+
+
+
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
+        }
 }
