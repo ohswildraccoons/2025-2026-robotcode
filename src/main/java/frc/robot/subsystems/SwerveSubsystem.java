@@ -35,6 +35,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -49,7 +50,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
  
 public class SwerveSubsystem extends SubsystemBase { 
   // bBot is 14 14
-  private final SwerveDrive swerveDrive;
+  private final SwerveDrive  swerveDrive;
   private final CameraSubsystem cameras = CameraSubsystem.getInstance();
   
   private final Field2d field = new Field2d();
@@ -153,7 +154,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
  public void addVisionMeasurement(EstimatedRobotPose est) {
 swerveDrive.addVisionMeasurement(
-    est.estimatedPose.toPose2d(),
+    new Pose2d(est.estimatedPose.toPose2d().getTranslation(), swerveDrive.getPose().getRotation()),
     est.timestampSeconds
 );
 

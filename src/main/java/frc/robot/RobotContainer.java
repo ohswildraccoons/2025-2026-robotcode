@@ -123,7 +123,7 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
       () -> m_driverController.getLeftY(), //forward back  
-      () -> m_driverController.getLeftX() * -1, // left right
+      () -> m_driverController.getLeftX(), // left right
         
         
         
@@ -152,7 +152,7 @@ public class RobotContainer {
         // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(75)));
     // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
-    m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
+    // m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
   public static Alliance alliance() {
