@@ -122,4 +122,11 @@ SparkFlexConfig serialSepMotorConfig;
     serialTubeMotorSim.iterate(serialTubeMotorSim.getVelocity(), 12, 0.02);
     serialSepMotorSim.iterate(serialSepMotorSim.getVelocity(), 12, 0.02);
   }
+
+  public void setCurrentLimit(double limit) {
+    serialTubeMotorConfig.smartCurrentLimit((int) limit);
+    serialSepMotorConfig.smartCurrentLimit((int) limit);
+    serialTubeMotor.configure(serialTubeMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    serialSepMotor.configure(serialSepMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
 }
