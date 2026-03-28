@@ -94,7 +94,8 @@ public class RobotContainer {
   Pose3d robotPose = new Pose3d();
 
   private final SendableChooser<Command> autoChooser;
-  
+  int isRed;
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -122,14 +123,15 @@ public class RobotContainer {
 
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
-      () -> m_driverController.getLeftY(), //forward back  
-      () -> m_driverController.getLeftX(), // left right
+      () -> m_driverController.getLeftY() * isRed, //forward back  
+      () -> m_driverController.getLeftX() * isRed, // left right
         
         
         
-        () -> m_driverController.getRightX() //rotation
+        () -> m_driverController.getRightX()//rotation
         )
     );
+
     //  m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
 
     // m_TurretSubsystemLeft.setDefaultCommand(
@@ -155,17 +157,24 @@ public class RobotContainer {
     // m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
+  public void setIsRed(Alliance alliance) {
+    isRed = (alliance == Alliance.Red) ? -1 : 1;
+  }
+
   public static Alliance alliance() {
       if (ALLIANCE.isPresent()) {
-        SmartDashboard.putString("Alliance", ALLIANCE.get().toString());
+          SmartDashboard.putString("Alliance", ALLIANCE.get().toString());
           return ALLIANCE.get();
-      } else if (DriverStation.getAlliance().isPresent()) {
+      }
+
+      if (DriverStation.getAlliance().isPresent()) {
           ALLIANCE = Optional.of(DriverStation.getAlliance().get());
           return ALLIANCE.get();
-      } else {
-          return Alliance.Blue;
       }
+
+      return Alliance.Blue; // default
   }
+
 
   /**>
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -183,6 +192,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
+
    
     // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(
     //   m_IntakeSubsystem.swapDeploy()));
@@ -199,9 +209,9 @@ public class RobotContainer {
       )
     );
 
-    m_driverController.povRight().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(90)));
-    m_driverController.povUp().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(0)));
-    m_driverController.povLeft().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(-90)));
+    // m_driverController.povRight().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(90)));
+    // m_driverController.povUp().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(0)));
+    // m_driverController.povLeft().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(-90)));
 
 
     //  m_driverController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
@@ -252,6 +262,7 @@ public class RobotContainer {
     
 
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

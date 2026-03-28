@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -81,6 +82,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
+
     
     // m_IntakeFX = new TalonF X(MotorConstants.kIntakeMotorPort);
     // m_rightShooterBottom = new TalonFX(MotorConstants.kLeftShooterMotorPort);
@@ -129,8 +131,12 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    
-  }
+
+  Alliance currentAlliance = m_robotContainer.alliance();
+  m_robotContainer.setIsRed(currentAlliance);
+
+  SmartDashboard.putString("ALLIANCE", currentAlliance.toString());
+ }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override

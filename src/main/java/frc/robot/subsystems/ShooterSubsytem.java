@@ -107,67 +107,11 @@ import edu.wpi.first.wpilibj2.command.Command;
      */
     public Command setSpeed(AngularVelocity speed) {return runOnce( () -> {shooter.setMechanismVelocitySetpoint(speed);});}
     
-    public Command setVelocityOfFire(double velocity) {
-      
-    double distanceGround = findDistanceBasedOnVelocity(velocity);
 
-    double prevDistance = 0;
-    double previousRPM = 0;
-    int id = 0;
-    
+    // public Command autoSetRPMofFire(Supplier<Pose3d> TargetLocation, Supplier<Pose3d> shooterLocation) {
+    //   return setVelocityOfFire(velocity);
+    // }
 
-    for (double distance: Constants.ShooterConstants.shooterDistances) {
-      if (distance == distanceGround){
-        return shooter.setSpeed(RPM.of(Constants.ShooterConstants.shooterRPMs[id]));
-      }else if (distance >= distanceGround){
-        double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPMs[id] - previousRPM);
-        double interpolatedRPM = previousRPM + slope * (distanceGround - prevDistance);
-        return shooter.setSpeed(RPM.of(interpolatedRPM));
-      }else{
-        prevDistance = distance;
-        previousRPM = Constants.ShooterConstants.shooterRPMs[id];
-        id++;
-      }
-    }
-    return shooter.setSpeed(RPM.of(Constants.ShooterConstants.shooterRPMs[Constants.ShooterConstants.shooterRPMs.length - 1]));
-    }
-
-    public Command autoSetVelocityOfFire(Supplier<Pose3d> TargetLocation, Supplier<Pose3d> shooterLocation) {
-      double velocity = CalcVelocity(TargetLocation.get(), shooterLocation.get());
-      return setVelocityOfFire(velocity);
-    }
-
-    /*
-    * calculates the required velocity needed to hit the set point
-    * 
-    * @param targetLocation
-    */
-    public double CalcVelocity(Pose3d TargetLocation, Pose3d shooterLocation){
-      double g = 9.8;
-      double height = TargetLocation.getZ() - shooterLocation.getZ();
-
-      double xDistance = Math.abs(TargetLocation.getX() - shooterLocation.getX());
-      double yDistance = Math.abs(TargetLocation.getY()- shooterLocation.getY());
-      double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-
-      double numerator = g*Math.pow(distance, 2);
-      double denominator = 2*Math.pow(Math.cos(Constants.TurretConstants.launchAngle), 2)*(distance * Math.tan(Constants.TurretConstants.launchAngle) - height);
-
-      double velocity = Math.sqrt(numerator/denominator);
-
-      return velocity;
-    }
-
-    /*
-    * Calculates given a distance in the air, the distance it will be on the ground
-    * 
-    * @param target Location
-    * @param RobotLocation
-    */
-    public double findDistanceBasedOnVelocity(double velocity){
-      double distance = (Math.pow(velocity, 2)*Math.sin(2*Constants.TurretConstants.launchAngle))/9.8;
-      return distance;
-    }
 
     /**
      * Set the dutycycle of the shooter.

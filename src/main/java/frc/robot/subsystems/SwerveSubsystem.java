@@ -19,12 +19,14 @@ import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,10 +34,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModuleState;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -47,6 +52,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+import com.revrobotics.spark.SparkMax;
  
 public class SwerveSubsystem extends SubsystemBase { 
   // bBot is 14 14
@@ -127,13 +133,48 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive.getPose();
   }
 
+  
+  public Command runAngleMotorTest(){
+    return run(() -> { 
+    for (SwerveModule module : swerveDrive.getModules()){
+     SparkMax spark = ((SparkMax)module.getAngleMotor().getMotor());
+     
+      spark.set(0.1);
+      
+     
+     SmartDashboard.putNumber("Position of angle motor "+spark.getDeviceId(), spark.getEncoder().getVelocity());
+    }});
+
+  }
+
+  public Command runDriveMotorTest(){
+    return run(() -> { 
+    for (SwerveModule module : swerveDrive.getModules()){
+     TalonFX spark = ((TalonFX)module.getDriveMotor().getMotor());
+      spark.set(0.1);
+      SmartDashboard.putNumber("Position of drive motor "+spark.getDeviceID(), spark.getVelocity().getValueAsDouble());
+    }});
+  }
+
+  public Command runModuleTest(){
+    return run(()-> {
+      SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(90));
+      for (SwerveModule module : swerveDrive.getModules()){
+        module.setDesiredState(state, false, false);;
+      }
+
+      
+  
+    });
+  }
+
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
       DoubleSupplier angularRotationX) {
     return run(() -> {
       // Make the robot move
       swerveDrive.drive(SwerveMath.scaleTranslation(
           new Translation2d(
-              -1 * translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
               translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
           0.8),
           Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(), // rotation
@@ -154,7 +195,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
  public void addVisionMeasurement(EstimatedRobotPose est) {
 swerveDrive.addVisionMeasurement(
-    new Pose2d(est.estimatedPose.toPose2d().getTranslation(), swerveDrive.getPose().getRotation()),
+    // new Pose2d(est.estimatedPose.toPose2d().getTranslation(), swerveDrive.getPose().getRotation()),
+    est.estimatedPose.toPose2d(),
     est.timestampSeconds
 );
 
@@ -215,8 +257,20 @@ vision.ifPresent(est -> {
     SmartDashboard.putNumber("Vision Y", est.estimatedPose.getY());
 });
 
-}
 
+ for (SwerveModule module : swerveDrive.getModules()){
+     TalonFX spark = ((TalonFX)module.getDriveMotor().getMotor());
+      SmartDashboard.putNumber("Position of drive motor "+spark.getDeviceID(), spark.getVelocity().getValueAsDouble());
+    }
+  
+  for (SwerveModule module : swerveDrive.getModules()){
+     SparkMax spark = ((SparkMax)module.getAngleMotor().getMotor());
+          
+     SmartDashboard.putNumber("Position of angle motor "+spark.getDeviceId(), spark.getEncoder().getPosition());
+  }
+
+
+}
 
 
 

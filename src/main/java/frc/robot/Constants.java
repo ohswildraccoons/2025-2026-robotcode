@@ -86,12 +86,12 @@ public final class Constants {
       public static final double frontRightPitch = Units.degreesToRadians(-15.5);
       public static final double frontRightYaw = Units.degreesToRadians(0);
 
-      public static final double frontLeftX = Units.inchesToMeters(13.25);
-      public static final double frontLeftY = Units.inchesToMeters(-7.2);
-      public static final double frontLeftZ = Units.inchesToMeters(3.75);
+      public static final double frontLeftX = Units.inchesToMeters(10.25);
+      public static final double frontLeftY = Units.inchesToMeters(0.2);
+      public static final double frontLeftZ = Units.inchesToMeters(17.75);
       public static final double frontLeftRoll = Units.degreesToRadians(0.0);
-      public static final double frontLeftPitch = Units.degreesToRadians(9.74);     
-      public static final double frontLeftYaw = Units.degreesToRadians(-11.3);
+      public static final double frontLeftPitch = Units.degreesToRadians(-15.5);     
+      public static final double frontLeftYaw = Units.degreesToRadians(0);
 
       public static final double backRightX =  Units.inchesToMeters(-13.5);
       public static final double backRightY =  Units.inchesToMeters(-12.875);
