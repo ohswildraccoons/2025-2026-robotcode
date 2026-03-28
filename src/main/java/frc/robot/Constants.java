@@ -23,7 +23,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class SwerveDriveConstants{
-    public static final double maximumSpeed = Units.feetToMeters(7.5);
+    public static final double maximumSpeed = Units.feetToMeters(7.5); //TODO is it really 7.5fps? thats low - hs
   }
   public static class MotorConstants{
 

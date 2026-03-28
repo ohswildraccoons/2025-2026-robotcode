@@ -271,7 +271,20 @@ vision.ifPresent(est -> {
 
 
 }
+ public void setCurrentLimit(int driveLimit, int steerLlimit)
+  {
+   
+       SwerveModule[] modules = new SwerveModule[4];
+       for(int i= 0; i==3; i++)
+       {
+       modules[i].getDriveMotor().setCurrentLimit(driveLimit);
+       modules[i].getAngleMotor().setCurrentLimit(steerLlimit); //commented out the CTRE default swervemodule bc it was randomly swapping moudles[] to a ctre array instead of yagsl array
+       }
 
+      
+  }
+
+ 
 
 
 

@@ -132,7 +132,7 @@ import edu.wpi.first.wpilibj2.command.Command;
       // YAMS only wraps ONE motor
       shooterMotor = new TalonFXWrapper(
           talonLeft,
-          DCMotor.getKrakenX44(1),
+          DCMotor.getKrakenX44Foc(1), //TODO Why we are not using FOC? 
           smcConfig
       );
 
@@ -189,6 +189,10 @@ import edu.wpi.first.wpilibj2.command.Command;
     public void simulationPeriodic() {
       // This method will be called once per scheduler run during simulation
       shooter.simIterate();
+    }
+
+    public void setCurrentLimit(double limit) {
+       shooter.getMotorController().setSupplyCurrentLimit(Amps.of(limit));
     }
   }
       

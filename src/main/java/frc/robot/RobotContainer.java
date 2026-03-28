@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
 import frc.robot.commands.Autos;
+import frc.robot.subsystems.CurrentManagementSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -85,6 +86,8 @@ public class RobotContainer {
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kLeftShooterMotorPortRight);
   private final ShooterSubsytem m_ShooterSubsystemRight = 
     new ShooterSubsytem(Constants.MotorConstants.kRightShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
+  
+  private final CurrentManagementSubsystem m_CurrentManagementSubsystem = new CurrentManagementSubsystem(m_swerveDrive, getIntake(), getSerializerSubsystem(), m_TurretSubsystemRight, m_TurretSubsystemLeft, m_ShooterSubsystemRight, m_ShooterSubsystemLeft); //needs to be last one
 
   // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
@@ -272,5 +275,41 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return autoChooser.getSelected();
+  }
+
+
+  public TurretSubsystem getLeftTurret()
+  {
+    return m_TurretSubsystemLeft;
+  }
+
+   public TurretSubsystem getRightTurret()
+  {
+    return m_TurretSubsystemLeft;
+  }
+
+  public ShooterSubsytem getLeftShooterSubsytem()
+  {
+    return m_ShooterSubsystemLeft;
+  }
+
+  public ShooterSubsytem getRightShooterSubsytem()
+  {
+    return m_ShooterSubsystemRight;
+  }
+ 
+  public IntakeSubsystem getIntake()
+  {
+    return m_IntakeSubsystem;
+  }
+ 
+  public serializerSubsystem getSerializerSubsystem()
+  {
+    return m_serializerSubsystem;
+  }
+ 
+  public SwerveSubsystem getSwerveSubsystem()
+  {
+    return m_swerveDrive;
   }
 }
