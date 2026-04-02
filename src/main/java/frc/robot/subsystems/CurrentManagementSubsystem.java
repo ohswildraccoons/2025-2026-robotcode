@@ -156,7 +156,7 @@ Time Amps
 
               
               managedDrivetrain.setCurrentLimit(30, 15);
-              managedIntake.setCurrentLimit(30000.0);
+              managedIntake.setCurrentLimit(30.0);
               managedSerializer.setCurrentLimit(30000.0);
               managedLeftTurret.setCurrentLimit(5000.0);
               managedRightTurret.setCurrentLimit(5000.0);

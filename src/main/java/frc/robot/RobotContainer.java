@@ -241,7 +241,7 @@ public class RobotContainer {
 
     m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
     m_mechController.povDown().onChange(new ParallelCommandGroup(
-      m_IntakeSubsystem.stopRoll(),
+      m_IntakeSubsystem.stopMotors(),
       m_serializerSubsystem.hardStopMotor()
       ));
 
