@@ -111,9 +111,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-
-
-
     NamedCommands.registerCommand("deploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
     NamedCommands.registerCommand("undeploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
 
@@ -244,7 +241,7 @@ public class RobotContainer {
 
     m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
     m_mechController.povDown().onChange(new ParallelCommandGroup(
-      m_IntakeSubsystem.stopMotors(),
+      m_IntakeSubsystem.stopRoll(),
       m_serializerSubsystem.hardStopMotor()
       ));
 

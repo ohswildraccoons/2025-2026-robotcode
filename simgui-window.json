@@ -6,13 +6,13 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "1171",
-      "maximized": "1",
+      "height": "873",
+      "maximized": "0",
       "style": "0",
       "userScale": "2",
-      "width": "1920",
-      "xpos": "0",
-      "ypos": "29"
+      "width": "1263",
+      "xpos": "184",
+      "ypos": "158"
     }
   },
   "Table": {
@@ -36,17 +36,17 @@
   "Window": {
     "###/SmartDashboard/Auto Chooser": {
       "Collapsed": "0",
-      "Pos": "60,60",
+      "Pos": "153,11",
       "Size": "307,60"
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "210,139",
+      "Pos": "157,139",
       "Size": "1218,564"
     },
     "###/SmartDashboard/Left turret/mechanism": {
       "Collapsed": "0",
-      "Pos": "367,730",
+      "Pos": "448,421",
       "Size": "511,323"
     },
     "###/SmartDashboard/Motors": {
@@ -66,23 +66,40 @@
     },
     "###/SmartDashboard/arm/mechanism": {
       "Collapsed": "0",
-      "Pos": "1165,84",
-      "Size": "305,200"
+      "Pos": "478,54",
+      "Size": "305,232"
     },
     "###/SmartDashboard/right Turret/mechanism": {
       "Collapsed": "0",
-      "Pos": "924,719",
+      "Pos": "590,332",
       "Size": "501,302"
     },
     "###FMS": {
       "Collapsed": "0",
+<<<<<<< HEAD
+      "Pos": "7,508",
+=======
       "Pos": "7,543",
+<<<<<<< HEAD
       "Size": "202,214"
+=======
+>>>>>>> bb0d7241cdbf560f5f07ee4eceee85e3ce8ae06c
+      "Size": "336,158"
+>>>>>>> db51572723cb367224d81f86cfc4445c4df16677
     },
     "###Joysticks": {
       "Collapsed": "0",
+<<<<<<< HEAD
+      "Pos": "239,428",
+      "Size": "976,239"
+=======
       "Pos": "1347,75",
+<<<<<<< HEAD
       "Size": "976,278"
+=======
+      "Size": "976,82"
+>>>>>>> bb0d7241cdbf560f5f07ee4eceee85e3ce8ae06c
+>>>>>>> db51572723cb367224d81f86cfc4445c4df16677
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -91,18 +108,18 @@
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "31,498",
-      "Size": "750,479"
+      "Pos": "388,570",
+      "Size": "750,284"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
-      "Pos": "907,441",
+      "Pos": "1141,77",
       "Size": "750,403"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1520,13",
-      "Size": "312,868"
+      "Pos": "864,4",
+      "Size": "218,420"
     },
     "###RoboRIO": {
       "Collapsed": "0",
@@ -111,13 +128,14 @@
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "59,349",
+      "Pos": "-4,193",
       "Size": "232,254"
     },
     "###Timing": {
       "Collapsed": "1",
-      "Pos": "6,187",
-      "Size": "162,142"
+      "Pos": "3,162",
+      "Size": "154,86"
+
     },
     "Debug##Default": {
       "Collapsed": "0",
