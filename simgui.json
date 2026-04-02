@@ -20,6 +20,11 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX (v6)[11]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
@@ -109,17 +114,7 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Left turret/mechanism": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/arm/mechanism": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/right Turret/mechanism": {
         "window": {
           "visible": true
         }

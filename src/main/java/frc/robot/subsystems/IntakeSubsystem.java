@@ -67,12 +67,12 @@ Pivot arm;
 SmartMotorController sparkSmartMotorController;
 boolean deployed = false;
 BooleanSupplier deployedSupplier = ()->deployed;
-
+boolean roll = false;
+BooleanSupplier rollSupplier = ()->roll;
 
   public IntakeSubsystem() {
 
     rollerMotor = new TalonFX(Constants.MotorConstants.kIntakeMotorPort);
-    //deployed = false;
     rollerMotorSim = new TalonFXSimState(rollerMotor);
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
     
@@ -81,7 +81,7 @@ BooleanSupplier deployedSupplier = ()->deployed;
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
   .withSubsystem(this)
-  .withClosedLoopController(0.65, 0.00, 0.0)
+  .withClosedLoopController(0.65, 0.0, 0.0)
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("31:50")))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
@@ -96,27 +96,19 @@ BooleanSupplier deployedSupplier = ()->deployed;
   
   // Vendor motor controller object
    SparkFlex RetractMC = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-
   // Create our SmartMotorController from our Spark and config with the NEO.
    sparkSmartMotorController = new SparkWrapper(RetractMC, DCMotor.getNeoVortex(1), smcConfig);
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
-   //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
+   // .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
       .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
-      .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
       .withHardLimit(Degrees.of(0.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(15));// MOI Calculation
-      
 
-  // Arm Mechanism
+  // pivot Mechanism
    arm = new Pivot(m_config);
-
-
-
-    
   }
- 
   /**
    * Set the angle of the arm.
    * @param angle Angle to go to.
@@ -124,121 +116,48 @@ BooleanSupplier deployedSupplier = ()->deployed;
   public Command setAngle(Supplier<Angle> angle) {
     return arm.setAngle(() -> {
       return angle.get();
-
-
     });
   }
-  
-  /**
-   * Set the angle of the arm, ends the command but does not stop the arm when the arm reaches the setpoint.
-   * @ param angle Angle to go to.
-   * @ param tolerance Angle tolerance for completion.
-   *  @ return A Command
-   */
-  //         public Command setAngleAndStop(Angle angle, Angle tolerance) { return arm.runTo(angle, tolerance);}
-  
-  /**
-   * Set arm closed loop controller to go to the specified mechanism position.
-   * @ param angle Angle to go to.
-   */
-  //         public void setAngleSetpoint(Angle angle) { arm.setMechanismPositionSetpoint(angle); }
-
-  /**
-   * Move the arm up and down.
+  /**   * Move the arm up and down.
    * @param dutycycle [-1, 1] speed to set the arm too.
    */
   public Command set(double dutycycle) { return arm.set(dutycycle);}
-
   /**
    * Run sysId on the {@link Arm}
    */
   public Command sysId() { return arm.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));}
-
   /**
    * Example command factory method.
-   *
    * @return a command
    */
-  public Command check(){
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
+// sets to 1
+  public Command setRoll() {
+
     return runOnce(() -> {
-            if (deployed) {
-                rollerMotor.set(1.0);
-            } else {
-                rollerMotor.set(0.0);
-            }}
-          );
+  rollerMotor.set(1.0);
+    });
   }
+  //sets to 0
+  public Command stopRoll() {
 
-public Command toggleDeploy() {
-  return runOnce(() -> {
-    deployed = !deployed;
-
-    if (deployedSupplier.getAsBoolean()) {
-      SmartDashboard.putString("deployed status", "deployed");
-    } else {
-      SmartDashboard.putString("deployed status", "undeployed");
-    }
-
-    check();
-  });
-}
-
-  public Command stopMotors() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-
-          rollerMotor.set(0);
-
-          /* one-time action goes here */
-        });
-  }
- public Command rollRollers() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-
-          rollerMotor.set(1.0);
-
-          /* one-time action goes here */
-        });
-  }
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   *  return value of some boolean subsystem state, such as a digital sensor.
-   */
-  //public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    //return false;
-  //}
-
-  // public Command unjam() {
-  //   return runOnce(() -> {
-  //      set(-1.0)
-  //     .andThen(new WaitCommand(.25))
-  //     .andThen(rollMotors())
-  //         });
-
-  // }
+    return runOnce(() -> {
+  rollerMotor.set(0.0);
+    });
+  };
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     // System.out.println("Arm Angle: " + (arm.getAngle().in(Degrees)));
     // System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
-
     arm.updateTelemetry();
     
+    SmartDashboard.putNumber("roller motor speed :", rollerMotor.get());  
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     arm.simIterate();
+   
   }
 }

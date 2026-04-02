@@ -109,9 +109,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-
-
-
     NamedCommands.registerCommand("deploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
     NamedCommands.registerCommand("undeploy rollers", m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
 
@@ -187,25 +184,31 @@ public class RobotContainer {
     // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(
     //   m_IntakeSubsystem.swapDeploy()));
 
-    m_driverController.rightBumper().onTrue(
+    // m_driverController.rightBumper().onTrue(
+    //   new SequentialCommandGroup(
+    //     m_IntakeSubsystem.stopRoll(),
+    //     m_IntakeSubsystem.setAngle(() -> Degrees.of(0)) ////TODO:game day hack (angles)
+    //   )
+    // );
+    // m_driverController.leftBumper().onTrue(    new SequentialCommandGroup(
+    //     m_IntakeSubsystem.setRoll(),
+    //     m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+    //   )
+    // );
+ m_driverController.button(1).onTrue(
       new SequentialCommandGroup(
-        m_IntakeSubsystem.stopMotors(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(0)) ////TODO:game day hack (angles)
+        m_IntakeSubsystem.stopRoll(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(90)) ////TODO:game day hack (angles)
       )
     );
-    m_driverController.leftBumper().onTrue(    new SequentialCommandGroup(
-        m_IntakeSubsystem.rollRollers(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+    m_driverController.button(2).onTrue(    new SequentialCommandGroup(
+        m_IntakeSubsystem.setRoll(),
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(0))
       )
     );
-
     m_driverController.povRight().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(90)));
     m_driverController.povUp().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(0)));
     m_driverController.povLeft().whileTrue(m_TurretSubsystemRight.setAngle(() -> Degrees.of(-90)));
-
-
-    //  m_driverController.leftTrigger().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(90)));
-    //  m_driverController.leftBumper().onTrue(m_IntakeSubsystem.setAngle(() -> Degrees.of(0)));
 
     
     // if (alliance() == Alliance.Blue){
@@ -246,7 +249,7 @@ public class RobotContainer {
 
     m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
     m_mechController.povDown().onChange(new ParallelCommandGroup(
-      m_IntakeSubsystem.stopMotors(),
+      m_IntakeSubsystem.stopRoll(),
       m_serializerSubsystem.hardStopMotor()
       ));
     
