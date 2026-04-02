@@ -76,13 +76,22 @@
     },
     "###FMS": {
       "Collapsed": "0",
+<<<<<<< HEAD
       "Pos": "7,508",
+=======
+      "Pos": "7,543",
+>>>>>>> bb0d7241cdbf560f5f07ee4eceee85e3ce8ae06c
       "Size": "336,158"
     },
     "###Joysticks": {
       "Collapsed": "0",
+<<<<<<< HEAD
       "Pos": "239,428",
       "Size": "976,239"
+=======
+      "Pos": "1347,75",
+      "Size": "976,82"
+>>>>>>> bb0d7241cdbf560f5f07ee4eceee85e3ce8ae06c
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -116,8 +125,13 @@
     },
     "###Timing": {
       "Collapsed": "1",
+<<<<<<< HEAD
       "Pos": "3,162",
       "Size": "154,86"
+=======
+      "Pos": "6,187",
+      "Size": "162,142"
+>>>>>>> bb0d7241cdbf560f5f07ee4eceee85e3ce8ae06c
     },
     "Debug##Default": {
       "Collapsed": "0",

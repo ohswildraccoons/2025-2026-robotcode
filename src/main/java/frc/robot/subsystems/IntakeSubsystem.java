@@ -22,7 +22,9 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.PersistMode;
@@ -63,19 +65,23 @@ public class IntakeSubsystem extends SubsystemBase {
 
 TalonFX rollerMotor;
 TalonFXSimState rollerMotorSim;
+TalonFXConfigurator rollerMotorConfigurator;
 Pivot arm;
 SmartMotorController sparkSmartMotorController;
 boolean deployed = false;
 BooleanSupplier deployedSupplier = ()->deployed;
-boolean roll = false;
+CurrentLimitsConfigs rollerLimits;boolean roll = false;
 BooleanSupplier rollSupplier = ()->roll;
 
   public IntakeSubsystem() {
 
     rollerMotor = new TalonFX(Constants.MotorConstants.kIntakeMotorPort);
     rollerMotorSim = new TalonFXSimState(rollerMotor);
-    TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
-    
+    rollerMotorConfigurator = rollerMotor.getConfigurator();
+    rollerLimits.SupplyCurrentLimit = 20; 
+    rollerLimits.SupplyCurrentLimitEnable = true; 
+    rollerMotorConfigurator.apply(rollerLimits);
+  
     // rollEndcoder = rollerMotor.getEncoder();
 
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
@@ -158,6 +164,5 @@ BooleanSupplier rollSupplier = ()->roll;
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     arm.simIterate();
-   
   }
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
 import frc.robot.commands.Autos;
+import frc.robot.subsystems.CurrentManagementSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import swervelib.SwerveDrive;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -85,6 +86,8 @@ public class RobotContainer {
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kLeftShooterMotorPortRight);
   private final ShooterSubsytem m_ShooterSubsystemRight = 
     new ShooterSubsytem(Constants.MotorConstants.kRightShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
+  
+  private final CurrentManagementSubsystem m_CurrentManagementSubsystem = new CurrentManagementSubsystem(m_swerveDrive, getIntake(), getSerializerSubsystem(), m_TurretSubsystemRight, m_TurretSubsystemLeft, m_ShooterSubsystemRight, m_ShooterSubsystemLeft); //needs to be last one
 
   // private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
@@ -94,7 +97,8 @@ public class RobotContainer {
   Pose3d robotPose = new Pose3d();
 
   private final SendableChooser<Command> autoChooser;
-  
+  int isRed;
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -119,14 +123,15 @@ public class RobotContainer {
 
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
-      () -> m_driverController.getLeftY(), //forward back  
-      () -> m_driverController.getLeftX(), // left right
+      () -> m_driverController.getLeftY() * isRed, //forward back  
+      () -> m_driverController.getLeftX() * isRed, // left right
         
         
         
-        () -> m_driverController.getRightX() //rotation
+        () -> m_driverController.getRightX()//rotation
         )
     );
+
     //  m_shooterSubsystem.setDefaultCommand(m_shooterSubsystem.autoSetVelocityOfFire(m_TurretSubsystem.getTarget(), () -> new Pose3d(m_swerveDrive.getPose()))); 
 
     // m_TurretSubsystemLeft.setDefaultCommand(
@@ -152,17 +157,24 @@ public class RobotContainer {
     // m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
+  public void setIsRed(Alliance alliance) {
+    isRed = (alliance == Alliance.Red) ? -1 : 1;
+  }
+
   public static Alliance alliance() {
       if (ALLIANCE.isPresent()) {
-        SmartDashboard.putString("Alliance", ALLIANCE.get().toString());
+          SmartDashboard.putString("Alliance", ALLIANCE.get().toString());
           return ALLIANCE.get();
-      } else if (DriverStation.getAlliance().isPresent()) {
+      }
+
+      if (DriverStation.getAlliance().isPresent()) {
           ALLIANCE = Optional.of(DriverStation.getAlliance().get());
           return ALLIANCE.get();
-      } else {
-          return Alliance.Blue;
       }
+
+      return Alliance.Blue; // default
   }
+
 
   /**>
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -179,6 +191,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
 
    
     // m_driverController.rightBumper().onTrue(new ParallelCommandGroup(
@@ -256,6 +269,7 @@ public class RobotContainer {
 
   }
 
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -264,5 +278,41 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return autoChooser.getSelected();
+  }
+
+
+  public TurretSubsystem getLeftTurret()
+  {
+    return m_TurretSubsystemLeft;
+  }
+
+   public TurretSubsystem getRightTurret()
+  {
+    return m_TurretSubsystemLeft;
+  }
+
+  public ShooterSubsytem getLeftShooterSubsytem()
+  {
+    return m_ShooterSubsystemLeft;
+  }
+
+  public ShooterSubsytem getRightShooterSubsytem()
+  {
+    return m_ShooterSubsystemRight;
+  }
+ 
+  public IntakeSubsystem getIntake()
+  {
+    return m_IntakeSubsystem;
+  }
+ 
+  public serializerSubsystem getSerializerSubsystem()
+  {
+    return m_serializerSubsystem;
+  }
+ 
+  public SwerveSubsystem getSwerveSubsystem()
+  {
+    return m_swerveDrive;
   }
 }

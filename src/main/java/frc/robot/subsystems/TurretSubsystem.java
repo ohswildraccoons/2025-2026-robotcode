@@ -468,4 +468,8 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
     // DogLog.log("Turret Angle", angle);
 
     }
+
+public void setCurrentLimit(double limit) {
+    turrePivot.getMotorController().setSupplyCurrentLimit(Amps.of(limit));
+}
   }
