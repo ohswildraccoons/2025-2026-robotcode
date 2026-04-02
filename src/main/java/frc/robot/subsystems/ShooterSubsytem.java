@@ -14,8 +14,9 @@
   import java.util.function.Supplier;
 
   import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-  import frc.robot.Constants;
+import frc.robot.Constants;
   import frc.robot.Constants.MotorConstants;
 
   import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -107,10 +108,49 @@ import edu.wpi.first.wpilibj2.command.Command;
      */
     public Command setSpeed(AngularVelocity speed) {return runOnce( () -> {shooter.setMechanismVelocitySetpoint(speed);});}
     
-
     // public Command autoSetRPMofFire(Supplier<Pose3d> TargetLocation, Supplier<Pose3d> shooterLocation) {
     //   return setVelocityOfFire(velocity);
     // }
+
+    public Command autoSetSpeed(Supplier<Pose3d> targetPose, Supplier<Pose3d> shooterPose){
+      Pose3d target = targetPose.get();
+      Pose3d shooter = shooterPose.get();
+      double deltaX = Math.abs(target.getX() - shooter.getX());
+      double deltaY = Math.abs(target.getY() - shooter.getY());
+      double distance = Math.sqrt((deltaX*deltaX) + (deltaY*deltaY));
+      int id = 0;
+      double prevDistance = 0;
+      double prevRPS = 0;
+      if (Math.abs(targetPose.get().getZ() - shooterPose.get().getZ()) >= 3){
+        for (double dist : Constants.ShooterConstants.shooterDistnacesHub){
+          if (dist > distance){
+            double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPSsHub[id] - prevRPS);
+            double interpolatedRPS = prevRPS + (slope*(distance-prevDistance));
+            return setSpeed(RotationsPerSecond.of(interpolatedRPS));
+          }else{
+            prevDistance = dist;
+            prevRPS = Constants.ShooterConstants.shooterRPSsHub[id];
+            id++;
+          }
+        } 
+       return setSpeed(RotationsPerSecond.of(Constants.ShooterConstants.shooterRPSs[id]));
+      }else {
+        for (double dist : Constants.ShooterConstants.shooterDistances){
+          if (dist > distance){
+            double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPSs[id] - prevRPS);
+            double interpolatedRPS = prevRPS + (slope*(distance-prevDistance));
+            return setSpeed(RotationsPerSecond.of(interpolatedRPS));
+          }else{
+            prevDistance = dist;
+            prevRPS = Constants.ShooterConstants.shooterRPSs[id];
+            id++;
+          }
+        } 
+        return setSpeed(RotationsPerSecond.of(Constants.ShooterConstants.shooterRPSs[id]));
+      }
+      
+    }
+    
 
 
     /**
@@ -143,7 +183,7 @@ import edu.wpi.first.wpilibj2.command.Command;
       // Diameter of the flywheel.
       .withDiameter(Inches.of(Constants.ShooterConstants.shooterWheelRadiusInches))
       // Mass of the flywheel.       
-      .withMass(Pounds.of(1))
+      .withMass(Pounds.of(0.69))
       // Maximum speed of the shooter.
       
       .withUpperSoftLimit(RPM.of(1000)) //TODO: this might need to be higher

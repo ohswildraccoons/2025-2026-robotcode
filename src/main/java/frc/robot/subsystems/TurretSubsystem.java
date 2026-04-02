@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
+import yams.gearing.Sprocket;
 import yams.mechanisms.SmartMechanism;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.PivotConfig;
@@ -88,7 +89,7 @@ public class TurretSubsystem extends SubsystemBase{
   //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 1)))
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,1),Sprocket.fromStages("12:72")))//
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -110,6 +111,26 @@ public class TurretSubsystem extends SubsystemBase{
 
   // Arm Mechanism
   private Pivot turrePivot;
+
+   /** Creates a new ExampleSubsystem. */
+  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide, int turretId) {
+    this.botRelativeXPos = botRelativeXPos;
+    this.botRelativeYPos = botRelativeYPos;
+    this.turretSide = turretSide;
+    this.turretId = turretId;
+    String name = (turretSide == TurretSide.LEFT) ? "Left turret" : "right Turret";
+
+    spark = new SparkMax(turretId, MotorType.kBrushless);
+    sparkSmartMotorController= new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
+    m_config= new PivotConfig(sparkSmartMotorController)
+      .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
+      // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping disabled bc the pivot cant spin infinitely
+      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
+      .withTelemetry(name, TelemetryVerbosity.HIGH) // Telemetry
+      .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
+    turrePivot = new Pivot(m_config);
+  }
+
 
   /**
    * Set the angle of the arm.
@@ -272,6 +293,7 @@ public Angle getAngle(){return turrePivot.getAngle();}
     public Supplier<Pose3d> getGhostSupplier(){
       return ()-> currentGhostTarget;
     }
+    
     public Supplier<Pose3d> getTurretFieldPosSupplier(Supplier<Pose3d> botPose3d){
       return (turretFieldRelativePose != null) ?  () ->turretFieldRelativePose: botPose3d;
     }
@@ -432,25 +454,7 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
     return velocity;
   }
 
-  /** Creates a new ExampleSubsystem. */
-  public TurretSubsystem(double botRelativeXPos, double botRelativeYPos, TurretSide turretSide, int turretId) {
-    this.botRelativeXPos = botRelativeXPos;
-    this.botRelativeYPos = botRelativeYPos;
-    this.turretSide = turretSide;
-    this.turretId = turretId;
-    String name = (turretSide == TurretSide.LEFT) ? "Left turret" : "right Turret";
-
-    spark = new SparkMax(turretId, MotorType.kBrushless);
-    sparkSmartMotorController= new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
-    m_config= new PivotConfig(sparkSmartMotorController)
-      .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
-      // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping disabled bc the pivot cant spin infinitely
-      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
-      .withTelemetry(name, TelemetryVerbosity.HIGH) // Telemetry
-      .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
-    turrePivot = new Pivot(m_config);
-  }
-
+ 
 
 
  
@@ -458,6 +462,8 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
   public void periodic() {
     turrePivot.updateTelemetry();
     SmartDashboard.putBoolean("Turret Manual Targeting", isManualSetpointTargeting.getAsBoolean());
+    SmartDashboard.putString("Turret Angle", turrePivot.getAngle().toShortString());
+    SmartDashboard.putNumber("Turret angle var",  angle);
   }
 
   @Override

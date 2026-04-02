@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.700699001426534,
-        "y": 0.7809272467902997
+        "x": 4.4013409415121245,
+        "y": 0.6386019971469341
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.837121223648756,
-        "y": 2.388760580123634
+        "x": 0.20921540656205462,
+        "y": 0.7679885877318128
       },
       "isLocked": false,
-      "linkedName": "RFONZ"
+      "linkedName": "RSAZR"
     },
     {
       "anchor": {
-        "x": 7.700699001426534,
-        "y": 6.021084165477889
+        "x": 0.5973751783166898,
+        "y": 2.281811697574893
       },
       "prevControl": {
-        "x": 7.651976779204311,
-        "y": 5.066128609922335
+        "x": 0.571497860199714,
+        "y": 0.27631954350927357
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LFNZ2"
+      "linkedName": "RSAZDE"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -178.31531568210372
   },
   "useDefaultConstraints": true
 }

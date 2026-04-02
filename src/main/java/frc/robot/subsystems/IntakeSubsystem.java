@@ -70,14 +70,14 @@ Pivot arm;
 SmartMotorController sparkSmartMotorController;
 boolean deployed = false;
 BooleanSupplier deployedSupplier = ()->deployed;
-CurrentLimitsConfigs rollerLimits;
+CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
 
   public IntakeSubsystem() {
 
     rollerMotor = new TalonFX(Constants.MotorConstants.kIntakeMotorPort);
     rollerMotorSim = new TalonFXSimState(rollerMotor);
     rollerMotorConfigurator = rollerMotor.getConfigurator();
-    rollerLimits.SupplyCurrentLimit = 20; 
+    rollerLimits.SupplyCurrentLimit = 40; 
     rollerLimits.SupplyCurrentLimitEnable = true; 
     rollerMotorConfigurator.apply(rollerLimits);
   
@@ -86,8 +86,8 @@ CurrentLimitsConfigs rollerLimits;
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
   .withSubsystem(this)
-  .withClosedLoopController(0.65, 0.00, 0.0)
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("31:50")))
+  .withClosedLoopController(0,0,0)//0.65, 0.00, 0.0)//
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("48:24")))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -100,24 +100,23 @@ CurrentLimitsConfigs rollerLimits;
 
   
   // Vendor motor controller object
-   SparkFlex RetractMC = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+  SparkFlex RetractMC = new SparkFlex(Constants.MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
+
+  // smcConfig.withExternalEncoder(RetractMC.getAbsoluteEncoder());
 
   // Create our SmartMotorController from our Spark and config with the NEO.
-   sparkSmartMotorController = new SparkWrapper(RetractMC, DCMotor.getNeoVortex(1), smcConfig);
+  sparkSmartMotorController = new SparkWrapper(RetractMC, DCMotor.getNeoVortex(1), smcConfig);
 
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
    //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
       .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
       .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(0.0), Degrees.of(90.0)) // Hard limit bc wiring prevents infinite spinning
-      .withTelemetry("arm", TelemetryVerbosity.HIGH) // Telemetry
+      .withHardLimit(Degrees.of(-10.0), Degrees.of(140.0)) // Hard limit bc wiring prevents infinite spinning
+      .withTelemetry("intake Pivot", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(15));// MOI Calculation
-      
 
   // Arm Mechanism
    arm = new Pivot(m_config);
-
-
 
     
   }
@@ -207,7 +206,7 @@ public Command toggleDeploy() {
     return runOnce(
         () -> {
 
-          rollerMotor.set(1.0);
+          rollerMotor.set(-1.0);
 
           /* one-time action goes here */
         });
@@ -238,6 +237,9 @@ public Command toggleDeploy() {
     // System.out.println("Arm setpoint: " + arm.getMotor().getMechanismPositionSetpoint());
 
     arm.updateTelemetry();
+    SmartDashboard.putString("arm Angle", arm.getAngle().toShortString());
+    SmartDashboard.putString("arm Angle --2", arm.getMotor().getRotorPosition().toShortString());
+    SmartDashboard.putNumber("roller motors RPM", rollerMotor.getVelocity().getValueAsDouble() * 60);
     
   }
 

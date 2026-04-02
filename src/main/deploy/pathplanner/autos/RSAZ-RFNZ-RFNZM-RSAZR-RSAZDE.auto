@@ -1,0 +1,56 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "deploy rollers"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSAZ-RFNZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RFNZ-RFNZM"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RFNZM-RSAZR"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSAZR-LSAZDE"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

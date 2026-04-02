@@ -65,12 +65,12 @@ public class Robot extends TimedRobot {
 
   // SparkMax m_intakeTraveler;
   // SparkMax m_intakeExtend;
-  SparkFlex m_intakeTube;
-  TalonFX m_rightShooterBottom;
-  SparkMax m_rightShooterTop;
+  // SparkFlex m_intakeTube;
+  // TalonFX m_rightShooterBottom;
+  // SparkMax m_rightShooterTop;
 
-  TalonFX m_leftShooterBottom;
-  TalonFX m_leftShooterTop;
+  // TalonFX m_leftShooterBottom;
+  // TalonFX m_leftShooterTop;
    
  
   /**

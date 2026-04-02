@@ -16,13 +16,13 @@ public class CurrentManagementSubsystem extends SubsystemBase {
   //Define subsystems
   //Define profiles
 
-  enum CurrentProfile {
+enum CurrentProfile {
  BALANCED, SHOOTER, DRIVE, INTAKE, FULLSEND
  }
 CurrentProfile nextCurrentProfile;
 CurrentProfile activeCurrentProfile;
 
- Alert CurrentProfileDisplay;
+ Alert CurrentProfileDisplay; 
 
 
  int balancedDriveLimit;
@@ -43,7 +43,7 @@ ShooterSubsytem managedrightShooter;
   /** Creates a new ExampleSubsystem. */
   public CurrentManagementSubsystem(SwerveSubsystem drivetrain, IntakeSubsystem intake, serializerSubsystem serializer, TurretSubsystem LeftTurret, TurretSubsystem RightTurret, ShooterSubsytem LeftShooter, ShooterSubsytem rightShooter)// Adding subsystems in constructor because they are private and also getters dont work {
  {
-    CurrentProfile activeCurrentProfile = CurrentProfile.BALANCED;
+    CurrentProfile activeCurrentProfile = null;
     CurrentProfile nexCurrentProfile = activeCurrentProfile;
     CurrentProfileDisplay = new Alert(activeCurrentProfile.toString(), AlertType.kInfo);
 
@@ -125,7 +125,7 @@ Time Amps
               managedSerializer.setCurrentLimit(10.0);
               managedLeftTurret.setCurrentLimit(5.0);
               managedRightTurret.setCurrentLimit(5.0);
-              managedLeftShooter.setCurrentLimit(10.0);
+              managedLeftShooter.setCurrentLimit(5.0);
               managedrightShooter.setCurrentLimit(10.0);
               CurrentProfileDisplay.setText(activeCurrentProfile.toString());
               nonBalancedTimer = 250;
@@ -153,6 +153,17 @@ Time Amps
               case FULLSEND:
 
               CurrentProfileDisplay = new Alert(activeCurrentProfile.toString(), AlertType.kError);
+
+              
+              managedDrivetrain.setCurrentLimit(30, 15);
+              managedIntake.setCurrentLimit(30000.0);
+              managedSerializer.setCurrentLimit(30000.0);
+              managedLeftTurret.setCurrentLimit(5000.0);
+              managedRightTurret.setCurrentLimit(5000.0);
+              managedLeftShooter.setCurrentLimit(10000.0);
+              managedrightShooter.setCurrentLimit(10000.0);
+              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
+              nonBalancedTimer = 250;
               
               nonBalancedTimer=-1;
 

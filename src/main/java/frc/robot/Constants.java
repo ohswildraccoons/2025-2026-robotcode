@@ -62,8 +62,8 @@ public final class Constants {
   public static class FieldConstants{
     public static final Pose3d middleField = new Pose3d( 8.3, 3.8, 0, new Rotation3d(0 ,0 ,0));
 
-    public static final Pose3d blueHub = new Pose3d(4.6, 4, 0, new Rotation3d(0 ,0 ,0));
-    public static final Pose3d redHub = new Pose3d(12, 4, 0, new Rotation3d(0 ,0 , 0));
+    public static final Pose3d blueHub = new Pose3d(4.6, 4, 6, new Rotation3d(0 ,0 ,0));
+    public static final Pose3d redHub = new Pose3d(12, 4, 6, new Rotation3d(0 ,0 , 0));
 
     public static final Pose3d blueRightDeposit= new Pose3d(2,1.5, 0, new Rotation3d(0 ,0 ,0));
     public static final Pose3d blueLeftDeposit = new Pose3d(2, 6.5, 0, new Rotation3d(0 ,0 ,0));
@@ -132,8 +132,11 @@ public final class Constants {
       public static final double shooterWheelRadiusInches = 3;
       public static final double shooterWheelRadiusMeters = Units.inchesToMeters(shooterWheelRadiusInches);
 
-      public static final double[] shooterRPMs = {25, 40, 50, 75, 80 ,85, 100};
-      public static final double[] shooterDistances = {10, 144 ,216, 348, 410 , 420, 432}; // in 
+      public static final double[] shooterRPSs = {25, 40, 50, 75, 80 ,85, 100};
+      public static final double[] shooterDistances = {0.833, 12 , 18, 29, 42.166, 35, 36}; // in 
+
+      public static final double[] shooterRPSsHub = {};
+      public static final double[] shooterDistnacesHub = {};
     } 
 
 

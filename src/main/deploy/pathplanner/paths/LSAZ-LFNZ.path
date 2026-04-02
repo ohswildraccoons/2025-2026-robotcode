@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.2455444444405,
-        "y": 7.367599999995041
+        "x": 4.026119828815976,
+        "y": 7.444336661911555
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.207855555555556,
-        "y": 7.9815000000000005
+        "x": 6.988430939931032,
+        "y": 8.058236661916514
       },
       "isLocked": false,
       "linkedName": "LSAZ"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.9999999996848
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
