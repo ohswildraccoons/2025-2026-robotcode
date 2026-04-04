@@ -28,6 +28,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -70,6 +71,7 @@ public class TurretSubsystem extends SubsystemBase{
   double botRelativeXPos;
   double botRelativeYPos;
   Pose3d turretFieldRelativePose;
+  double desiredTurretAngle;
   Boolean manual = false;
   BooleanSupplier isManualSetpointTargeting = () ->manual;
   public enum TurretSide {
@@ -85,8 +87,8 @@ public class TurretSubsystem extends SubsystemBase{
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(0.5, 0.00, 0.0)
-  //.withClosedLoopController(4, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
+  .withClosedLoopController(4.3, 0.0, 0.0)
+  //.withClosedLoopController(4, 0, 0, DgreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5,1),Sprocket.fromStages("12:72")))//
@@ -124,8 +126,8 @@ public class TurretSubsystem extends SubsystemBase{
     sparkSmartMotorController= new SparkWrapper(spark, DCMotor.getNEO(1), smcConfig);
     m_config= new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
-      // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping disabled bc the pivot cant spin infinitely
-      .withHardLimit(Degrees.of(-90), Degrees.of(90)) // Hard limit bc wiring prevents infinite spinning
+      // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping enabled bc the pivot can spin infinitely
+      .withHardLimit(Degrees.of(-180), Degrees.of(180)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry(name, TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
     turrePivot = new Pivot(m_config);
@@ -186,24 +188,44 @@ public Angle getAngle(){return turrePivot.getAngle();}
 
     public Command targetPose(Supplier<Pose3d> robotPose, Supplier<Pose3d> targetPose, SwerveSubsystem swerveSubsystem) {
       return turrePivot.setAngle(() -> {
+
+        // 1. Compute field-relative turret pose
         turretFieldRelativePose = getFieldPos(robotPose.get());
-          SmartDashboard.putString("Field Section", getFieldSection(robotPose.get()).name());
-         currentGhostTarget = ghostTargetPose(targetPose.get(), turretFieldRelativePose, swerveSubsystem);
-        double deltaX = currentGhostTarget.getX() - turretFieldRelativePose.getX();
-        double deltaY = currentGhostTarget.getY() - turretFieldRelativePose.getY();
-        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 
-        double angle = Math.atan2(deltaY, deltaX);
-        double angleDeg = adjustAngleToFieldRelative(robotPose, () -> Math.toDegrees(angle));
-        SmartDashboard.putNumber("Turret Target Angle", angleDeg);
-        
-        SmartDashboard.putNumber("v-target x", currentGhostTarget.getX());
-        SmartDashboard.putNumber("v-target y", currentGhostTarget.getY());
+        // 2. Compute delta to target
+        double dx = targetPose.get().getX() - turretFieldRelativePose.getX();
+        double dy = targetPose.get().getY() - turretFieldRelativePose.getY();
 
+        // 3. Absolute field angle to target (-180..180)
+        double targetFieldAngle = Math.toDegrees(Math.atan2(dy, dx));
+        targetFieldAngle = Math.IEEEremainder(targetFieldAngle, 360);
 
-        SmartDashboard.putNumber("angle of Turret", angleDeg);
-        return Degrees.of(angleDeg);
-      });
+        // 4. Robot heading (field-relative)
+        double robotHeading = robotPose.get().getRotation().toRotation2d().getDegrees();
+        robotHeading = Math.IEEEremainder(robotHeading, 360);
+
+        // 5. Convert target angle into robot-relative turret angle
+        desiredTurretAngle = targetFieldAngle - robotHeading; // Robot heading is inverted because of coordinate system differences
+        desiredTurretAngle += 180; // Because the turret is mounted backwards
+        desiredTurretAngle = Math.IEEEremainder(desiredTurretAngle, 360);
+        desiredTurretAngle *= -1;
+        // 6. Get current turret angle
+        double currentTurretAngle = turrePivot.getAngle().in(Degrees);
+
+        // 7. Compute shortest path delta
+        double delta = desiredTurretAngle - currentTurretAngle;
+        delta = Math.IEEEremainder(delta, 360);
+
+        // 8. New commanded angle = current + shortest delta
+        double commandedAngle = currentTurretAngle + delta;
+
+        // 9. Clamp to turret physical limits
+        commandedAngle = MathUtil.clamp(commandedAngle, -90, 90);
+
+        SmartDashboard.putNumber("Turret Commanded Angle", commandedAngle);
+
+        return Degrees.of(commandedAngle);
+    });
     }
 
     public double adjustAngleToFieldRelative(Supplier<Pose3d> robotPose, Supplier<Double> angle) {
@@ -464,6 +486,8 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
     SmartDashboard.putBoolean("Turret Manual Targeting", isManualSetpointTargeting.getAsBoolean());
     SmartDashboard.putString("Turret Angle", turrePivot.getAngle().toShortString());
     SmartDashboard.putNumber("Turret angle var",  angle);
+    SmartDashboard.putNumber("Turret Raw Angle", turrePivot.getAngle().in(Degrees));
+    SmartDashboard.putNumber("Turret Desired Angle", desiredTurretAngle);
   }
 
   @Override

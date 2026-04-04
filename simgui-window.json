@@ -6,11 +6,11 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "873",
+      "height": "1171",
       "maximized": "1",
       "style": "0",
       "userScale": "2",
-      "width": "1263",
+      "width": "1920",
       "xpos": "0",
       "ypos": "29"
     }
@@ -41,8 +41,8 @@
     },
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "Pos": "117,84",
-      "Size": "1218,564"
+      "Pos": "117,185",
+      "Size": "1218,463"
     },
     "###/SmartDashboard/Left turret/mechanism": {
       "Collapsed": "0",
@@ -81,8 +81,8 @@
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "239,428",
-      "Size": "976,239"
+      "Pos": "335,626",
+      "Size": "976,278"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -92,7 +92,7 @@
     "###NetworkTables": {
       "Collapsed": "0",
       "Pos": "388,570",
-      "Size": "750,284"
+      "Size": "750,533"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
@@ -111,7 +111,7 @@
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "-4,193",
+      "Pos": "2,212",
       "Size": "232,254"
     },
     "###Timing": {

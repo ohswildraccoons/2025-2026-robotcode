@@ -27,6 +27,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.MotorConstants;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import static edu.wpi.first.units.Units.Amps;;
 
 
@@ -65,7 +68,7 @@ public class Robot extends TimedRobot {
 
   // SparkMax m_intakeTraveler;
   // SparkMax m_intakeExtend;
-  // SparkFlex m_intakeTube;
+  // SparkMax m_intakeTube;
   // TalonFX m_rightShooterBottom;
   // SparkMax m_rightShooterTop;
 
@@ -91,7 +94,7 @@ public class Robot extends TimedRobot {
     // m_leftShooterTop = new TalonFX(MotorConstants.kLeftShooterMotorPortTop);
     // m_intakeTraveler = new SparkMax(MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
     // m_intakeExtend = new SparkMax(MotorConstants.kIntakeExtendMotorPort, MotorType.kBrushless);
-    // m_intakeTube = new  SparkFlex(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+    // m_intakeTube = new  SparkMax(MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
 
     // m_IntakeFX.set(-0.6);
     // m_rightShooterBottom.set(1);
@@ -100,7 +103,7 @@ public class Robot extends TimedRobot {
     // m_leftShooterTop.set(-1);
     // m_intakeTraveler.set(0.85);
     // m_intakeExtend.set(0.0);
-    // m_intakeTube .set(1);
+    // m_intakeTube.set(0.7);
 
 
 
@@ -136,9 +139,11 @@ public class Robot extends TimedRobot {
   m_robotContainer.setIsRed(currentAlliance);
 
   SmartDashboard.putString("ALLIANCE", currentAlliance.toString());
+
+  SmartDashboard.putString("IS_RED", "" + (m_robotContainer.isRed == -1));
  }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called once each tdime the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
   }
@@ -155,6 +160,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    m_robotContainer.getLeftShooterSubsytem().setDefaultCommand(m_robotContainer.getLeftShooterSubsytem().autoSetSpeed(m_robotContainer.getLeftTurret().getGhostSupplier(), m_robotContainer.getLeftTurret().getTurretFieldPosSupplier(() -> new Pose3d(m_robotContainer.getSwerveSubsystem().getPose()))));
+    m_robotContainer.getRightShooterSubsytem().setDefaultCommand(m_robotContainer.getRightShooterSubsytem().autoSetSpeed(m_robotContainer.getRightTurret().getGhostSupplier(), m_robotContainer.getRightTurret().getTurretFieldPosSupplier(() -> new Pose3d(m_robotContainer.getSwerveSubsystem().getPose()))));
   }
 
   /** This function is called periodically during autonomous. */
@@ -170,6 +177,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    
+    m_robotContainer.getLeftShooterSubsytem().setDefaultCommand( m_robotContainer.getLeftShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
+    m_robotContainer.getRightShooterSubsytem().setDefaultCommand( m_robotContainer.getRightShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
   }
 
 }

@@ -57,6 +57,7 @@ import frc.robot.subsystems.ShooterSubsytem;
 
  import dev.doglog.DogLog;
  import dev.doglog.DogLogOptions;
+import dev.doglog.internal.tunable.Tunable;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -74,27 +75,32 @@ public class RobotContainer {
 
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
-  private final TurretSubsystem m_TurretSubsystemLeft = 
-    new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, 
-                        TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kLeftTurretMotorPort);
+  
     private final TurretSubsystem m_TurretSubsystemRight = 
     new TurretSubsystem(TurretConstants.rightTurretMetersX, TurretConstants.rightTurretMetersX, 
                         TurretSubsystem.TurretSide.RIGHT, Constants.MotorConstants.kRightTurretMotorPort);
-
+private final TurretSubsystem m_TurretSubsystemLeft = 
+    new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, 
+                        TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kLeftTurretMotorPort);
 
   private final ShooterSubsytem m_ShooterSubsystemLeft = 
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kLeftShooterMotorPortRight);
   private final ShooterSubsytem m_ShooterSubsystemRight = 
     new ShooterSubsytem(Constants.MotorConstants.kRightShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
   
-  // private final CurrentManagementSubsystem m_CurrentManagementSubsystem = new CurrentManagementSubsystem(m_swerveDrive, getIntake(), getSerializerSubsystem(), m_TurretSubsystemRight, m_TurretSubsystemLeft, m_ShooterSubsystemRight, m_ShooterSubsystemLeft); //needs to be last one
 
   //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
   private final serializerSubsystem m_serializerSubsystem = new serializerSubsystem();
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
+  
+  
+  // private final CurrentManagementSubsystem m_CurrentManagementSubsystem = new CurrentManagementSubsystem(m_swerveDrive, getIntake(), getSerializerSubsystem(), m_TurretSubsystemRight, m_TurretSubsystemLeft, m_ShooterSubsystemRight, m_ShooterSubsystemLeft); //needs to be last one
+
+ 
   Pose3d robotPose = new Pose3d();
 
   private final SendableChooser<Command> autoChooser;
+  // private final tuna
   int isRed;
 
 
@@ -126,7 +132,7 @@ public class RobotContainer {
         
         
         
-        () -> m_driverController.getRightX()//rotation
+        () -> m_driverController.getRightX() *-1//rotation
         )
     );
 
@@ -139,25 +145,26 @@ public class RobotContainer {
           alliance()
       )
     );
-    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(-7500)));
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(-60)));
     // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
-    m_TurretSubsystemRight.setDefaultCommand(
-        m_TurretSubsystemRight.targettingCommand(
-          () -> new Pose3d(m_swerveDrive.getPose()),
-          m_swerveDrive,
-          alliance()
-      )
-    );
-        // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(-7500)));
+    // m_TurretSubsystemRight.setDefaultCommand(
+    //     m_TurretSubsystemRight.targettingCommand(
+    //       () -> new Pose3d(m_swerveDrive.getPose()),
+    //       m_swerveDrive,
+    //       alliance()
+    //   )
+    // );
+    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(-60)));
     // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
     m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
 
   public void setIsRed(Alliance alliance) {
-    isRed = (alliance == Alliance.Red) ? -1 : 1;
+    isRed = (alliance == Alliance.Red) ? 1 : -1;
   }
+
 
   public static Alliance alliance() {
       if (ALLIANCE.isPresent()) {
@@ -239,11 +246,13 @@ public class RobotContainer {
       m_TurretSubsystemRight.setAutoTargettingOn()
     ));
 
-    m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
-    m_mechController.povDown().onChange(new ParallelCommandGroup(
-      m_IntakeSubsystem.stopMotors(),
-      m_serializerSubsystem.hardStopMotor()
-      ));
+    // m_mechController.povLeft().onTrue(m_CurrentManagementSubsystem.applyDriveProfile());
+
+    // m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
+    // m_mechController.povDown().onChange(new ParallelCommandGroup(
+    //   m_IntakeSubsystem.stopMotors(),
+    //   m_serializerSubsystem.hardStopMotor()
+    //   ));
 
     
     

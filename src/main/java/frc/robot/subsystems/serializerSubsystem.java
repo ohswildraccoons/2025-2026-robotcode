@@ -9,10 +9,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkFlexConfigAccessor;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkFlexSim;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
@@ -26,10 +28,10 @@ import frc.robot.Constants;
 
 public class serializerSubsystem extends SubsystemBase {
 
-SparkFlex serialTubeMotor;
+SparkMax serialTubeMotor;
 SparkFlex serialSepMotor;
-SparkFlexSim serialTubeMotorSim;
-SparkFlexConfig serialTubeMotorConfig;
+SparkMaxSim serialTubeMotorSim;
+SparkMaxConfig serialTubeMotorConfig;
 SparkFlexSim serialSepMotorSim;
 SparkFlexConfig serialSepMotorConfig;
 
@@ -39,11 +41,11 @@ SparkFlexConfig serialSepMotorConfig;
   public serializerSubsystem() {
 
 
-      serialTubeMotor = new SparkFlex(Constants.MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
-      serialSepMotor = new SparkFlex(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    serialTubeMotor = new SparkMax(Constants.MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
+    serialSepMotor = new SparkFlex(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
 
-   serialTubeMotorSim = new SparkFlexSim(serialTubeMotor, DCMotor.getNeoVortex(1));
-   SparkFlexConfig serialTubeMotorConfig = new SparkFlexConfig();
+   serialTubeMotorSim = new SparkMaxSim(serialTubeMotor, DCMotor.getNeoVortex(1));
+   SparkMaxConfig serialTubeMotorConfig = new SparkMaxConfig();
    serialTubeMotorConfig.idleMode(IdleMode.kBrake);
    serialTubeMotorConfig.smartCurrentLimit(20);
 

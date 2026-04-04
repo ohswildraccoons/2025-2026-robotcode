@@ -23,7 +23,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
   public static class SwerveDriveConstants{
-    public static final double maximumSpeed = Units.feetToMeters(7.5); //TODO is it really 7.5fps? thats low - hs
+    public static final double maximumSpeed = Units.feetToMeters(15); //TODO is it really 7.5fps? thats low - hs
   }
   public static class MotorConstants{
 
@@ -79,15 +79,15 @@ public final class Constants {
   
   public static final class CameraConstants{
 
-      public static final double frontRightX = Units.inchesToMeters(10.25);
-      public static final double frontRightY = Units.inchesToMeters(0.2);
+      public static final double frontRightX = Units.inchesToMeters(0.2);
+      public static final double frontRightY = Units.inchesToMeters(10.25);
       public static final double frontRightZ = Units.inchesToMeters(17.75);
       public static final double frontRightRoll = Units.degreesToRadians(0.0);
       public static final double frontRightPitch = Units.degreesToRadians(-15.5);
       public static final double frontRightYaw = Units.degreesToRadians(0);
 
-      public static final double frontLeftX = Units.inchesToMeters(10.25);
-      public static final double frontLeftY = Units.inchesToMeters(0.2);
+      public static final double frontLeftX = Units.inchesToMeters(0.2);
+      public static final double frontLeftY = Units.inchesToMeters(-10.25);
       public static final double frontLeftZ = Units.inchesToMeters(17.75);
       public static final double frontLeftRoll = Units.degreesToRadians(0.0);
       public static final double frontLeftPitch = Units.degreesToRadians(-15.5);     
@@ -135,8 +135,8 @@ public final class Constants {
       public static final double[] shooterRPSs = {25, 40, 50, 75, 80 ,85, 100};
       public static final double[] shooterDistances = {0.833, 12 , 18, 29, 42.166, 35, 36}; // in 
 
-      public static final double[] shooterRPSsHub = {};
-      public static final double[] shooterDistnacesHub = {};
+      public static final double[] shooterRPSsHub = {59,60, 61};
+      public static final double[] shooterDistnacesHub = {9.1, 10.66, 12.1};
     } 
 
 

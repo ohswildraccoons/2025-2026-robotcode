@@ -86,8 +86,8 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
   .withSubsystem(this)
-  .withClosedLoopController(0,0,0)//0.65, 0.00, 0.0)//
-  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("48:24")))
+  .withClosedLoopController(2.0,0,0)//0.65, 0.00, 0.0)//
+  .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("24:48")))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)
   // Setup Telemetry
@@ -168,7 +168,7 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(() -> {
             if (deployed) {
-                rollerMotor.set(1.0);
+                rollerMotor.set(0.0);
             } else {
                 rollerMotor.set(0.0);
             }}
@@ -206,7 +206,7 @@ public Command toggleDeploy() {
     return runOnce(
         () -> {
 
-          rollerMotor.set(-1.0);
+          rollerMotor.set(-0.5);
 
           /* one-time action goes here */
         });

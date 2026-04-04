@@ -1,215 +1,149 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
-
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 
 public class CurrentManagementSubsystem extends SubsystemBase {
 
-  //Define subsystems
-  //Define profiles
+    public enum CurrentProfile {
+        BALANCED,
+        SHOOTER,
+        DRIVE,
+        INTAKE,
+        FULLSEND
+    }
 
-enum CurrentProfile {
- BALANCED, SHOOTER, DRIVE, INTAKE, FULLSEND
- }
-CurrentProfile nextCurrentProfile;
-CurrentProfile activeCurrentProfile;
+    private CurrentProfile activeProfile;
+    private CurrentProfile nextProfile;
 
- Alert CurrentProfileDisplay; 
+    private Alert profileAlert;
 
+    private int nonBalancedTimer = 0;
 
- int balancedDriveLimit;
- int balancedShooterLimit;
- int balancedIntakeLimit;
- int nonBalancedTimer;
+    // Managed subsystems (matching YOUR names)
+    private final SwerveSubsystem drivetrain;
+    private final IntakeSubsystem intake;
+    private final serializerSubsystem serializer;
+    private final TurretSubsystem leftTurret;
+    private final TurretSubsystem rightTurret;
+    private final ShooterSubsytem leftShooter;
+    private final ShooterSubsytem rightShooter;
 
-SwerveSubsystem managedDrivetrain;
-IntakeSubsystem managedIntake; 
-serializerSubsystem managedSerializer; 
-TurretSubsystem managedLeftTurret;
-TurretSubsystem managedRightTurret; 
-ShooterSubsytem managedLeftShooter;
-ShooterSubsytem managedrightShooter;
+    public CurrentManagementSubsystem(
+            SwerveSubsystem drivetrain,
+            IntakeSubsystem intake,
+            serializerSubsystem serializer,
+            TurretSubsystem leftTurret,
+            TurretSubsystem rightTurret,
+            ShooterSubsytem leftShooter,
+            ShooterSubsytem rightShooter) {
 
- 
+        this.drivetrain = drivetrain;
+        this.intake = intake;
+        this.serializer = serializer;
+        this.leftTurret = leftTurret;
+        this.rightTurret = rightTurret;
+        this.leftShooter = leftShooter;
+        this.rightShooter = rightShooter;
 
-  /** Creates a new ExampleSubsystem. */
-  public CurrentManagementSubsystem(SwerveSubsystem drivetrain, IntakeSubsystem intake, serializerSubsystem serializer, TurretSubsystem LeftTurret, TurretSubsystem RightTurret, ShooterSubsytem LeftShooter, ShooterSubsytem rightShooter)// Adding subsystems in constructor because they are private and also getters dont work {
- {
-    CurrentProfile activeCurrentProfile = null;
-    CurrentProfile nexCurrentProfile = activeCurrentProfile;
-    CurrentProfileDisplay = new Alert(activeCurrentProfile.toString(), AlertType.kInfo);
+        activeProfile = CurrentProfile.DRIVE;
+        nextProfile = activeProfile;
 
-    managedDrivetrain=drivetrain;
-    managedIntake=intake;
-    managedSerializer = serializer;
-    managedLeftTurret = LeftTurret;
-    managedRightTurret = RightTurret;
-    managedLeftShooter =LeftShooter;
-    managedrightShooter = rightShooter;
-    nonBalancedTimer = 250; // 5 econds, 250 robotperiodic iteration
-   
-   
+        profileAlert = new Alert("Current Profile: " + activeProfile, AlertType.kInfo);
+    }
 
-  }
+    public Command applyDriveProfile() {
+        return applyProfile(CurrentProfile.DRIVE);
+    }
 
- 
+    public Command applyProfile(CurrentProfile profile) {
+        return runOnce(() -> applyProfileInternal(profile));
+    }
 
+    private void applyProfileInternal(CurrentProfile profile) {
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command ApplyCurrentLimitProfile(CurrentProfile input) {
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
+        activeProfile = profile;
+        nextProfile = profile;
 
-/* 	
+        switch (profile) {
 
-Min breaker blo curve from optifue (i kno, eaton no make graph)
-Time Amps
-0.2	972
-0.5	708
-1	492
-5	300
-10	240
-100	132
-135	126
-*/
-
-    return runOnce(
-        () -> {
-         
-          switch (input)
-          {
-             
             case BALANCED:
-            //Balanced is "normal" using default limits. Right now, aiming for 
-            //TODO: Tune these values - current maxx iaa 400... may have to get eperimental on this: get drivetrain acrual value from a match log, figure out idle and under load at FULLSEND for each mechanism. 
-              managedDrivetrain.setCurrentLimit(40, 20);
-              managedIntake.setCurrentLimit(20.0);
-              managedSerializer.setCurrentLimit(20.0);
-              managedLeftTurret.setCurrentLimit(10.0);
-              managedRightTurret.setCurrentLimit(10.0);
-              managedLeftShooter.setCurrentLimit(20.0);
-              managedrightShooter.setCurrentLimit(20.0);
-              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
-              nonBalancedTimer = 250;
+                drivetrain.setCurrentLimit(40, 20);
+                intake.setCurrentLimit(20);
+                // serializer.setCurrentLimit(20);
+                leftTurret.setCurrentLimit(10);
+                rightTurret.setCurrentLimit(10);
+                leftShooter.setCurrentLimit(20);
+                rightShooter.setCurrentLimit(20);
+                nonBalancedTimer = 250;
+                break;
 
-              break;
-
-            case SHOOTER: 
-              managedDrivetrain.setCurrentLimit(15, 10);  //100A
-              managedIntake.setCurrentLimit(20.0);
-              managedSerializer.setCurrentLimit(20.0);
-              managedLeftTurret.setCurrentLimit(8.0);
-              managedRightTurret.setCurrentLimit(8.0);
-              managedLeftShooter.setCurrentLimit(35.0);
-              managedrightShooter.setCurrentLimit(35.0);
-              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
-              nonBalancedTimer = 250;
-
-          
-              break;
+            case SHOOTER:
+                drivetrain.setCurrentLimit(15, 10);
+                intake.setCurrentLimit(20);
+                serializer.setCurrentLimit(20);
+                leftTurret.setCurrentLimit(8);
+                rightTurret.setCurrentLimit(8);
+                leftShooter.setCurrentLimit(35);
+                rightShooter.setCurrentLimit(35);
+                nonBalancedTimer = 250;
+                break;
 
             case DRIVE:
-              managedDrivetrain.setCurrentLimit(60, 25);  //100A
-              managedIntake.setCurrentLimit(20.0);
-              managedSerializer.setCurrentLimit(10.0);
-              managedLeftTurret.setCurrentLimit(5.0);
-              managedRightTurret.setCurrentLimit(5.0);
-              managedLeftShooter.setCurrentLimit(5.0);
-              managedrightShooter.setCurrentLimit(10.0);
-              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
-              nonBalancedTimer = 250;
-              
-              
-
-            //put limit apps here
-              break;
+                drivetrain.setCurrentLimit(60, 25);
+                intake.setCurrentLimit(20);
+                serializer.setCurrentLimit(10);
+                leftTurret.setCurrentLimit(5);
+                rightTurret.setCurrentLimit(5);
+                leftShooter.setCurrentLimit(5);
+                rightShooter.setCurrentLimit(10);
+                nonBalancedTimer = 250;
+                break;
 
             case INTAKE:
+                drivetrain.setCurrentLimit(30, 15);
+                intake.setCurrentLimit(30);
+                serializer.setCurrentLimit(30);
+                leftTurret.setCurrentLimit(5);
+                rightTurret.setCurrentLimit(5);
+                leftShooter.setCurrentLimit(10);
+                rightShooter.setCurrentLimit(10);
+                nonBalancedTimer = 250;
+                break;
 
-              managedDrivetrain.setCurrentLimit(30, 15);
-              managedIntake.setCurrentLimit(30.0);
-              managedSerializer.setCurrentLimit(30.0);
-              managedLeftTurret.setCurrentLimit(5.0);
-              managedRightTurret.setCurrentLimit(5.0);
-              managedLeftShooter.setCurrentLimit(10.0);
-              managedrightShooter.setCurrentLimit(10.0);
-              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
-              nonBalancedTimer = 250;
+            case FULLSEND:
+                profileAlert = new Alert("FULLSEND MODE ACTIVE", AlertType.kError);
 
-            //put limit apps here
-              break;
+                drivetrain.setCurrentLimit(90, 35);
+                intake.setCurrentLimit(30);
+                serializer.setCurrentLimit(30000);
+                leftTurret.setCurrentLimit(5000);
+                rightTurret.setCurrentLimit(5000);
+                leftShooter.setCurrentLimit(10000);
+                rightShooter.setCurrentLimit(10000);
 
-              case FULLSEND:
+                nonBalancedTimer = -1;
+                break;
+        }
 
-              CurrentProfileDisplay = new Alert(activeCurrentProfile.toString(), AlertType.kError);
+        profileAlert.setText("Current Profile: " + activeProfile);
+    }
 
-              
-              managedDrivetrain.setCurrentLimit(30, 15);
-              managedIntake.setCurrentLimit(30.0);
-              managedSerializer.setCurrentLimit(30000.0);
-              managedLeftTurret.setCurrentLimit(5000.0);
-              managedRightTurret.setCurrentLimit(5000.0);
-              managedLeftShooter.setCurrentLimit(10000.0);
-              managedrightShooter.setCurrentLimit(10000.0);
-              CurrentProfileDisplay.setText(activeCurrentProfile.toString());
-              nonBalancedTimer = 250;
-              
-              nonBalancedTimer=-1;
+    @Override
+    public void periodic() {
 
-              break;
-          
-            default:
-              break;
-          }
+        if (nonBalancedTimer == 0) {
+            nextProfile = CurrentProfile.BALANCED;
+        }
 
+        if (nextProfile != activeProfile) {
+            applyProfileInternal(nextProfile);
+        }
 
-
-        });
-
-        
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-     if (nonBalancedTimer==0)
-     {
-      nextCurrentProfile=CurrentProfile.BALANCED;
-     }
-
-      if(nextCurrentProfile!=activeCurrentProfile)
-      {
-        ApplyCurrentLimitProfile(nextCurrentProfile);
-      }
-
-    nonBalancedTimer--;
-
-    
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
+        if (nonBalancedTimer > 0) {
+            nonBalancedTimer--;
+        }
+    }
 }

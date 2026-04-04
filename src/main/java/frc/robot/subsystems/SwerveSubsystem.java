@@ -9,9 +9,13 @@ import frc.robot.subsystems.CameraSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.photonvision.EstimatedRobotPose;
@@ -19,6 +23,7 @@ import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,12 +63,20 @@ public class SwerveSubsystem extends SubsystemBase {
   // bBot is 14 14
   private final SwerveDrive  swerveDrive;
   private final CameraSubsystem cameras = CameraSubsystem.getInstance();
+    private boolean isRedAlliance = false;
+
   
   private final Field2d field = new Field2d();
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-
+    Rotation2d initialRotation2d;
+    Optional<Alliance> ALLIANCE = Optional.empty();
+    if (ALLIANCE.isPresent() && ALLIANCE.get() == Alliance.Red) {
+      initialRotation2d = Rotation2d.fromDegrees(180);
+    } else {
+      initialRotation2d = Rotation2d.kZero;
+    }
     try {
       if (RobotBase.isSimulation()) {
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -73,7 +86,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setCosineCompensator(false); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life
       } else {
         swerveDrive = new SwerveParser(swerveJsonDirectory)
-          .createSwerveDrive(SwerveDriveConstants.maximumSpeed);
+          .createSwerveDrive(SwerveDriveConstants.maximumSpeed, new Pose2d(3,3, initialRotation2d));
+
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -84,9 +98,11 @@ public class SwerveSubsystem extends SubsystemBase {
       System.out.println("Unknown error during SwerveDrive initialization");
       throw new RuntimeException("SwerveDrive initialization failed.");
     }
-
+    Pose2d startingPose = !isRedAlliance ? new Pose2d(Meters.of(1.0), Meters.of(4.0), Rotation2d.fromDegrees(0)) : new Pose2d (Meters.of(16), Meters.of(4.0), Rotation2d.fromDegrees(180));
+   
     setupPathPlanner();
         SmartDashboard.putData("Field", field);
+
 
   };
 
@@ -163,7 +179,7 @@ public class SwerveSubsystem extends SubsystemBase {
         module.setDesiredState(state, false, false);;
       }
 
-      
+
   
     });
   }
@@ -174,8 +190,8 @@ public class SwerveSubsystem extends SubsystemBase {
       // Make the robot move
       swerveDrive.drive(SwerveMath.scaleTranslation(
           new Translation2d(
-              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-              translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
+              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity()  ,
+              translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() ),
           0.8),
           Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(), // rotation
           true, // Field relative
@@ -283,10 +299,6 @@ vision.ifPresent(est -> {
 
       
   }
-
- 
-
-
 
 
   @Override
