@@ -478,7 +478,6 @@ private Pose3d ghostTargetPose(Pose3d targetPose, Pose3d botPose3d, SwerveSubsys
 
  
 
-
  
   @Override
   public void periodic() {

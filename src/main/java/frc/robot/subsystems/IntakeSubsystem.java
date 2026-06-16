@@ -128,8 +128,6 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
   public Command setAngle(Supplier<Angle> angle) {
     return arm.setAngle(() -> {
       return angle.get();
-
-
     });
   }
   

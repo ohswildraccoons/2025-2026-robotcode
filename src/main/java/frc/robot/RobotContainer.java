@@ -145,7 +145,7 @@ private final TurretSubsystem m_TurretSubsystemLeft =
           alliance()
       )
     );
-    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(-60)));
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(0)));
     // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
     // m_TurretSubsystemRight.setDefaultCommand(
@@ -155,8 +155,8 @@ private final TurretSubsystem m_TurretSubsystemLeft =
     //       alliance()
     //   )
     // );
-    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(-60)));
-    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetVelocityOfFire(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
+    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(0)));
+    // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetSpeed(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
     m_serializerSubsystem.setDefaultCommand(m_serializerSubsystem.runQ());
   }
@@ -199,16 +199,25 @@ private final TurretSubsystem m_TurretSubsystemLeft =
 
     m_driverController.rightBumper().onTrue(
       new SequentialCommandGroup(
-        // m_IntakeSubsystem.stopMotors(),
+        m_IntakeSubsystem.stopMotors(),
         m_IntakeSubsystem.setAngle(() -> Degrees.of(-10)) ////TODO:game day hack (angles)
       )
     );
     m_driverController.leftBumper().onTrue(    
       new SequentialCommandGroup(
-        // m_IntakeSubsystem.rollRollers(),
+        m_IntakeSubsystem.rollRollers(),
         m_IntakeSubsystem.setAngle(() -> Degrees.of(130))
       )
     );
+
+    m_mechController.rightTrigger().whileTrue(new SequentialCommandGroup(
+      m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(-60)),
+      m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(-60))
+      ));
+    m_mechController.rightTrigger().whileFalse(new SequentialCommandGroup(
+      m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(0)),
+      m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(0))
+      ));
     
     if (alliance() == Alliance.Blue){
       m_mechController.x().whileTrue( new ParallelCommandGroup(
@@ -248,7 +257,7 @@ private final TurretSubsystem m_TurretSubsystemLeft =
 
     // m_mechController.povLeft().onTrue(m_CurrentManagementSubsystem.applyDriveProfile());
 
-    // m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
+    m_mechController.leftBumper().onChange(m_serializerSubsystem.activateJam());
     // m_mechController.povDown().onChange(new ParallelCommandGroup(
     //   m_IntakeSubsystem.stopMotors(),
     //   m_serializerSubsystem.hardStopMotor()

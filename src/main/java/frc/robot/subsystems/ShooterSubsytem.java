@@ -11,7 +11,8 @@
   import static edu.wpi.first.units.Units.Seconds;
   import static edu.wpi.first.units.Units.Volts;
 
-  import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
   import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -115,9 +116,12 @@ import edu.wpi.first.wpilibj2.command.Command;
     public Command autoSetSpeed(Supplier<Pose3d> targetPose, Supplier<Pose3d> shooterPose){
       // Pose3d target = targetPose.get();
       // Pose3d shooter = shooterPose.get();
-      double deltaX = Math.abs(targetPose.get().getX() - shooterPose.get().getX());
-      double deltaY = Math.abs(targetPose.get().getY() - shooterPose.get().getY());
-      double distance = Math.sqrt((deltaX*deltaX) + (deltaY*deltaY));
+      return run(()->{
+
+      DoubleSupplier deltaX = ()-> Math.abs(targetPose.get().getX() - shooterPose.get().getX());
+      DoubleSupplier deltaY = ()->Math.abs(targetPose.get().getY() - shooterPose.get().getY());
+      DoubleSupplier distance = () -> Math.sqrt((deltaX.getAsDouble()*deltaX.getAsDouble()) + (deltaY.getAsDouble()*deltaY.getAsDouble()));
+      double d = distance.getAsDouble();
 
       int id = 0;
       double prevDistance = 0;
@@ -125,32 +129,35 @@ import edu.wpi.first.wpilibj2.command.Command;
 
       if (Math.abs(targetPose.get().getZ() - shooterPose.get().getZ()) >= 3){
         for (double dist : Constants.ShooterConstants.shooterDistnacesHub){
-          if (dist > distance){
-            double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPSsHub[id] - prevRPS);
-            double interpolatedRPS = prevRPS + (slope*(distance-prevDistance));
-            return setSpeed(RotationsPerSecond.of(-interpolatedRPS));
+          if (dist > d){
+            double slope = (d - prevDistance)/(Constants.ShooterConstants.shooterRPSsHub[id] - prevRPS);
+            double interpolatedRPS = prevRPS + (slope*(d-prevDistance));
+            setSpeed(RotationsPerSecond.of(-interpolatedRPS));
+            return;
           }else{
             prevDistance = dist;
             prevRPS = Constants.ShooterConstants.shooterRPSsHub[id];
             id++;
           }
         } 
-       return setSpeed(RotationsPerSecond.of(-Constants.ShooterConstants.shooterRPSs[id]));
+       setSpeed(RotationsPerSecond.of(-Constants.ShooterConstants.shooterRPSs[id-1]));
       }else {
         for (double dist : Constants.ShooterConstants.shooterDistances){
-          if (dist > distance){
-            double slope = (distance - prevDistance)/(Constants.ShooterConstants.shooterRPSs[id] - prevRPS);
-            double interpolatedRPS = prevRPS + (slope*(distance-prevDistance));
-            return setSpeed(RotationsPerSecond.of(-interpolatedRPS));
+          if (dist > d){
+            double slope = (d - prevDistance)/(Constants.ShooterConstants.shooterRPSs[id] - prevRPS);
+            double interpolatedRPS = prevRPS + (slope*(d-prevDistance));
+            setSpeed(RotationsPerSecond.of(-interpolatedRPS));
+            return;
           }else{
             prevDistance = dist;
             prevRPS = Constants.ShooterConstants.shooterRPSs[id];
             id++;
           }
         } 
-        return setSpeed(RotationsPerSecond.of(-Constants.ShooterConstants.shooterRPSs[id]));
+        setSpeed(RotationsPerSecond.of(-Constants.ShooterConstants.shooterRPSs[id-1]));
       }
       
+      });
     }
     
 

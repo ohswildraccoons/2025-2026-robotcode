@@ -160,8 +160,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    m_robotContainer.getLeftShooterSubsytem().setDefaultCommand(m_robotContainer.getLeftShooterSubsytem().autoSetSpeed(m_robotContainer.getLeftTurret().getGhostSupplier(), m_robotContainer.getLeftTurret().getTurretFieldPosSupplier(() -> new Pose3d(m_robotContainer.getSwerveSubsystem().getPose()))));
-    m_robotContainer.getRightShooterSubsytem().setDefaultCommand(m_robotContainer.getRightShooterSubsytem().autoSetSpeed(m_robotContainer.getRightTurret().getGhostSupplier(), m_robotContainer.getRightTurret().getTurretFieldPosSupplier(() -> new Pose3d(m_robotContainer.getSwerveSubsystem().getPose()))));
+    m_robotContainer.getLeftShooterSubsytem().setDefaultCommand(m_robotContainer.getLeftShooterSubsytem().setSpeed(RotationsPerSecond.of(-55)));
+    m_robotContainer.getRightShooterSubsytem().setDefaultCommand(m_robotContainer.getRightShooterSubsytem().setSpeed(RotationsPerSecond.of(-55)));  
+   // m_robotContainer.getRightShooterSubsytem().setDefaultCommand(m_robotContainer.getRightShooterSubsytem().autoSetSpeed(m_robotContainer.getRightTurret().getGhostSupplier(), m_robotContainer.getRightTurret().getTurretFieldPosSupplier(() -> new Pose3d(m_robotContainer.getSwerveSubsystem().getPose()))));
+    m_robotContainer.getSerializerSubsystem().setDefaultCommand(m_robotContainer.getSerializerSubsystem().runQ());
+
   }
 
   /** This function is called periodically during autonomous. */
