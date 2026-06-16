@@ -4,69 +4,185 @@
 
 package frc.robot.subsystems;
 
+import frc.robot.subsystems.CameraSubsystem;
+
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import org.photonvision.EstimatedRobotPose;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveConstants;
 
-public class SwerveSubsystem extends SubsystemBase {
-  private final SwerveDrive swerveDrive;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModuleState;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+import com.revrobotics.spark.SparkMax;
+ 
+public class SwerveSubsystem extends SubsystemBase { 
+  // bBot is 14 14
+  private final SwerveDrive  swerveDrive;
+  private final CameraSubsystem cameras = CameraSubsystem.getInstance();
+    private boolean isRedAlliance = false;
 
+  
+  private final Field2d field = new Field2d();
   /** Creates a new SwerveSubsystem. */
   public SwerveSubsystem() {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    SwerveDrive tempDrive = null;
-
+    Rotation2d initialRotation2d;
+    Optional<Alliance> ALLIANCE = Optional.empty();
+    if (ALLIANCE.isPresent() && ALLIANCE.get() == Alliance.Red) {
+      initialRotation2d = Rotation2d.fromDegrees(180);
+    } else {
+      initialRotation2d = Rotation2d.kZero;
+    }
     try {
-      tempDrive = new SwerveParser(swerveJsonDirectory)
-          .createSwerveDrive(SwerveDriveConstants.maximumSpeed);
+      if (RobotBase.isSimulation()) {
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        swerveDrive = new SwerveParser(swerveJsonDirectory)
+          .createSwerveDrive(SwerveDriveConstants.maximumSpeed, new Pose2d(0.5,0.5, Rotation2d.kZero)); 
+        swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+        swerveDrive.setCosineCompensator(false); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life
+      } else {
+        swerveDrive = new SwerveParser(swerveJsonDirectory)
+          .createSwerveDrive(SwerveDriveConstants.maximumSpeed, new Pose2d(3,3, initialRotation2d));
+
+      }
     } catch (IOException e) {
       e.printStackTrace();
-    }
-
-    if (tempDrive != null) {
-      swerveDrive = tempDrive;
-    } else {
-      System.out.println("Failed to create SwerveDrive");
+      System.out.println("Failed to read SwerveDrive JSON files");
+      throw new RuntimeException("SwerveDrive initialization failed.");
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Unknown error during SwerveDrive initialization");
       throw new RuntimeException("SwerveDrive initialization failed.");
     }
+    Pose2d startingPose = !isRedAlliance ? new Pose2d(Meters.of(1.0), Meters.of(4.0), Rotation2d.fromDegrees(0)) : new Pose2d (Meters.of(16), Meters.of(4.0), Rotation2d.fromDegrees(180));
+   
+    setupPathPlanner();
+        SmartDashboard.putData("Field", field);
+
 
   };
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
+  public void setupPathPlanner(){
+    RobotConfig config = null;
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
 
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotVelocity, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> swerveDrive.setChassisSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  }
+
+ public ChassisSpeeds getVelocity() {
+    return swerveDrive.getFieldVelocity();
+  }
+
+  public Pose2d getRobotPose() {
+    return swerveDrive.getPose();
+  }
+
+  
+  public Command runAngleMotorTest(){
+    return run(() -> { 
+    for (SwerveModule module : swerveDrive.getModules()){
+     SparkMax spark = ((SparkMax)module.getAngleMotor().getMotor());
+     
+      spark.set(0.1);
+      
+     
+     SmartDashboard.putNumber("Position of angle motor "+spark.getDeviceId(), spark.getEncoder().getVelocity());
+    }});
 
   }
 
-  // public void drive(Translation2d translation, double rotation, boolean
-  // fieldRelative)
-  // {
-  // swerveDrive.drive(translation,
-  // rotation,
-  // fieldRelative,
-  // false); // Open loop is disabled since it shouldn't be used most of the time.
-  // }
+  public Command runDriveMotorTest(){
+    return run(() -> { 
+    for (SwerveModule module : swerveDrive.getModules()){
+     TalonFX spark = ((TalonFX)module.getDriveMotor().getMotor());
+      spark.set(0.1);
+      SmartDashboard.putNumber("Position of drive motor "+spark.getDeviceID(), spark.getVelocity().getValueAsDouble());
+    }});
+  }
+
+  public Command runModuleTest(){
+    return run(()-> {
+      SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(90));
+      for (SwerveModule module : swerveDrive.getModules()){
+        module.setDesiredState(state, false, false);;
+      }
+
+
+  
+    });
+  }
 
   public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY,
       DoubleSupplier angularRotationX) {
@@ -74,14 +190,57 @@ public class SwerveSubsystem extends SubsystemBase {
       // Make the robot move
       swerveDrive.drive(SwerveMath.scaleTranslation(
           new Translation2d(
-              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-              translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
+              translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity()  ,
+              translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() ),
           0.8),
           Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(), // rotation
-          false, // Field relative
+          true, // Field relative
           false);
     });
   }
+
+  /**
+   * Returns the current pose of the robot.
+   *
+   * @return The current pose.
+   */
+  public Pose2d getPose()
+  {
+    return swerveDrive.getPose();
+  }
+
+ public void addVisionMeasurement(EstimatedRobotPose est) {
+swerveDrive.addVisionMeasurement(
+    // new Pose2d(est.estimatedPose.toPose2d().getTranslation(), swerveDrive.getPose().getRotation()),
+    est.estimatedPose.toPose2d(),
+    est.timestampSeconds
+);
+
+}
+
+  /**
+   * Resets odometry to the given pose. Gyro angle and module positions do not need to be reset when calling this
+   * method.  However, if either gyro angle or module position is reset, this must be called in order for odometry to
+   * keep working.
+   *
+   * @param initialHolonomicPose The pose to set the odometry to
+   */
+  public void resetOdometry(Pose2d initialHolonomicPose)
+  {
+    swerveDrive.resetOdometry(initialHolonomicPose);
+  }
+
+  /**
+   * Gets the current velocity (x, y and omega) of the robot
+   *
+   * @return A {@link ChassisSpeeds} object of the current velocity
+   */
+  public ChassisSpeeds getRobotVelocity()
+  {
+    return swerveDrive.getRobotVelocity();
+  }
+
+
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a
@@ -94,13 +253,55 @@ public class SwerveSubsystem extends SubsystemBase {
     return false;
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+@Override
+public void periodic() {
+
+
+    Optional<EstimatedRobotPose> vision = cameras.getPose(getPose());
+
+    vision.ifPresent(est -> addVisionMeasurement(est));
+
+
+    field.setRobotPose(getPose());
+
+
+SmartDashboard.putBoolean("Vision Update Fired", false);
+
+vision.ifPresent(est -> {
+    SmartDashboard.putBoolean("Vision Update Fired", true);
+    SmartDashboard.putNumber("Vision X", est.estimatedPose.getX());
+    SmartDashboard.putNumber("Vision Y", est.estimatedPose.getY());
+});
+
+
+ for (SwerveModule module : swerveDrive.getModules()){
+     TalonFX spark = ((TalonFX)module.getDriveMotor().getMotor());
+      SmartDashboard.putNumber("Position of drive motor "+spark.getDeviceID(), spark.getVelocity().getValueAsDouble());
+    }
+  
+  for (SwerveModule module : swerveDrive.getModules()){
+     SparkMax spark = ((SparkMax)module.getAngleMotor().getMotor());
+          
+     SmartDashboard.putNumber("Position of angle motor "+spark.getDeviceId(), spark.getEncoder().getPosition());
   }
+
+
+}
+ public void setCurrentLimit(int driveLimit, int steerLlimit)
+  {
+   
+       SwerveModule[] modules = new SwerveModule[4];
+       for(int i= 0; i==3; i++)
+       {
+       modules[i].getDriveMotor().setCurrentLimit(driveLimit);
+       modules[i].getAngleMotor().setCurrentLimit(steerLlimit); //commented out the CTRE default swervemodule bc it was randomly swapping moudles[] to a ctre array instead of yagsl array
+       }
+
+      
+  }
+
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
+        }
 }

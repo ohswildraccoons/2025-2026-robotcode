@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LSAZ-LFNZ"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deploy rollers"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LFNZ-RFNZ2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSNZ2-RSONZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSONZ-LFNZ2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

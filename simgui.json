@@ -1,0 +1,212 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK Flex [11]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [13]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [53] RELATIVE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[11]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[11]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Arm/mechanism": "Mechanism2d",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Encoders": "Alerts",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/IMU": "Alerts",
+      "/SmartDashboard/JSON": "Alerts",
+      "/SmartDashboard/Left turret/mechanism": "Mechanism2d",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ArmMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/IntakeSubsystem/Live Tuning": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/ShooterSubsytem/Live Tuning": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretMotor/ZeroEncoder": "Command",
+      "/SmartDashboard/Mechanisms/Commands/TurretSubsystem/Live Tuning": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/Down": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/Up": "Command",
+      "/SmartDashboard/Mechanisms/Commands/arm/ZeroEncoder": "Command",
+      "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
+      "/SmartDashboard/Pigeon 2 (v6) [9]": "Gyro",
+      "/SmartDashboard/Pigeon IMU [13]": "Gyro",
+      "/SmartDashboard/Pigeon IMU [9]": "Gyro",
+      "/SmartDashboard/PivotExample/mechanism": "Mechanism2d",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/ShooterMech/mechanism": "Mechanism2d",
+      "/SmartDashboard/Swerve Drive": "Alerts",
+      "/SmartDashboard/TurretPivot/mechanism": "Mechanism2d",
+      "/SmartDashboard/TurretSubsystem": "Subsystem",
+      "/SmartDashboard/arm/mechanism": "Mechanism2d",
+      "/SmartDashboard/intake Pivot/mechanism": "Mechanism2d",
+      "/SmartDashboard/right Turret/mechanism": "Mechanism2d",
+      "/SmartDashboard/wake me up bruih": "Command"
+    },
+    "windows": {
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "OdometryPose": {
+          "arrowSize": 47,
+          "selectable": false
+        },
+        "Robot": {
+          "arrowColor": [
+            0.1985294222831726,
+            0.0,
+            0.3970588445663452,
+            255.0
+          ],
+          "length": 0.6858000159263611,
+          "weight": 1.0
+        },
+        "XModules": {
+          "arrows": false,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.12700000405311584,
+          "weight": 2.0,
+          "width": 0.12700000405311584
+        },
+        "bottom": 1914,
+        "height": 8.069275856018066,
+        "left": 245,
+        "right": 3942,
+        "top": 118,
+        "units": "inches",
+        "width": 16.54119300842285,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Left turret/mechanism": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/arm/mechanism": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/right Turret/mechanism": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "Retained Values": {
+      "open": false
+    },
+    "retained": {
+      "SmartDashboard": {
+        "Auto Chooser": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "Mechanisms": {
+        "TurretPivot": {
+          "TurretMotor": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      },
+      "PathPlanner": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "PathPlanner": {
+          "open": true
+        },
+        "Scheduler": {
+          "open": true
+        },
+        "ShooterMech": {
+          "mechanism": {
+            "ShooterMechRoot": {
+              "open": true
+            },
+            "open": true
+          }
+        },
+        "TurretPivot": {
+          "mechanism": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Elastic@1": {
+      "open": true
+    },
+    "Elastic@2": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "Server": {
+      "open": true
+    },
+    "visible": true
+  }
+}

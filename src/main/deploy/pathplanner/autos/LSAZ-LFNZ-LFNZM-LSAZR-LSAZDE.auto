@@ -1,0 +1,56 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "deploy rollers"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LSAZ-LFNZ"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LFNZ-LFNZM"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LFNZM-LSAZR"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LSAZR-LSAZDE"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
