@@ -127,7 +127,7 @@ public class TurretSubsystem extends SubsystemBase{
     m_config= new PivotConfig(sparkSmartMotorController)
       .withStartingPosition(Degrees.of(0)) // Starting position of the Pivot
       // .withWrapping(Degrees.of(-180), Degrees.of(180)) // Wrapping enabled bc the pivot can spin infinitely
-      .withHardLimit(Degrees.of(-180), Degrees.of(180)) // Hard limit bc wiring prevents infinite spinning
+      .withHardLimit(Degrees.of(-45), Degrees.of(45)) // Hard limit bc wiring prevents infinite spinning ***changed to 45 for testing HS**
       .withTelemetry(name, TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(4)); // MOI Calculation
     turrePivot = new Pivot(m_config);

@@ -60,7 +60,7 @@ import edu.wpi.first.wpilibj2.command.Command;
       .withControlMode(ControlMode.CLOSED_LOOP)
 
       // Feedback Constants (PID Constants)
-      .withClosedLoopController(1.5, 0, 0, DegreesPerSecond.of(900000), DegreesPerSecondPerSecond.of(9999999))
+      .withClosedLoopController(0.1, 0, 0, DegreesPerSecond.of(900000), DegreesPerSecondPerSecond.of(9999999))
       .withSimClosedLoopController(0.8, 0, 0, DegreesPerSecond.of(900000), DegreesPerSecondPerSecond.of(45))
 
       // Feedforward Constants

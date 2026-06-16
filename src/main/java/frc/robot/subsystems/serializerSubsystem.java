@@ -29,11 +29,11 @@ import frc.robot.Constants;
 public class serializerSubsystem extends SubsystemBase {
 
 SparkMax serialTubeMotor;
-SparkFlex serialSepMotor;
+SparkMax serialSepMotor;
 SparkMaxSim serialTubeMotorSim;
 SparkMaxConfig serialTubeMotorConfig;
-SparkFlexSim serialSepMotorSim;
-SparkFlexConfig serialSepMotorConfig;
+SparkMaxSim serialSepMotorSim;
+SparkMaxConfig serialSepMotorConfig;
 
 
  boolean jam = true;
@@ -42,15 +42,15 @@ SparkFlexConfig serialSepMotorConfig;
 
 
     serialTubeMotor = new SparkMax(Constants.MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
-    serialSepMotor = new SparkFlex(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    serialSepMotor = new SparkMax(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
 
-   serialTubeMotorSim = new SparkMaxSim(serialTubeMotor, DCMotor.getNeoVortex(1));
+   serialTubeMotorSim = new SparkMaxSim(serialTubeMotor, DCMotor.getNEO(1));
    SparkMaxConfig serialTubeMotorConfig = new SparkMaxConfig();
    serialTubeMotorConfig.idleMode(IdleMode.kBrake);
    serialTubeMotorConfig.smartCurrentLimit(20);
 
-   serialSepMotorSim = new SparkFlexSim(serialSepMotor, DCMotor.getNeoVortex(1));
-   SparkFlexConfig serialSepMotorConfig = new SparkFlexConfig();
+   serialSepMotorSim = new SparkMaxSim(serialSepMotor, DCMotor.getNEO(1));
+   SparkMaxConfig serialSepMotorConfig = new SparkMaxConfig();
    serialSepMotorConfig.idleMode(IdleMode.kBrake);
    serialSepMotorConfig.smartCurrentLimit(20);
 

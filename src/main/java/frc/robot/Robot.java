@@ -181,8 +181,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     
-    m_robotContainer.getLeftShooterSubsytem().setDefaultCommand( m_robotContainer.getLeftShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
-    m_robotContainer.getRightShooterSubsytem().setDefaultCommand( m_robotContainer.getRightShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
+   // m_robotContainer.getLeftShooterSubsytem().setDefaultCommand( m_robotContainer.getLeftShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
+   // m_robotContainer.getRightShooterSubsytem().setDefaultCommand( m_robotContainer.getRightShooterSubsytem().setSpeed(RotationsPerSecond.of(0)));
   }
 
 }
