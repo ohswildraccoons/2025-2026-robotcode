@@ -37,8 +37,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    mFlex = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    mFlex.set(50);
+    // mFlex = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    // mFlex.set(50);
 
 
     
