@@ -37,6 +37,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -76,21 +77,25 @@ public class RobotContainer {
   private final SwerveSubsystem m_swerveDrive = new SwerveSubsystem();
 
   
-    private final TurretSubsystem m_TurretSubsystemRight = 
-    new TurretSubsystem(TurretConstants.rightTurretMetersX, TurretConstants.rightTurretMetersX, 
-                        TurretSubsystem.TurretSide.RIGHT, Constants.MotorConstants.kRightTurretMotorPort);
-private final TurretSubsystem m_TurretSubsystemLeft = 
+  private final TurretSubsystem m_TurretSubsystemLeft = 
     new TurretSubsystem(TurretConstants.leftTurretMetersX, TurretConstants.leftTurretMetersY, 
                         TurretSubsystem.TurretSide.LEFT, Constants.MotorConstants.kLeftTurretMotorPort);
 
+  private final TurretSubsystem m_TurretSubsystemRight = 
+    new TurretSubsystem(TurretConstants.rightTurretMetersX, TurretConstants.rightTurretMetersX, 
+                        TurretSubsystem.TurretSide.RIGHT, Constants.MotorConstants.kRightTurretMotorPort);
+
+                        
   private final ShooterSubsytem m_ShooterSubsystemLeft = 
     new ShooterSubsytem(Constants.MotorConstants.kLeftShooterMotorPortLeft, Constants.MotorConstants.kLeftShooterMotorPortRight);
+
   private final ShooterSubsytem m_ShooterSubsystemRight = 
     new ShooterSubsytem(Constants.MotorConstants.kRightShooterMotorPortLeft, Constants.MotorConstants.kRightShooterMotorPortRight);
   
 
-  //constant issue// private final ShooterSubsytem m_shooterSubsystem = new ShooterSubsytem(Constants.MotorConstants.kShooterMotorPort, Constants.MotorConstants.kShooterMotorPortTop);
   private final serializerSubsystem m_serializerSubsystem = new serializerSubsystem();
+
+
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   
   
@@ -100,16 +105,17 @@ private final TurretSubsystem m_TurretSubsystemLeft =
   Pose3d robotPose = new Pose3d();
 
   private final SendableChooser<Command> autoChooser;
-  // private final tuna
+  
+
   int isRed;
 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
- private final CommandXboxController m_mechController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort + 1); //TODO: are you sure you want to do it this way? port and port+1 or just hardcode it
 
+   private final CommandXboxController m_mechController = new CommandXboxController(
+      OperatorConstants.kMechControllerPort);
 
 
   /**
@@ -124,6 +130,9 @@ private final TurretSubsystem m_TurretSubsystemLeft =
     SmartDashboard.putData("Auto Chooser", autoChooser);
     // Configure the trigger bindings
     configureBindings();
+
+
+    // Set default commands
 
     m_swerveDrive.setDefaultCommand(
       m_swerveDrive.driveCommand(
@@ -146,17 +155,18 @@ private final TurretSubsystem m_TurretSubsystemLeft =
       )
     );
 
-   // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(0)));
-    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
-    
      m_TurretSubsystemRight.setDefaultCommand(
          m_TurretSubsystemRight.targettingCommand(
            () -> new Pose3d(m_swerveDrive.getPose()),
            m_swerveDrive,
            alliance()
        )
-    
-       );
+    );
+
+
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(0)));
+    // m_ShooterSubsystemLeft.setDefaultCommand(m_ShooterSubsystemLeft.autoSetVelocityOfFire(m_TurretSubsystemLeft.getGhostSupplier(), m_TurretSubsystemLeft.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
+ 
     // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(0)));
     // m_ShooterSubsystemRight.setDefaultCommand(m_ShooterSubsystemRight.autoSetSpeed(m_TurretSubsystemRight.getGhostSupplier(), m_TurretSubsystemRight.getTurretFieldPosSupplier( () -> new Pose3d(m_swerveDrive.getPose()))));
     
@@ -209,7 +219,7 @@ private final TurretSubsystem m_TurretSubsystemLeft =
     m_driverController.leftBumper().onTrue(    
       new SequentialCommandGroup(
         m_IntakeSubsystem.rollRollers(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(90))
+        m_IntakeSubsystem.protectedDeploy(Degrees.of(90), )
       )
     );
 
@@ -229,36 +239,42 @@ private final TurretSubsystem m_TurretSubsystemLeft =
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueLeftDeposit),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.blueLeftDeposit)
         ));
+
       m_mechController.b().whileTrue( new ParallelCommandGroup(
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueRightDeposit),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.blueRightDeposit)
         ));
+
       m_mechController.y().whileTrue(new ParallelCommandGroup(
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.blueHub),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.blueHub)
         ));
+
     }else if (alliance() == Alliance.Red){
       m_mechController.x().whileTrue( new ParallelCommandGroup(
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.redLeftDeposit),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.redLeftDeposit)
         ));
+
       m_mechController.b().whileTrue( new ParallelCommandGroup(
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.redRightDeposit),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.redRightDeposit)
         ));
+
       m_mechController.y().whileTrue(new ParallelCommandGroup(
         m_TurretSubsystemLeft.setManualTarget(FieldConstants.redHub),
         m_TurretSubsystemRight.setManualTarget(FieldConstants.redHub)
         ));
     }
-    m_mechController.a().whileTrue(new ParallelCommandGroup(
-      m_TurretSubsystemLeft.setSplitTarget(alliance()),
-      m_TurretSubsystemRight.setSplitTarget(alliance())
+       m_mechController.a().whileTrue(new ParallelCommandGroup(
+         m_TurretSubsystemLeft.setSplitTarget(alliance()),
+         m_TurretSubsystemRight.setSplitTarget(alliance())
     ));
+
+
     m_mechController.rightBumper().whileTrue(m_serializerSubsystem.runQ());
-      
     
-    
+    m_mechController.rightBumper().onFalse(m_serializerSubsystem.hardStopMotor());
     
     //(new ParallelCommandGroup(
     //  m_TurretSubsystemLeft.setAutoTargettingOn(),
@@ -274,8 +290,6 @@ private final TurretSubsystem m_TurretSubsystemLeft =
     //   ));
 
     
-    
-
   }
 
 

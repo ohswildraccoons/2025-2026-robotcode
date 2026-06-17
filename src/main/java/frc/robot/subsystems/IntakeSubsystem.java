@@ -110,7 +110,6 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
   PivotConfig                m_config         = new PivotConfig(sparkSmartMotorController)
    //   .withSoftLimits(Degrees.of(0.0), Degrees.of(90.0)) // Soft limits for the arm, these will be enforced in code but not by the motor controller
       .withStartingPosition(Degrees.of(0.0)) // Starting position of the Pivot
-      .withWrapping(Degrees.of(0.0), Degrees.of(360.0)) // Wrapping enabled bc the pivot can spin infinitely
       .withHardLimit(Degrees.of(-10.0), Degrees.of(140.0)) // Hard limit bc wiring prevents infinite spinning
       .withTelemetry("intake Pivot", TelemetryVerbosity.HIGH) // Telemetry
       .withMOI(Feet.of(0.25), Pounds.of(15));// MOI Calculation
@@ -131,6 +130,17 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
     });
   }
   
+  public Command protectedDeploy(Angle target, Angle cutoff) {
+    if (arm.getAngle().isNear(target, cutoff))
+    {
+      return arm.set(0.0);
+    }
+    else 
+    { 
+      return arm.setAngle(target);
+    }
+  }
+
   /**
    * Set the angle of the arm, ends the command but does not stop the arm when the arm reaches the setpoint.
    * @ param angle Angle to go to.

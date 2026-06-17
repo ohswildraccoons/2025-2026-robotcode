@@ -42,20 +42,23 @@ SparkMaxConfig serialSepMotorConfig;
 
 
     serialTubeMotor = new SparkMax(Constants.MotorConstants.kIntakeTubeMotorPort, MotorType.kBrushless);
-    serialSepMotor = new SparkMax(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+    serialTubeMotorConfig = new SparkMaxConfig();
+    serialTubeMotorSim = new SparkMaxSim(serialTubeMotor, DCMotor.getNEO(1));
+   
+     serialTubeMotorConfig.idleMode(IdleMode.kBrake);
+     serialTubeMotorConfig.smartCurrentLimit(20);
+      serialTubeMotor.configure(serialTubeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+     
+     serialSepMotor = new SparkMax(Constants.MotorConstants.kIntakeTravellerMotorPort, MotorType.kBrushless);
+     serialSepMotorConfig = new SparkMaxConfig();
+     serialSepMotorSim = new SparkMaxSim(serialSepMotor, DCMotor.getNEO(1));
 
-   serialTubeMotorSim = new SparkMaxSim(serialTubeMotor, DCMotor.getNEO(1));
-   SparkMaxConfig serialTubeMotorConfig = new SparkMaxConfig();
-   serialTubeMotorConfig.idleMode(IdleMode.kBrake);
-   serialTubeMotorConfig.smartCurrentLimit(20);
+     serialSepMotorConfig.idleMode(IdleMode.kBrake);
+     serialSepMotorConfig.smartCurrentLimit(20);
+       serialSepMotor.configure(serialSepMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-   serialSepMotorSim = new SparkMaxSim(serialSepMotor, DCMotor.getNEO(1));
-   SparkMaxConfig serialSepMotorConfig = new SparkMaxConfig();
-   serialSepMotorConfig.idleMode(IdleMode.kBrake);
-   serialSepMotorConfig.smartCurrentLimit(20);
-
-    serialTubeMotor.configure(serialTubeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    serialSepMotor.configure(serialSepMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+   
+   
 
   }
 
@@ -85,7 +88,7 @@ SparkMaxConfig serialSepMotorConfig;
       };    
 
   public Command activateJam(){
-    return runOnce(() -> { jam = !jam; });
+    return runOnce(() -> { jam = !jam; }); // TODO Fix Jam command
   }
 
   public Command hardStopMotor(){

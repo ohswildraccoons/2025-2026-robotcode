@@ -21,6 +21,7 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kMechControllerPort = 1;
   }
   public static class SwerveDriveConstants{
     public static final double maximumSpeed = Units.feetToMeters(15); //TODO is it really 7.5fps? thats low - hs
