@@ -219,7 +219,7 @@ public class RobotContainer {
     m_driverController.leftBumper().onTrue(    
       new SequentialCommandGroup(
         m_IntakeSubsystem.rollRollers(),
-        m_IntakeSubsystem.protectedDeploy(Degrees.of(90), )
+        m_IntakeSubsystem.protectedDeploy(Degrees.of(90), Degrees.of(90)) //TODO work on protectedDeploy deployment angle
       )
     );
 
