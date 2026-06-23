@@ -86,7 +86,7 @@ CurrentLimitsConfigs rollerLimits = new CurrentLimitsConfigs();
    SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig()
   //.withControlMode(ControlMode.CLOSED_LOOP)
   .withSubsystem(this)
-  .withClosedLoopController(2.0,0,0)//0.65, 0.00, 0.0)//
+  .withClosedLoopController(2.5,0.000,0)//0.65, 0.00, 0.0)//
   .withGearing(new MechanismGearing(GearBox.fromReductionStages(5.0,4.0,1.0),Sprocket.fromStages("24:48")))
   .withIdleMode(MotorMode.BRAKE)
   .withMotorInverted(false)

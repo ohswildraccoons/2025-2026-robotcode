@@ -213,20 +213,20 @@ public class RobotContainer {
     m_driverController.rightBumper().onTrue(
       new SequentialCommandGroup(
         m_IntakeSubsystem.stopMotors(),
-        m_IntakeSubsystem.setAngle(() -> Degrees.of(-10)) ////TODO:game day hack (angles)
+        m_IntakeSubsystem.setAngle(() -> Degrees.of(0)) ////TODO:game day hack (angles)
       )
     );
     m_driverController.leftBumper().onTrue(    
       new SequentialCommandGroup(
         m_IntakeSubsystem.rollRollers(),
-        m_IntakeSubsystem.protectedDeploy(Degrees.of(90), Degrees.of(90)) //TODO work on protectedDeploy deployment angle
+        m_IntakeSubsystem.protectedDeploy(Degrees.of(90), Degrees.of(20)) //TODO work on protectedDeploy deployment angle
       )
     );
 
   
     m_mechController.rightTrigger().onTrue(new SequentialCommandGroup(
-      m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(-60)),
-      m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(-60))
+      m_ShooterSubsystemLeft.setSpeed(RotationsPerSecond.of(5000)),
+      m_ShooterSubsystemRight.setSpeed(RotationsPerSecond.of(5000))//TODO maxrpm hs 
       ));
 
     m_mechController.rightTrigger().onFalse(new SequentialCommandGroup(

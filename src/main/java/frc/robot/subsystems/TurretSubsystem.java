@@ -87,7 +87,7 @@ public class TurretSubsystem extends SubsystemBase{
     
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
   .withControlMode(ControlMode.CLOSED_LOOP)
-  .withClosedLoopController(4.3, 0.0, 0.0)
+  .withClosedLoopController(4.5, 0.0, 0.0)
   //.withClosedLoopController(4, 0, 0, DgreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90)) Profiled PID breaks the thing?! - hs 20JAN
 //  .withSimClosedLoopController(4.0, 0, 0, DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
   // Configure Motor and Mechanism properties
